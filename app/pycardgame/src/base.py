@@ -39,11 +39,11 @@ class Card:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def get_suit(self, index=False):
-        return self.suit if index else Card.suit_names[self.suit]
+    def get_suit(self, as_index=False):
+        return self.suit if as_index else Card.suit_names[self.suit]
 
-    def get_rank(self, index=False):
-        return self.rank if index else Card.rank_names[self.rank]
+    def get_rank(self, as_index=False):
+        return self.rank if as_index else Card.rank_names[self.rank]
 
     def __str__(self):
         return f"{Card.rank_names[self.rank]} of {Card.suit_names[self.suit]}{' (trump)' if self.trump else ''}"
@@ -91,10 +91,13 @@ class Deck:
         else:
             raise TypeError("Argument must be of type Card, int, or str")
 
+    def sort(self, by="suit"):
+        self.cards.sort(key=lambda c: (c.suit, c.rank) if by == "suit" else lambda c: (c.rank, c.suit))
+        return self
+
     def shuffle(self): random.shuffle(self.cards); return self
-    def draw(self): return self.cards.pop()
+    def draw(self, n=1): return [self.cards.pop() for _ in range(n)] if n > 1 else self.cards.pop()
     def add(self, card): self.cards.append(card); return self
-    def sort(self): self.cards.sort(); return self
     def get_index(self, card): return [i for i, c in enumerate(self.cards) if c == card]
     def get_cards(self): return self.cards
 

@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 
 class Card:
     """
@@ -40,17 +42,17 @@ class Card:
         self.suit: int = suit
         self.trump: bool = trump
 
-    def get_suit(self, index: bool = False) -> int | str:
+    def get_suit(self, as_index: bool = False) -> int | str:
         """
         Return the suit of the card.
-        :param index: If True, return the index of the suit.
+        :param as_index: If True, return the index of the suit.
         """
         pass
 
-    def get_rank(self, index: bool = False) -> int | str:
+    def get_rank(self, as_index: bool = False) -> int | str:
         """
         Return the rank of the card.
-        :param index: If True, return the index of the rank.
+        :param as_index: If True, return the index of the rank.
         """
         pass
 
@@ -73,33 +75,10 @@ class Deck:
         """
         self.cards: list[Card] = cards
 
-    def shuffle(self) -> Deck:
-        """Shuffle the deck."""
-        pass
-
-    def draw(self) -> Card:
-        """Draw a card from the deck."""
-        pass
-
-    def add(self, card: Card) -> Deck:
-        """
-        Add a card to the end of deck.
-        :param card: The card to add to the deck.
-        """
-        pass
-
     def reset(self) -> Deck:
-        """Reset the deck to a new deck of cards."""
-        pass
-
-    def sort(self) -> Deck:
-        """Sorts and returns the deck."""
-        pass
-
-    def get_index(self, card: Card) -> list[int]:
         """
-        Return the indices of all occurrences of a card in the deck.
-        :param card: The card to search for.
+        Reset the deck to a new deck of cards.
+        :return: The deck with a new set of cards.
         """
         pass
 
@@ -107,11 +86,54 @@ class Deck:
         """
         Return the number of occurrences of a card, suit, or rank in the deck.
         :param card: The card, suit, or rank to count.
+        :return: The number of occurrences of the card, suit, or rank in the deck.
+        """
+        pass
+
+    def sort(self, by: Literal["suit", "rank"] = "suit") -> Deck:
+        """
+        Sorts and returns the deck.
+        :param by: The attribute to sort by.
+        :return: The sorted deck.
+        """
+        pass
+
+    def shuffle(self) -> Deck:
+        """
+        Shuffle the deck.
+        :return: The shuffled deck.
+        """
+        pass
+
+    def draw(self, n: int = 1) -> Card | list[Card]:
+        """
+        Draw `n` cards from the deck.
+        :param n: The number of cards to draw.
+        :return: A single card if `n` is 1, otherwise a list of cards.
+        """
+        pass
+
+    def add(self, card: Card) -> Deck:
+        """
+        Add a card to the end of deck.
+        :param card: The card to add to the deck.
+        :return: The deck with the card added.
+        """
+        pass
+
+    def get_index(self, card: Card) -> list[int]:
+        """
+        Return the indices of all occurrences of a card in the deck.
+        :param card: The card to search for.
+        :return: A list of indices of the card in the deck
         """
         pass
 
     def get_cards(self) -> list[Card]:
-        """Return the list of cards in the deck."""
+        """
+        Return the list of cards in the deck.
+        :return: The list of cards in the deck.
+        """
         pass
 
     def __getitem__(self, index) -> Card: ...

@@ -13,3 +13,31 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+from setuptools import setup, find_packages
+
+with open("app/README.md", "r") as file:
+    long_description = file.read()
+
+setup(
+    name="pycardgame",
+    version="0.1.0",
+    description="A base library for creating card games in Python",
+    package_dir={ "": "app" },
+    packages=find_packages(where="app"),
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/Popa-42/pycardgame",
+    author="Popa",
+    author_email="115492561+Popa-42@users.noreply.github.com",
+    license="GPL-3.0",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
+    ],
+    extras_require={
+        "dev": ["pytest>=7.0", "twine>=4.0.2"]
+    },
+    python_requires=">=3.8",
+)
