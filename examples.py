@@ -24,8 +24,8 @@ Card.rank_names = ["7", "8", "9", "10", "Esquire", "Knight", "King", "Ace"]
 card1 = Card(2, 2)
 card2 = Card("Ace", "Golds")
 
-print(f"card1 = {card1}")
-print(f"card1 = {card2}\n")
+print(f"card1 = {repr(card1)}")
+print(f"card1 = {repr(card2)}\n")
 
 print(f"{card1 < card2 = }")
 print(f"{card1 > card2 = }")
@@ -34,7 +34,7 @@ print(f"card1 != card2 = {card1 != card2}")
 print(f"{card1 <= card2 = }")
 print(f"{card1 >= card2 = }\n\n")
 
-deck = Deck().shuffle()
+deck = Deck().add(Card(None, None, joker=True), Card(None, None, joker=True)).shuffle()
 print(deck)  # Same effect as print(str(deck))
 print(repr(deck))  # Will print the object representation! (evaluable)
 

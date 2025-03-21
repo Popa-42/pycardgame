@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Literal, Iterator
+from typing import Literal, Iterator, Iterable
 
 from .types import Suit, Rank
 
@@ -32,7 +32,7 @@ class Card:
     suit_names: list[Suit | str]
     rank_names: list[Rank | str]
 
-    def __init__(self, rank: int | str, suit: int | str, trump: bool = False, **kwargs) -> None:
+    def __init__(self, rank: int | str | None, suit: int | str | None, trump: bool = False, **kwargs) -> None:
         """
         Initialize a card with a rank, suit, and trump status.
         :param rank: The rank of the card.
@@ -40,8 +40,8 @@ class Card:
         :param trump: Whether the card is a trump card.
         :param kwargs: Additional attributes for the card.
         """
-        self.rank: int = ...
-        self.suit: int = ...
+        self.rank: int | None = ...
+        self.suit: int | None = ...
         self.trump: bool = ...
 
     def get_suit(self, as_index: bool = False) -> int | str:
@@ -69,7 +69,10 @@ class Card:
 
 
 class Deck:
-    """A deck of cards."""
+    """
+    A deck of cards.
+    :param cards: A list of cards to initialize the deck with.
+    """
     def __init__(self, cards: list[Card] = None) -> None:
         """
         Initialize the deck with a list of cards.
@@ -115,11 +118,18 @@ class Deck:
         """
         pass
 
-    def add(self, card: Card) -> Deck:
+    def add(self, *cards: Card) -> Deck:
         """
         Add a card to the end of deck.
-        :param card: The card to add to the deck.
+        :param cards: The cards to add to the deck.
         :return: The deck with the card added.
+        """
+        pass
+
+    def remove(self, card: Card) -> None:
+        """
+        Remove a card from the deck.
+        :param card: The card to remove from the deck.
         """
         pass
 
