@@ -16,14 +16,14 @@
 
 from setuptools import setup, find_packages
 
-with open("app/README.md", "r") as file:
+with open("README.md", "r") as file:
     long_description = file.read()
 
 setup(
     name="pycardgame",
-    version="0.1.0",
+    version="0.1.2",
     description="A base library for creating card games in Python",
-    package_dir={ "": "app" },
+    package_dir={"": "app"},
     packages=find_packages(where="app"),
     long_description=long_description,
     long_description_content_type="text/markdown",

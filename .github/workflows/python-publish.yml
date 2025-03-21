@@ -1,0 +1,102 @@
+name: Publish to TestPyPI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+env:
+  INCREMENT_VERSION: "PATCH"  # Options: PATCH, MINOR, MAJOR
+  SKIP_VERSION_BUMP: "false"  # Set to "true" to skip version bumping
+  SKIP_DEPLOYMENT: "false"  # Set to "true" to skip deployment
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch all tags
+        run: git fetch --tags
+
+      - name: Determine current version
+        id: get_version
+        run: |
+          # Determine the latest version tag
+          current=$(git tag --list "v*" --sort=-version:refname | head -n 1)
+          if [ -z "$current" ]; then
+            echo "No version tag found. Starting from 0.1.0"
+            current="0.1.0"
+          else
+            # Remove the leading "v" from the version tag
+            current="${current#v}"
+          fi
+          echo "current_version=$current" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: bump_version
+        run: |
+          current="${{ steps.get_version.outputs.current_version }}"
+          IFS='.' read -r major minor patch <<< "$current"
+          if [ "${{ env.SKIP_VERSION_BUMP }}" = "true" ]; then
+            timestamp=$(date +%Y%m%d%H%M%S)
+            new_version="${current}-${timestamp}"
+          else
+            case "${{ env.INCREMENT_VERSION }}" in
+              MINOR)
+                minor=$((minor+1))
+                patch=0
+                new_version="${major}.${minor}.${patch}"
+                ;;
+              MAJOR)
+                major=$((major+1))
+                minor=0
+                patch=0
+                new_version="${major}.${minor}.${patch}"
+                ;;
+              *)
+                patch=$((patch+1))
+                new_version="${major}.${minor}.${patch}"
+                ;;
+            esac
+          fi
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Create and push Git tag
+        if: ${{ env.SKIP_VERSION_BUMP != 'true' }}
+        run: |
+          new_version="${{ steps.bump_version.outputs.new_version }}"
+          echo "Creating git tag v$new_version"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "v$new_version"
+          git push origin "v$new_version"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: versioning
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download artifacts (if any)
+        if: ${{ env.SKIP_DEPLOYMENT != 'true' }}
+        # If you have any artifacts to download, you can do it here
+        run: echo "No artifacts to download in this example"
+      - name: Setup Python and build package
+        if: ${{ env.SKIP_DEPLOYMENT != 'true' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install build tools and build distribution
+        if: ${{ env.SKIP_DEPLOYMENT != 'true' }}
+        run: |
+            python -m pip install --upgrade build
+            python -m build
+      - name: Publish to TestPyPI
+        if: ${{ env.SKIP_DEPLOYMENT != 'true' }}
+        env:
+          TWINE_USERNAME: "__token__"
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
+          python -m pip install --upgrade twine
+          twine upload --verbose --repository-url https://test.pypi.org/legacy/ dist/*
