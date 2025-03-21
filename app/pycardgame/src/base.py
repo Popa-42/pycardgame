@@ -24,15 +24,11 @@ class Card:
     rank_names = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
 
     def __init__(self, rank, suit, trump=False, **kwargs):
-        if type(suit) is str:
-            try: suit = Card.suit_names.index(suit)
-            except ValueError: raise ValueError(f"Invalid suit name: {suit}")
-        if type(rank) is str:
-            try: rank = Card.rank_names.index(rank)
-            except ValueError: raise ValueError(f"Invalid rank name: {rank}")
+        if type(rank) is str and not rank in Card.rank_names: raise ValueError(f"Invalid rank name: {rank}")
+        if type(suit) is str and not suit in Card.suit_names: raise ValueError(f"Invalid suit name: {suit}")
 
-        self.rank = rank
-        self.suit = suit
+        self.rank = rank if type(rank) is int else Card.rank_names.index(rank)
+        self.suit = suit if type(suit) is int else Card.suit_names.index(suit)
         self.trump = trump
 
         # Set any additional attributes
@@ -77,22 +73,20 @@ class Deck:
     def count(self, card):
         if isinstance(card, Card):
             return self.cards.count(card)
-        elif isinstance(card, int):
-            return sum(1 for c in self.cards if c.rank == card or c.suit == card)
         elif isinstance(card, str):
             if card in Card.rank_names:
-                rank_index = Card.rank_names.index(card)
-                return sum(1 for c in self.cards if c.rank == rank_index)
+                return sum(1 for c in self.cards if c.get_rank() == card)
             elif card in Card.suit_names:
-                suit_index = Card.suit_names.index(card)
-                return sum(1 for c in self.cards if c.suit == suit_index)
+                return sum(1 for c in self.cards if c.get_suit() == card)
             else:
-                raise ValueError(f"Invalid rank or suit name: {card}")
+                raise ValueError("Invalid card name: must be a rank or suit name")
         else:
-            raise TypeError("Argument must be of type Card, int, or str")
+            raise ValueError("Invalid card type: must be a Card object, a suit, or a rank")
 
     def sort(self, by="suit"):
-        self.cards.sort(key=lambda c: (c.suit, c.rank) if by == "suit" else lambda c: (c.rank, c.suit))
+        if by == "rank": self.cards.sort(key=lambda c: (not c.trump, c.rank, c.suit))
+        elif by == "suit": self.cards.sort()
+        else: raise ValueError("Invalid sort key: must be 'rank' or 'suit'")
         return self
 
     def shuffle(self): random.shuffle(self.cards); return self

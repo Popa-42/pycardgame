@@ -16,7 +16,9 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Iterator
+
+from .types import Suit, Rank
 
 
 class Card:
@@ -27,8 +29,8 @@ class Card:
     :param trump: Whether the card is a trump card.
     """
 
-    suit_names: list[str]
-    rank_names: list[str]
+    suit_names: list[Suit | str]
+    rank_names: list[Rank | str]
 
     def __init__(self, rank: int | str, suit: int | str, trump: bool = False, **kwargs) -> None:
         """
@@ -38,9 +40,9 @@ class Card:
         :param trump: Whether the card is a trump card.
         :param kwargs: Additional attributes for the card.
         """
-        self.rank: int = rank
-        self.suit: int = suit
-        self.trump: bool = trump
+        self.rank: int = ...
+        self.suit: int = ...
+        self.trump: bool = ...
 
     def get_suit(self, as_index: bool = False) -> int | str:
         """
@@ -82,7 +84,7 @@ class Deck:
         """
         pass
 
-    def count(self, card: Card | int | str) -> int:
+    def count(self, card: Card | Suit | Rank | str) -> int:
         """
         Return the number of occurrences of a card, suit, or rank in the deck.
         :param card: The card, suit, or rank to count.
@@ -140,4 +142,4 @@ class Deck:
     def __len__(self) -> int: ...
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
-    def __iter__(self) -> iter: ...
+    def __iter__(self) -> Iterator[Card]: ...

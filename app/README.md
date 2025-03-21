@@ -45,7 +45,7 @@ print(card2)  # Output: Ace of Hearts
 
 - `get_suit(as_index=False)`: Returns the suit of the card. If `as_index` is `True`, returns the index of the suit.
 - `get_rank(as_index=False)`: Returns the rank of the card. If `as_index` is `True`, returns the index of the rank.
-- Comparison operators: <, <=, ==, !=, >=, >. Cards are compared first based on their suit and then on their rank.
+- Comparison operators: `<`, `<=`, `==`, `!=`, `>=`, `>`. Cards are compared first based on their suit and then on their rank.
 
 **Example:**
 

@@ -17,8 +17,12 @@
 
 from app.pycardgame import *
 
-card1 = Card(2, 1)
-card2 = Card("Ace", "Hearts")
+# Set the suit and rank names
+Card.suit_names = ["Cups", "Golds", "Clubs", "Swords"]
+Card.rank_names = ["7", "8", "9", "10", "Esquire", "Knight", "King", "Ace"]
+
+card1 = Card(2, 2)
+card2 = Card("Ace", "Golds")
 
 print(f"card1 = {card1}")
 print(f"card1 = {card2}\n")
@@ -35,8 +39,8 @@ print(deck)  # Same effect as print(str(deck))
 print(repr(deck))  # Will print the object representation! (evaluable)
 
 for card in deck:
-    # Make all Diamonds trumps
-    if card.get_suit() == "Diamonds":
+    # Make all Golds trumps
+    if card.get_suit(as_index=True) == 1:
         card.trump = True
     print("-", card)
 print()
