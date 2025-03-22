@@ -20,27 +20,19 @@ import random
 
 
 class Card:
-    suit_names = ["Clubs", "Diamonds", "Hearts", "Spades"]
+    # Ascending order of suits and ranks
     rank_names = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+    suit_names = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
     def __init__(self, rank, suit, trump=False, **kwargs):
-        if rank is not None:
-            if isinstance(rank, str):
-                if rank not in Card.rank_names:
-                    raise ValueError(f"Invalid rank name: {rank}")
-                rank = Card.rank_names.index(rank)
-            elif not isinstance(rank, int):
-                raise ValueError("Rank must be None, an int, or a valid rank name")
-        if suit is not None:
-            if isinstance(suit, str):
-                if suit not in Card.suit_names:
-                    raise ValueError(f"Invalid suit name: {suit}")
-                suit = Card.suit_names.index(suit)
-            elif not isinstance(suit, int):
-                raise ValueError("Suit must be None, an int, or a valid suit name")
+        self.rank = None
+        self.suit = None
 
-        self.rank = rank
-        self.suit = suit
+        if rank is not None:
+            self.set_rank(rank)
+        if suit is not None:
+            self.set_suit(suit)
+
         self.trump = trump
 
         # Set any additional attributes
@@ -52,10 +44,37 @@ class Card:
             return None
         return self.suit if as_index else Card.suit_names[self.suit]
 
+    def set_suit(self, suit):
+        if isinstance(suit, str):
+            if suit not in Card.suit_names:
+                raise ValueError(f"Invalid suit name: {suit}")
+            suit = Card.suit_names.index(suit)
+        elif not isinstance(suit, int):
+            raise ValueError("Suit must be None, an int, or a valid suit name")
+        self.suit = suit
+        return self
+
     def get_rank(self, as_index=False):
         if self.rank is None:
             return None
         return self.rank if as_index else Card.rank_names[self.rank]
+
+    def set_rank(self, rank):
+        if isinstance(rank, str):
+            if rank not in Card.rank_names:
+                raise ValueError(f"Invalid rank name: {rank}")
+            rank = Card.rank_names.index(rank)
+        elif not isinstance(rank, int):
+            raise ValueError("Rank must be None, an int, or a valid rank name")
+        self.rank = rank
+        return self
+
+    def get_trump(self):
+        return self.trump
+
+    def set_trump(self, trump):
+        self.trump = trump
+        return self
 
     def __str__(self):
         rank_str = Card.rank_names[self.rank] if self.rank is not None else "None"
@@ -63,10 +82,10 @@ class Card:
         return f"{rank_str} of {suit_str}{' (trump)' if self.trump else ''}"
 
     def __repr__(self):
-        additional = ", ".join(f"{k}={v}" for k, v in self.__dict__.items() if k not in ("rank", "suit", "trump"))
-        return (f"{self.__class__.__name__}(rank={self.rank}, suit={self.suit}"
+        additional = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items() if k not in ("rank", "suit", "trump"))
+        return (f"{self.__class__.__name__}(rank={self.rank!r}, suit={self.suit!r}"
                 f"{', trump=True' if self.trump else ''}"
-                f"{', ' + additional if additional else ''})")
+                f"{f', {additional}' if additional else ''})")
 
     def __lt__(self, other):
         if self.trump and not other.trump:
@@ -125,7 +144,7 @@ class Deck:
         return self
 
     def draw(self, n=1):
-        return [self.cards.pop(0) for _ in range(n)] if n > 1 else self.cards.pop(0)
+        return [self.cards.pop(0) for _ in range(n)]
 
     def add(self, *cards):
         self.cards.extend(cards)
@@ -140,8 +159,11 @@ class Deck:
     def get_cards(self):
         return self.cards
 
+    def get_top_card(self):
+        return self.cards[-1] if self.cards else None
+
     def __getitem__(self, index): return self.cards[index]
     def __len__(self): return len(self.cards)
     def __str__(self): return f"Deck of {len(self)} cards.{f' Top card: {self[0]}' if len(self) else ''}"
-    def __repr__(self): return f"{self.__class__.__name__}(cards={self.cards})"
+    def __repr__(self): return f"{self.__class__.__name__}(cards={self.cards!r})"
     def __iter__(self): return iter(self.cards)

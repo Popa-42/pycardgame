@@ -17,9 +17,9 @@
 
 from app.pycardgame import *
 
-# Set the suit and rank names
-Card.suit_names = ["Cups", "Golds", "Clubs", "Swords"]
+# Set the rank and suit names
 Card.rank_names = ["7", "8", "9", "10", "Esquire", "Knight", "King", "Ace"]
+Card.suit_names = ["Cups", "Golds", "Clubs", "Swords"]
 
 card1 = Card(2, 2)
 card2 = Card("Ace", "Golds")
@@ -48,3 +48,23 @@ print()
 deck.sort()
 for card in deck:
     print("-", card)
+print()
+
+# Create a few players
+player1 = Player("Alice")
+player2 = Player("Bob")
+player3 = Player("Charlie")
+
+# Create a new game with the players
+game = Game(deck.shuffle(), "Cups", 4, player1, player2, player3)
+print(game)
+print(repr(game), "\n")
+
+print(str(game.deal().get_current_player()) + ":")
+[print(c) for c in game.get_current_player().get_hand()]
+print()
+
+game.play(game.get_current_player(), game.get_current_player().get_hand()[0])
+print(str(game.get_current_player()) + ":")
+[print(c) for c in game.get_current_player().get_hand()]
+print("Discard Pile:", game.discard_pile)
