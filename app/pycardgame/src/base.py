@@ -20,8 +20,9 @@ import random
 
 
 class Card:
-    suit_names = ["Clubs", "Diamonds", "Hearts", "Spades"]
+    # Ascending order of suits and ranks
     rank_names = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+    suit_names = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
     def __init__(self, rank, suit, trump=False, **kwargs):
         self.rank = None

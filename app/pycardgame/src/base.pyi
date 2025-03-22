@@ -29,16 +29,17 @@ class Card:
     :param trump: Whether the card is a trump card.
     """
 
-    suit_names: list[Suit | str]
     rank_names: list[Rank | str]
+    suit_names: list[Suit | str]
 
     def __init__(self, rank: Rank | int | str | None, suit: Suit | int | str | None, trump: bool = False, **kwargs) -> None:
         """
-        Initialize a card with a rank, suit, and trump status.
-        :param rank: The rank of the card.
-        :param suit: The suit of the card.
+        Creates a new card instance.
+        :param rank: The card’s rank, provided either as a string (e.g., `"Ace"`) or an integer index.
+        :param suit: The card’s suit, provided either as a string (e.g., `"Hearts"`) or an integer index.
         :param trump: Whether the card is a trump card.
-        :param kwargs: Additional attributes for the card.
+        :param kwargs: Additional attributes to set on the card.
+        :raise ValueError: If the given rank or suit is not found or the index is out of range.
         """
         self.rank: int | None = ...
         self.suit: int | None = ...
@@ -46,37 +47,42 @@ class Card:
 
     def get_suit(self, as_index: bool = False) -> Suit | int | str:
         """
-        Return the suit of the card.
-        :param as_index: If True, return the index of the suit.
+        Returns the card’s suit.
+        :param as_index: If `True`, returns the suit as an integer index; otherwise, as a string.
+        :return: The suit of the card.
         """
         pass
 
     def set_suit(self, suit: Suit | int | str) -> Card:
         """
-        Set the suit of the card.
+        Sets the card’s suit. Accepts a suit name or an integer index.
         :param suit: The suit to set.
-        :return: The card with the suit set.
+        :return: The card instance with the updated suit.
+        :raise ValueError: If the given string is not found in `suit_names` or the index is out of range.
         """
         pass
 
     def get_rank(self, as_index: bool = False) -> Rank | int | str:
         """
-        Return the rank of the card.
-        :param as_index: If True, return the index of the rank.
+        Returns the card’s rank.
+        :param as_index: If `True`, the rank is returned as an integer index; otherwise, as a string.
+        :return: The rank of the card.
         """
         pass
 
     def set_rank(self, rank: Rank | int | str) -> Card:
         """
-        Set the rank of the card.
+        Sets the card’s rank. Accepts a rank name or an integer index.
         :param rank: The rank to set.
         :return: The card with the rank set.
+        :raise ValueError: If the given string is not found in `rank_names` or the index is out of range.
         """
         pass
 
     def get_trump(self) -> bool:
         """
-        Return whether the card is a trump card.
+        Returns whether the card is marked as a trump card.
+        :return: `True` if the card is a trump card; otherwise, `False`.
         """
         pass
 

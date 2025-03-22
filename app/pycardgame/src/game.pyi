@@ -163,11 +163,11 @@ class Game:
         """
         pass
 
-    def deal(self, num_cards: int = 1, player: Player = None) -> Game:
+    def deal(self, num_cards: int = 1, *players: Player) -> Game:
         """
         Deal cards to a player in the game.
-        :param num_cards: The number of cards to deal.
-        :param player: The player to deal the cards to. If not provided, the current player will be dealt to.
+        :param num_cards: The number of cards to deal. Default is 1.
+        :param players: The players to deal the cards to. If not provided, the current player will be dealt to.
         :return: The game object.
         """
         pass

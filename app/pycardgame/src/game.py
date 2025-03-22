@@ -108,9 +108,10 @@ class Game:
             self.players.remove(player)
         return self
 
-    def deal(self, num_cards=1, player=None):
-        player = player or self.get_current_player()
-        player.add_card(*self.deck.draw(num_cards))
+    def deal(self, num_cards=1, *players):
+        players = players or [self.get_current_player()]
+        for player in players:
+            player.add_card(*self.deck.draw(num_cards))
         return self
 
     def shuffle(self):

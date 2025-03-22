@@ -34,18 +34,24 @@ trump card.
 ```python
 from pycardgame import Card
 
-card1 = Card(2, 1)
-card2 = Card("Ace", "Hearts")
+print(Card.suit_names)  # Output: ["Clubs", "Diamonds", "Hearts", "Spades"]
+print(Card.rank_names)  # Output: ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
 
-print(card1)  # Output: 3 of Diamonds
-print(card2)  # Output: Ace of Hearts
+card1 = Card(12, 1)
+card2 = Card("4", "Hearts")
+card3 = Card(9, "Hearts")
+card4 = Card("Jack", 2)
+
+print(card1)  # Output: Ace of Diamonds
+print(card2)  # Output: 4 of Hearts
+print(card3)  # Output: Jack of Hearts
+print(card4)  # Output: Jack of Hearts
+
+# Compare cards
+print(card1 < card2)  # Output: True => Diamonds < Hearts
+print(card2 >= card3)  # Output: False => 4 < Jack
+print(card3 == card4)  # Output: True => Jack of Hearts == Jack of Hearts
 ```
-
-#### Class methods
-
-- `get_suit(as_index=False)`: Returns the suit of the card. If `as_index` is `True`, returns the index of the suit.
-- `get_rank(as_index=False)`: Returns the rank of the card. If `as_index` is `True`, returns the index of the rank.
-- Comparison operators: `<`, `<=`, `==`, `!=`, `>=`, `>`. Cards are compared first based on their suit and then on their rank.
 
 **Example:**
 
@@ -90,14 +96,7 @@ print(card)  # Output: (random card from the deck)
 **Example:**
 
 ```python
-from pycardgame import Card, Deck
-
-# Create cards
-card1 = Card(2, 1)
-card2 = Card("Ace", "Hearts")
-
-# Compare cards
-print(card1 < card2)  # Output: True or False
+from pycardgame import Deck
 
 # Create and shuffle deck
 deck = Deck().shuffle()
