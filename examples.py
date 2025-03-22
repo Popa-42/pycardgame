@@ -48,3 +48,23 @@ print()
 deck.sort()
 for card in deck:
     print("-", card)
+print()
+
+# Create a few players
+player1 = Player("Alice")
+player2 = Player("Bob")
+player3 = Player("Charlie")
+
+# Create a new game with the players
+game = Game(deck.shuffle(), "Cups", 4, player1, player2, player3)
+print(game)
+print(repr(game), "\n")
+
+print(str(game.deal(num_cards=1).get_current_player()) + ":")
+[print(c) for c in game.get_current_player().get_hand()]
+print()
+
+game.play(game.get_current_player(), game.get_current_player().get_hand()[0])
+print(str(game.get_current_player()) + ":")
+[print(c) for c in game.get_current_player().get_hand()]
+print("Discard Pile:", game.discard_pile)
