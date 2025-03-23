@@ -148,8 +148,8 @@ class Deck:
     def sort(self, by="suit"):
         if by == "rank":
             self.cards.sort(key=lambda c: (
-            not c.trump, c.rank if c.rank is not None else -1,
-            c.suit if c.suit is not None else -1))
+                not c.trump, c.rank if c.rank is not None else -1,
+                c.suit if c.suit is not None else -1))
         elif by == "suit":
             self.cards.sort()
         else:
