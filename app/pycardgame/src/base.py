@@ -21,7 +21,8 @@ import random
 
 class Card:
     # Ascending order of suits and ranks
-    rank_names = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+    rank_names = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen",
+                  "King", "Ace"]
     suit_names = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
     def __init__(self, rank, suit, trump=False, **kwargs):
@@ -51,6 +52,8 @@ class Card:
             suit = Card.suit_names.index(suit)
         elif not isinstance(suit, int):
             raise ValueError("Suit must be None, an int, or a valid suit name")
+        if suit < 0 or suit >= len(Card.suit_names):
+            raise ValueError(f"Invalid suit index: {suit}")
         self.suit = suit
         return self
 
@@ -66,6 +69,8 @@ class Card:
             rank = Card.rank_names.index(rank)
         elif not isinstance(rank, int):
             raise ValueError("Rank must be None, an int, or a valid rank name")
+        if rank < 0 or rank >= len(Card.rank_names):
+            raise ValueError(f"Invalid rank index: {rank}")
         self.rank = rank
         return self
 
@@ -77,14 +82,17 @@ class Card:
         return self
 
     def __str__(self):
-        rank_str = Card.rank_names[self.rank] if self.rank is not None else "None"
-        suit_str = Card.suit_names[self.suit] if self.suit is not None else "None"
+        rank_str = Card.rank_names[self.rank] if self.rank is not None \
+            else "None"
+        suit_str = Card.suit_names[self.suit] if self.suit is not None \
+            else "None"
         return f"{rank_str} of {suit_str}{' (trump)' if self.trump else ''}"
 
     def __repr__(self):
-        additional = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items() if k not in ("rank", "suit", "trump"))
-        return (f"{self.__class__.__name__}(rank={self.rank!r}, suit={self.suit!r}"
-                f"{', trump=True' if self.trump else ''}"
+        additional = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items()
+                               if k not in ("rank", "suit", "trump"))
+        return (f"{self.__class__.__name__}(rank={self.rank!r}, "
+                f"suit={self.suit!r}{', trump=True' if self.trump else ''}"
                 f"{f', {additional}' if additional else ''})")
 
     def __lt__(self, other):
@@ -99,8 +107,12 @@ class Card:
         rank2 = other.rank if other.rank is not None else -1
         return (suit1, rank1) < (suit2, rank2)
 
-    def __eq__(self, other): return self.suit == other.suit and self.rank == other.rank
-    def __gt__(self, other): return not self.__lt__(other) and not self.__eq__(other)
+    def __eq__(self, other):
+        return self.suit == other.suit and self.rank == other.rank
+
+    def __gt__(self, other):
+        return not self.__lt__(other) and not self.__eq__(other)
+
     def __le__(self, other): return not self.__gt__(other)
     def __ge__(self, other): return not self.__lt__(other)
     def __ne__(self, other): return not self.__eq__(other)
@@ -114,7 +126,8 @@ class Deck:
             self.cards = cards
 
     def reset(self):
-        self.cards = [Card(rank, suit) for suit in range(len(Card.suit_names)) for rank in range(len(Card.rank_names))]
+        self.cards = [Card(rank, suit) for suit in range(len(Card.suit_names))
+                      for rank in range(len(Card.rank_names))]
         return self.sort()
 
     def count(self, card):
@@ -126,13 +139,17 @@ class Deck:
             elif card in Card.suit_names:
                 return sum(1 for c in self.cards if c.get_suit() == card)
             else:
-                raise ValueError("Invalid card name: must be a rank or suit name")
+                raise ValueError(
+                    "Invalid card name: must be a rank or suit name")
         else:
-            raise ValueError("Invalid card type: must be a Card object, a suit, or a rank")
+            raise ValueError(
+                "Invalid card type: must be a Card object, a suit, or a rank")
 
     def sort(self, by="suit"):
         if by == "rank":
-            self.cards.sort(key=lambda c: (not c.trump, c.rank if c.rank is not None else -1, c.suit if c.suit is not None else -1))
+            self.cards.sort(key=lambda c: (
+                not c.trump, c.rank if c.rank is not None else -1,
+                c.suit if c.suit is not None else -1))
         elif by == "suit":
             self.cards.sort()
         else:
@@ -150,8 +167,10 @@ class Deck:
         self.cards.extend(cards)
         return self
 
-    def remove(self, card):
-        self.cards.remove(card)
+    def remove(self, *cards):
+        for card in cards:
+            self.cards.remove(card)
+        return self
 
     def get_index(self, card):
         return [i for i, c in enumerate(self.cards) if c == card]
@@ -162,8 +181,14 @@ class Deck:
     def get_top_card(self):
         return self.cards[-1] if self.cards else None
 
-    def __getitem__(self, index): return self.cards[index]
+    def __repr__(self):
+        return f"{self.__class__.__name__}(cards={self.cards!r})"
+
+    def __str__(self):
+        deck_string = f"Deck of {len(self)} cards."
+        top_card = f" Top card: {self[0]}" if self.cards else ""
+        return deck_string + top_card
+
+    def __getitem__(self, key): return self.cards[key]
     def __len__(self): return len(self.cards)
-    def __str__(self): return f"Deck of {len(self)} cards.{f' Top card: {self[0]}' if len(self) else ''}"
-    def __repr__(self): return f"{self.__class__.__name__}(cards={self.cards!r})"
     def __iter__(self): return iter(self.cards)

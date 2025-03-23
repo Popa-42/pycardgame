@@ -9,8 +9,8 @@ on:
 
 env:
   INCREMENT_VERSION: "PATCH"  # Options: PATCH, MINOR, MAJOR
-  SKIP_VERSION_BUMP: "true"  # Set to "true" to skip version bumping
-  SKIP_DEPLOYMENT: "true"  # Set to "true" to skip deployment
+  SKIP_VERSION_BUMP: "false"  # Set to "true" to skip version bumping
+  SKIP_DEPLOYMENT: "false"  # Set to "true" to skip deployment
 
 jobs:
   versioning:

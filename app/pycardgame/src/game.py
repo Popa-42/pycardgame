@@ -59,11 +59,14 @@ class Player:
         self.name = name
         return self
 
-    def __str__(self): return f"Player {self.name} ({len(self.hand)} cards)"
+    def __str__(self):
+        return f"Player {self.name} ({len(self.hand)} cards)"
 
     def __repr__(self):
-        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items() if k not in ["name", "hand", "score"])
-        return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r}, score={self.score!r}"
+        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
+                               if k not in ["name", "hand", "score"])
+        return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r}, "
+                f"score={self.score!r}"
                 f"{f', {additional}' if additional else ''})")
 
     def __eq__(self, other): return self.score == other.score
@@ -157,11 +160,13 @@ class Game:
         self.deck = deck
         return self
 
-    def __str__(self): return f"Game of {len(self.players)} players"
+    def __str__(self):
+        return f"Game of {len(self.players)} players"
 
     def __repr__(self):
-        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items() if k not in [
-            "deck", "discard_pile", "players", "current_player_index"
-        ])
-        return (f"{self.__class__.__name__}({self.deck!r}, trump={self.trump!r}, hand_size={self.hand_size!r}"
+        keys = ["deck", "discard_pile", "players", "current_player_index"]
+        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
+                               if k not in keys)
+        return (f"{self.__class__.__name__}({self.deck!r}, "
+                f"trump={self.trump!r}, hand_size={self.hand_size!r}"
                 f"{f', {additional}' if additional else ''})")
