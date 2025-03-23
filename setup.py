@@ -21,7 +21,7 @@ with open("README.md", "r") as file:
 
 setup(
     name="pycardgame",
-    version="0.1.3",
+    version="0.1.4",
     description="A base library for creating card games in Python",
     package_dir={"": "app"},
     packages=find_packages(where="app"),
