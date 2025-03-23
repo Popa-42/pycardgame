@@ -109,23 +109,25 @@ class Deck:
     """
     def __init__(self, cards: list[Card] = None) -> None:
         """
-        Initialize the deck with a list of cards.
-        :param cards: A list of cards to initialize the deck with.
+        Creates a new deck instance.
+        :param cards: A custom list of `Card` objects. If omitted, a full deck is created using the `reset()` method.
         """
         self.cards: list[Card] = cards
 
     def reset(self) -> Deck:
         """
-        Reset the deck to a new deck of cards.
-        :return: The deck with a new set of cards.
+        Creates a full deck by iterating over every combination of suit and rank from the `Card` class, then sorts the
+            deck.
+        :return: The deck instance.
         """
         pass
 
-    def count(self, card: Card | Suit | Rank | str) -> int:
+    def count(self, card: Card | Rank | Suit | str) -> int:
         """
-        Return the number of occurrences of a card, suit, or rank in the deck.
-        :param card: The card, suit, or rank to count.
-        :return: The number of occurrences of the card, suit, or rank in the deck.
+        Counts the number of occurrences of a specific card, rank, or suit in the deck.
+        :param card: Either a card instance, a rank (as a `string`), or a suit (as a `string`).
+        :return: The number of occurrences of the specified card, rank, or suit in the deck.
+        :raise ValueError: If the given card is not a valid card instance, rank, or suit.
         """
         pass
 
@@ -134,62 +136,64 @@ class Deck:
         Sorts and returns the deck.
         :param by: The attribute to sort by.
         :return: The sorted deck.
+        :raise ValueError: If the `by` parameter is not a valid attribute.
         """
         pass
 
     def shuffle(self) -> Deck:
         """
-        Shuffle the deck.
-        :return: The shuffled deck.
+        Randomly shuffles the cards in the deck.
+        :return: The deck instance.
         """
         pass
 
     def draw(self, n: int = 1) -> list[Card]:
         """
-        Draw `n` cards from the deck.
-        The drawn cards are removed from the deck.
-        :param n: The number of cards to draw.
+        Draw `n` cards from the top of the deck.
+        :param n: The number of cards to draw. Defaults to `1`.
         :return: A list of drawn cards.
         """
         pass
 
     def add(self, *cards: Card) -> Deck:
         """
-        Add cards at the end of the deck.
-        :param cards: The cards to add to the deck.
-        :return: The deck with the card added.
+        Adds one or more cards to the bottom of the deck.
+        :param cards: The cards to be added to the deck.
+        :return: The deck instance.
         """
         pass
 
-    def remove(self, card: Card) -> None:
+    def remove(self, *cards: Card) -> Deck:
         """
-        Remove a card from the deck.
-        :param card: The card to remove from the deck.
+        The cards to be removed from the deck.
+        :param cards: The cards to remove from the deck.
+        :return: The deck instance.
+        :raise ValueError: If any card is not found in the deck.
         """
         pass
 
     def get_index(self, card: Card) -> list[int]:
         """
-        Return the indices of all occurrences of a card in the deck.
-        :param card: The card to search for.
-        :return: A list of indices of the card in the deck
+        Returns the indices of all occurrences of a given card in the deck.
+        :param card: The card to search for in the deck.
+        :return: A list of indices where the card is found. If the card is not found, an empty list is returned.
         """
         pass
 
     def get_cards(self) -> list[Card]:
         """
-        Return the list of cards in the deck.
-        :return: The list of cards in the deck.
+        Retrieves the entire list of cards in the deck.
+        :return: A list of all cards in the deck.
         """
         pass
 
     def get_top_card(self) -> Card | None:
         """
-        Return the top card of the deck.
-        :return: The top card of the deck, or None if the deck is empty.
+        Returns the card at the top of the deck without removing it.
+        :return: The top card of the deck if the deck is not empty; otherwise, `None`.
         """
         pass
 
-    def __getitem__(self, index) -> Card: ...
+    def __getitem__(self, key) -> Card: ...
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[Card]: ...
