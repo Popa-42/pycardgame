@@ -34,7 +34,8 @@ print(f"card1 != card2 = {card1 != card2}")
 print(f"{card1 <= card2 = }")
 print(f"{card1 >= card2 = }\n\n")
 
-deck = Deck().add(Card(None, None, joker=True), Card(None, None, joker=True)).shuffle()
+deck = Deck().add(Card(None, None, joker=True),
+                  Card(None, None, joker=True)).shuffle()
 print(deck)  # Same effect as print(str(deck))
 print(repr(deck))  # Will print the object representation! (evaluable)
 
