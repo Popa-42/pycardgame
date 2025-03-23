@@ -51,6 +51,8 @@ class Card:
             suit = Card.suit_names.index(suit)
         elif not isinstance(suit, int):
             raise ValueError("Suit must be None, an int, or a valid suit name")
+        if suit < 0 or suit >= len(Card.suit_names):
+            raise ValueError(f"Invalid suit index: {suit}")
         self.suit = suit
         return self
 
@@ -66,6 +68,8 @@ class Card:
             rank = Card.rank_names.index(rank)
         elif not isinstance(rank, int):
             raise ValueError("Rank must be None, an int, or a valid rank name")
+        if rank < 0 or rank >= len(Card.rank_names):
+            raise ValueError(f"Invalid rank index: {rank}")
         self.rank = rank
         return self
 
@@ -150,8 +154,10 @@ class Deck:
         self.cards.extend(cards)
         return self
 
-    def remove(self, card):
-        self.cards.remove(card)
+    def remove(self, *cards):
+        for card in cards:
+            self.cards.remove(card)
+        return self
 
     def get_index(self, card):
         return [i for i, c in enumerate(self.cards) if c == card]
@@ -162,7 +168,7 @@ class Deck:
     def get_top_card(self):
         return self.cards[-1] if self.cards else None
 
-    def __getitem__(self, index): return self.cards[index]
+    def __getitem__(self, key): return self.cards[key]
     def __len__(self): return len(self.cards)
     def __str__(self): return f"Deck of {len(self)} cards.{f' Top card: {self[0]}' if len(self) else ''}"
     def __repr__(self): return f"{self.__class__.__name__}(cards={self.cards!r})"
