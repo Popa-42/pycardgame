@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Literal, Iterator, Iterable
+from typing import Literal, Iterator
 
 from .types import Suit, Rank
 
