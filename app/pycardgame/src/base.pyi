@@ -32,14 +32,20 @@ class Card:
     rank_names: list[Rank | str]
     suit_names: list[Suit | str]
 
-    def __init__(self, rank: Rank | int | str | None, suit: Suit | int | str | None, trump: bool = False, **kwargs) -> None:
+    def __init__(self,
+                 rank: Rank | int | str | None,
+                 suit: Suit | int | str | None,
+                 trump: bool = False, **kwargs) -> None:
         """
         Creates a new card instance.
-        :param rank: The card’s rank, provided either as a string (e.g., `"Ace"`) or an integer index.
-        :param suit: The card’s suit, provided either as a string (e.g., `"Hearts"`) or an integer index.
+        :param rank: The card’s rank, provided either as a string
+            (e.g., `"Ace"`) or an integer index.
+        :param suit: The card’s suit, provided either as a string
+            (e.g., `"Hearts"`) or an integer index.
         :param trump: Whether the card is a trump card.
         :param kwargs: Additional attributes to set on the card.
-        :raise ValueError: If the given rank or suit is not found or the index is out of range.
+        :raise ValueError: If the given rank or suit is not found or the
+            index is out of range.
         """
         self.rank: int | None = ...
         self.suit: int | None = ...
@@ -48,7 +54,8 @@ class Card:
     def get_suit(self, as_index: bool = False) -> Suit | int | str:
         """
         Returns the card’s suit.
-        :param as_index: If `True`, returns the suit as an integer index; otherwise, as a string.
+        :param as_index: If `True`, returns the suit as an integer
+            index; otherwise, as a string.
         :return: The suit of the card.
         """
         pass
@@ -58,14 +65,16 @@ class Card:
         Sets the card’s suit. Accepts a suit name or an integer index.
         :param suit: The suit to set.
         :return: The card instance with the updated suit.
-        :raise ValueError: If the given string is not found in `suit_names` or the index is out of range.
+        :raise ValueError: If the given string is not found in
+            `suit_names` or the index is out of range.
         """
         pass
 
     def get_rank(self, as_index: bool = False) -> Rank | int | str:
         """
         Returns the card’s rank.
-        :param as_index: If `True`, the rank is returned as an integer index; otherwise, as a string.
+        :param as_index: If `True`, the rank is returned as an integer
+            index; otherwise, as a string.
         :return: The rank of the card.
         """
         pass
@@ -75,7 +84,8 @@ class Card:
         Sets the card’s rank. Accepts a rank name or an integer index.
         :param rank: The rank to set.
         :return: The card with the rank set.
-        :raise ValueError: If the given string is not found in `rank_names` or the index is out of range.
+        :raise ValueError: If the given string is not found in
+            `rank_names` or the index is out of range.
         """
         pass
 
@@ -95,10 +105,15 @@ class Card:
         pass
 
     def __lt__(self, other: Card) -> bool: ...
+
     def __eq__(self, other: Card) -> bool: ...
+
     def __gt__(self, other: Card) -> bool: ...
+
     def __le__(self, other: Card) -> bool: ...
+
     def __ge__(self, other: Card) -> bool: ...
+
     def __ne__(self, other: Card) -> bool: ...
 
 
@@ -107,27 +122,33 @@ class Deck:
     A deck of cards.
     :param cards: A list of cards to initialize the deck with.
     """
+
     def __init__(self, cards: list[Card] = None) -> None:
         """
         Creates a new deck instance.
-        :param cards: A custom list of `Card` objects. If omitted, a full deck is created using the `reset()` method.
+        :param cards: A custom list of `Card` objects. If omitted, a
+            full deck is created using the `reset()` method.
         """
         self.cards: list[Card] = cards
 
     def reset(self) -> Deck:
         """
-        Creates a full deck by iterating over every combination of suit and rank from the `Card` class, then sorts the
-            deck.
+        Creates a full deck by iterating over every combination of suit
+        and rank from the `Card` class, then sorts the deck.
         :return: The deck instance.
         """
         pass
 
     def count(self, card: Card | Rank | Suit | str) -> int:
         """
-        Counts the number of occurrences of a specific card, rank, or suit in the deck.
-        :param card: Either a card instance, a rank (as a `string`), or a suit (as a `string`).
-        :return: The number of occurrences of the specified card, rank, or suit in the deck.
-        :raise ValueError: If the given card is not a valid card instance, rank, or suit.
+        Counts the number of occurrences of a specific card, rank, or
+        suit in the deck.
+        :param card: Either a card instance, a rank (as a `string`), or
+            a suit (as a `string`).
+        :return: The number of occurrences of the specified card, rank,
+            or suit in the deck.
+        :raise ValueError: If the given card is not a valid card
+            instance, rank, or suit.
         """
         pass
 
@@ -136,7 +157,8 @@ class Deck:
         Sorts and returns the deck.
         :param by: The attribute to sort by.
         :return: The sorted deck.
-        :raise ValueError: If the `by` parameter is not a valid attribute.
+        :raise ValueError: If the `by` parameter is not a valid
+            attribute.
         """
         pass
 
@@ -174,9 +196,11 @@ class Deck:
 
     def get_index(self, card: Card) -> list[int]:
         """
-        Returns the indices of all occurrences of a given card in the deck.
+        Returns the indices of all occurrences of a given card in the
+        deck.
         :param card: The card to search for in the deck.
-        :return: A list of indices where the card is found. If the card is not found, an empty list is returned.
+        :return: A list of indices where the card is found. If the card
+            is not found, an empty list is returned.
         """
         pass
 
@@ -190,10 +214,13 @@ class Deck:
     def get_top_card(self) -> Card | None:
         """
         Returns the card at the top of the deck without removing it.
-        :return: The top card of the deck if the deck is not empty; otherwise, `None`.
+        :return: The top card of the deck if the deck is not empty;
+            otherwise, `None`.
         """
         pass
 
     def __getitem__(self, key) -> Card: ...
+
     def __len__(self) -> int: ...
+
     def __iter__(self) -> Iterator[Card]: ...

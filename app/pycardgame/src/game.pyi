@@ -30,7 +30,10 @@ class Player:
     :param kwargs: Additional attributes to set on the player.
     """
 
-    def __init__(self, name: str, hand: list[Card] = None, score: int = 0, **kwargs) -> None:
+    def __init__(self,
+                 name: str,
+                 hand: list[Card] = None,
+                 score: int = 0, **kwargs) -> None:
         """
         Constructor for the Player class.
         :param name: The name of the player.
@@ -61,7 +64,8 @@ class Player:
 
     def play_card(self, *cards: Card) -> Card | list[Card]:
         """
-        Play a card from the player's hand. The card will be removed from the hand.
+        Play a card from the player's hand. The card will be removed
+        from the hand.
         :param cards: The card(s) to play.
         :return: The card(s) that was/were played.
         """
@@ -117,7 +121,8 @@ class Player:
 class Game:
     """
     A class representing a card game.
-    :param deck: The deck of cards to use in the game. If not provided, a new deck will be created.
+    :param deck: The deck of cards to use in the game. If not provided,
+        a new deck will be created.
     :param trump: The trump suit for the game.
     :param players: The players in the game.
     :param kwargs: Additional attributes to set on the game.
@@ -133,7 +138,8 @@ class Game:
     ) -> None:
         """
         Constructor for the Game class.
-        :param deck: The deck of cards to use in the game. If not provided, a new deck will be created.
+        :param deck: The deck of cards to use in the game. If not
+            provided, a new deck will be created.
         :param hand_size: The number of cards to deal to each player.
         :param trump: The trump suit for the game.
         :param players: The players in the game.
@@ -167,7 +173,8 @@ class Game:
         """
         Deal cards to a player in the game.
         :param num_cards: The number of cards to deal. Default is 1.
-        :param players: The players to deal the cards to. If not provided, the current player will be dealt to.
+        :param players: The players to deal the cards to. If not
+            provided, the current player will be dealt to.
         :return: The game object.
         """
         pass
@@ -181,8 +188,10 @@ class Game:
 
     def play(self, player: Player = None, *cards: Card) -> Game:
         """
-        Play one or more cards from a player's hand. The cards will be added to the discard pile.
-        :param player: The player to play the card from. If not provided, the current player will play the card.
+        Play one or more cards from a player's hand. The cards will be
+        added to the discard pile.
+        :param player: The player to play the card from. If not
+            provided, the current player will play the card.
         :param cards: The card(s) to play.
         :return: The game object.
         """
