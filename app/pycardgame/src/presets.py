@@ -13,9 +13,9 @@ class SkatCard(Card):
     SUITS = ["Diamonds", "Hearts", "Spades", "Clubs"]
 
     def __init__(self, rank, suit):
-        if rank not in self.RANKS:
+        if not isinstance(rank, int) and rank not in SkatCard.RANKS:
             raise ValueError(f"Invalid rank for Skat card: {rank}")
-        if suit not in self.SUITS:
+        if not isinstance(rank, int) and suit not in SkatCard.SUITS:
             raise ValueError(f"Invalid suit for Skat card: {suit}")
         self.rank = rank
         self.suit = suit
