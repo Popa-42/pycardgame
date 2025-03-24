@@ -24,8 +24,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .src.base import Card, Deck
 from .src.game import Game, Player
+from .src.presets import UnoCard, UnoDeck, PokerDeck
 
-__all__ = ["Card", "Deck", "Game", "Player"]
+__all__ = ["Card", "Deck", "Game", "Player", "UnoCard", "UnoDeck", "PokerDeck"]
 
 print("""
     PyCardGame  Copyright (C) 2025  Popa-42

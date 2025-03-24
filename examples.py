@@ -68,4 +68,7 @@ print()
 game.play(game.get_current_player(), game.get_current_player().get_hand()[0])
 print(str(game.get_current_player()) + ":")
 [print(c) for c in game.get_current_player().get_hand()]
-print("Discard Pile:", game.discard_pile)
+print("Discard Pile:", game.discard_pile, end="\n\n")
+
+uno_deck = UnoDeck()
+print(repr(uno_deck))
