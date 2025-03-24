@@ -22,8 +22,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from .src.base import *
-from .src.game import *
+from .src.base import Card, Deck
+from .src.game import Game, Player
+
+__all__ = ["Card", "Deck", "Game", "Player"]
 
 print("""
     PyCardGame  Copyright (C) 2025  Popa-42

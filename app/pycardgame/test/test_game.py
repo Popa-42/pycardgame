@@ -277,6 +277,7 @@ def test_game_repr():
     assert "discard_pile=Deck(cards=[])" in game_repr
     assert "trump='Hearts'" in game_repr
     assert "hand_size=4" in game_repr
-    assert "players=[Player('Alice', hand=[], score=0), Player('Bob', hand=[], score=0)]" in game_repr
+    assert ("players=[Player('Alice', hand=[], score=0), "
+            "Player('Bob', hand=[], score=0)]") in game_repr
     assert "current_player_index=0" in game_repr
     assert "extra='extra'" in game_repr
