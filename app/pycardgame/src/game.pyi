@@ -62,7 +62,7 @@ class Player:
         """
         pass
 
-    def play_card(self, *cards: Card) -> Card | list[Card]:
+    def play_card(self, *cards: Card) -> list[Card]:
         """
         Play a card from the player's hand. The card will be removed
         from the hand.
@@ -108,6 +108,7 @@ class Player:
         """
         pass
 
+    def __getitem__(self, item: int | slice) -> Card | list[Card]: ...
     def __eq__(self, other: Player) -> bool: ...
     def __lt__(self, other: Player) -> bool: ...
     def __le__(self, other: Player) -> bool: ...
@@ -116,6 +117,7 @@ class Player:
     def __ne__(self, other: Player) -> bool: ...
     def __bool__(self) -> bool: ...
     def __iter__(self) -> Iterator[Card]: ...
+    def __len__(self) -> int: ...
 
 
 class Game:
@@ -153,7 +155,7 @@ class Game:
         self.players: list[Player] = ...
         self.current_player_index: int = ...
 
-    def add_player(self, *players: Player) -> Game:
+    def add_players(self, *players: Player) -> Game:
         """
         Add one or multiple players to the game.
         :param players: The players to add.
@@ -161,7 +163,7 @@ class Game:
         """
         pass
 
-    def remove_player(self, *players: Player) -> Game:
+    def remove_players(self, *players: Player) -> Game:
         """
         Remove one or multiple players from the game.
         :param players: The players to remove.
@@ -174,7 +176,7 @@ class Game:
         Deal cards to a player in the game.
         :param num_cards: The number of cards to deal. Default is 1.
         :param players: The players to deal the cards to. If not
-            provided, the current player will be dealt to.
+            provided, all players will be dealt to.
         :return: The game object.
         """
         pass

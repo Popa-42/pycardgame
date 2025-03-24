@@ -3,7 +3,7 @@ import pytest
 from ..src.base import Card, Deck
 
 
-# ===========================|    Test Card class   |===========================
+# ==========================|     Test Card class    |==========================
 
 def test_card_init():
     card = Card("Ace", "Hearts", trump=False, extra="extra")
@@ -132,7 +132,7 @@ def test_card_compare():
     assert card5 < card6
 
 
-# ===========================|    Test Deck class   |===========================
+# ==========================|     Test Deck class    |==========================
 
 def test_deck_init():
     deck1 = Deck()

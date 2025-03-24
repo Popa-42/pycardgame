@@ -37,7 +37,7 @@ class Player:
 
     def play_card(self, *cards):
         if not cards:
-            return self.hand.pop()
+            return [self.hand.pop()]
         for card in cards:
             self.hand.remove(card)
         return list(cards)
@@ -59,8 +59,11 @@ class Player:
         self.name = name
         return self
 
+    def __getitem__(self, item):
+        return self.hand[item]
+
     def __str__(self):
-        return f"Player {self.name} ({len(self.hand)} cards)"
+        return f"Player {self.name} ({len(self.hand)} card(s))"
 
     def __repr__(self):
         additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
@@ -69,14 +72,21 @@ class Player:
                 f"score={self.score!r}"
                 f"{f', {additional}' if additional else ''})")
 
-    def __eq__(self, other): return self.score == other.score
+    def __eq__(self, other):
+        return (self.score == other.score and self.hand == other.hand and
+                self.name == other.name)
+
+    def __ne__(self, other):
+        return (self.score != other.score or self.hand != other.hand or
+                self.name != other.name)
+
     def __lt__(self, other): return self.score < other.score
     def __le__(self, other): return self.score <= other.score
     def __gt__(self, other): return self.score > other.score
     def __ge__(self, other): return self.score >= other.score
-    def __ne__(self, other): return self.score != other.score
     def __bool__(self): return bool(self.hand) and self.score >= 0
     def __iter__(self): return iter(self.hand)
+    def __len__(self): return len(self.hand)
 
 
 class Game:
@@ -102,17 +112,17 @@ class Game:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def add_player(self, *players):
+    def add_players(self, *players):
         self.players.extend(players)
         return self
 
-    def remove_player(self, *players):
+    def remove_players(self, *players):
         for player in players:
             self.players.remove(player)
         return self
 
     def deal(self, num_cards=1, *players):
-        players = players or [self.get_current_player()]
+        players = players or self.players
         for player in players:
             player.add_card(*self.deck.draw(num_cards))
         return self
@@ -164,9 +174,15 @@ class Game:
         return f"Game of {len(self.players)} players"
 
     def __repr__(self):
-        keys = ["deck", "discard_pile", "players", "current_player_index"]
+        keys = ["deck", "discard_pile", "players", "trump", "hand_size",
+                "current_player_index"]
         additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
                                if k not in keys)
-        return (f"{self.__class__.__name__}({self.deck!r}, "
-                f"trump={self.trump!r}, hand_size={self.hand_size!r}"
+        return (f"{self.__class__.__name__}("
+                f"deck={self.deck!r}, "
+                f"discard_pile={self.discard_pile!r}"
+                f"trump={self.trump!r}, "
+                f"hand_size={self.hand_size!r}, "
+                f"players={self.players!r}, "
+                f"current_player_index={self.current_player_index!r}"
                 f"{f', {additional}' if additional else ''})")
