@@ -15,6 +15,41 @@ class PokerDeck(Deck[Card]):
         pass
 
 
+class SkatCard(Card):
+    """
+    A Skat card implementation extending the base `Card` class. Defines
+    Skat-specific ranks and suits.
+    """
+
+    RankType = Literal["7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+    SuitType = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+    RANKS: List[RankType]
+    SUITS: List[SuitType]
+
+    def __init__(self,
+                 suit: Union[SuitType, int],
+                 rank: Union[RankType, int]) -> None:
+        """
+        Initialize a Skat card with a suit and a rank.
+        :param suit: The suit of the Skat card (e.g., "Clubs", "Spades", etc.).
+        :param rank: The rank of the Skat card (e.g., "7", "Jack", etc.).
+        """
+        pass
+
+
+class SkatDeck(Deck[SkatCard]):
+    """
+    A deck implementation for Skat games. Inherits from the base Deck class.
+    """
+
+    def __init__(self, cards: Optional[List[SkatCard]] = None) -> None:
+        """
+        Initialize a SkatDeck instance.
+        :param cards: Optional list of Card objects to initialize the deck.
+        """
+        pass
+
+
 class UnoCard(Card):
     """
     A UNO card implementation extending the base Card class. Defines
@@ -22,7 +57,7 @@ class UnoCard(Card):
     """
 
     RankType = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
-    "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
+                       "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
     SuitType = Literal["Red", "Yellow", "Green", "Blue"]
     RANKS: List[RankType]
     SUITS: List[SuitType]
