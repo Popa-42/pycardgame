@@ -6,6 +6,19 @@ class PokerDeck(Deck):
         super().__init__(cards)
 
 
+class SkatCard(Card):
+    RANKS = ["7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+    SUITS = ["Diamonds", "Hearts", "Spades", "Clubs"]
+
+    def __init__(self, suit, rank):
+        super().__init__(rank, suit)
+
+
+class SkatDeck(Deck):
+    def __init__(self, cards=None):
+        super().__init__(cards)
+
+
 class UnoCard(Card):
     RANKS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
              "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
