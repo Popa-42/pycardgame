@@ -38,7 +38,7 @@ class UnoDeck(Deck):
     def reset(self):
         # Clear the current cards list
         self.cards = []
-        colors = ["Red", "Green", "Blue", "Yellow"]
+        colors = [suit for suit in UnoCard.SUITS if suit != "Wild"]
 
         for color in colors:
             # Add one 0 card
@@ -52,4 +52,38 @@ class UnoDeck(Deck):
         self.cards.extend([UnoCard(suit="Wild", rank="Wild")] * 4)
         self.cards.extend([UnoCard(suit="Wild", rank="Wild Draw Four")] * 4)
 
+        return self.sort()
+
+
+class SixNimmtCard(Card):
+    RANKS = [i for i in range(1, 105)]
+
+    def __init__(self, value):
+        self.value = value
+        self.bull_heads = self.calculate_bull_heads(value)
+        super().__init__(None, value)
+
+    @staticmethod
+    def calculate_bull_heads(value):
+        if value == 55:
+            return 7
+        elif value % 11 == 0:
+            return 5
+        elif value % 10 == 0:
+            return 3
+        elif value % 5 == 0:
+            return 2
+        else:
+            return 1
+
+    def __str__(self): return f"{self.value} ({self.bull_heads} bull heads)"
+    def __repr__(self): return f"{self.__class__.__name__}({self.value})"
+
+
+class SixNimmtDeck(Deck):
+    def __init__(self, cards=None):
+        super().__init__(cards)
+
+    def reset(self):
+        self.cards = [SixNimmtCard(value) for value in SixNimmtCard.RANKS]
         return self.sort()
