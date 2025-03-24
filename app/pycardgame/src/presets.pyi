@@ -27,12 +27,12 @@ class SkatCard(Card):
     SUITS: List[SuitType]
 
     def __init__(self,
-                 suit: Union[SuitType, int],
-                 rank: Union[RankType, int]) -> None:
+                 rank: Union[RankType, int],
+                 suit: Union[SuitType, int]) -> None:
         """
         Initialize a Skat card with a suit and a rank.
-        :param suit: The suit of the Skat card (e.g., "Clubs", "Spades", etc.).
         :param rank: The rank of the Skat card (e.g., "7", "Jack", etc.).
+        :param suit: The suit of the Skat card (e.g., "Clubs", "Spades", etc.).
         """
         pass
 
@@ -63,12 +63,12 @@ class UnoCard(Card):
     SUITS: List[SuitType]
 
     def __init__(self,
-                 suit: Union[SuitType, int],
-                 rank: Union[RankType, int]) -> None:
+                 rank: Union[RankType, int],
+                 suit: Union[SuitType, int]) -> None:
         """
         Initialize a `UnoCard` with a suit and a rank.
-        :param suit: The suit of the Uno card (e.g., "Red", "Green", etc.).
         :param rank: The rank of the Uno card (e.g., "0", "Skip", 5, etc.).
+        :param suit: The suit of the Uno card (e.g., "Red", "Green", etc.).
         """
         pass
 

@@ -16,7 +16,8 @@
 
 from __future__ import annotations
 
-from typing import Optional, List, Union, Iterator, TypeVar, Generic, Literal
+from typing import Optional, List, Union, Iterator, TypeVar, Generic, Literal, \
+    Type
 
 
 class Card:
@@ -122,13 +123,15 @@ class Deck(Generic[T]):
     :param cards: A list of cards to initialize the deck with.
     """
 
-    def __init__(self, cards: Optional[List[T]] = None) -> None:
+    def __init__(self, cards: Optional[List[T]] = None,
+                 card_type: Type[T] = Type[T]) -> None:
         """
         Creates a new deck instance.
         :param cards: A custom list of `Card` objects. If omitted, a
             full deck is created using the `reset()` method.
         """
         self.cards: List[T] = cards
+        self.card_type: Type[T] = ...
 
     def reset(self) -> Deck[T]:
         """

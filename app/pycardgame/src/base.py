@@ -25,7 +25,7 @@ class Card:
              "King", "Ace"]
     SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
-    def __init__(self, rank, suit, trump=False, **kwargs):
+    def __init__(self, rank=None, suit=None, trump=False, **kwargs):
         self.rank = None
         self.suit = None
 
@@ -121,24 +121,26 @@ class Card:
 
 
 class Deck:
-    def __init__(self, cards=None):
+    def __init__(self, cards=None, card_type=Card):
+        self.card_type = card_type
         if cards is None:
             self.cards = self.reset().get_cards()
         else:
             self.cards = cards
 
     def reset(self):
-        self.cards = [Card(rank, suit) for suit in range(len(Card.SUITS))
-                      for rank in range(len(Card.RANKS))]
+        self.cards = [self.card_type(rank, suit)
+                      for suit in range(len(self.card_type.SUITS))
+                      for rank in range(len(self.card_type.RANKS))]
         return self.sort()
 
     def count(self, card):
-        if isinstance(card, Card):
+        if isinstance(card, self.card_type):
             return self.cards.count(card)
         elif isinstance(card, str):
-            if card in Card.RANKS:
+            if card in self.card_type.RANKS:
                 return sum(1 for c in self.cards if c.get_rank() == card)
-            elif card in Card.SUITS:
+            elif card in self.card_type.SUITS:
                 return sum(1 for c in self.cards if c.get_suit() == card)
             else:
                 raise ValueError(
@@ -175,7 +177,7 @@ class Deck:
         return self
 
     def get_index(self, card):
-        if not isinstance(card, Card):
+        if not isinstance(card, self.card_type):
             raise TypeError("Invalid card type: must be a Card object")
         return [i for i, c in enumerate(self.cards) if c == card]
 

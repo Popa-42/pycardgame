@@ -1,3 +1,5 @@
+from typing import Type
+
 from .base import Deck, Card
 
 
@@ -10,13 +12,19 @@ class SkatCard(Card):
     RANKS = ["7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
     SUITS = ["Diamonds", "Hearts", "Spades", "Clubs"]
 
-    def __init__(self, suit, rank):
+    def __init__(self, rank, suit):
+        if rank not in self.RANKS:
+            raise ValueError(f"Invalid rank for Skat card: {rank}")
+        if suit not in self.SUITS:
+            raise ValueError(f"Invalid suit for Skat card: {suit}")
+        self.rank = rank
+        self.suit = suit
         super().__init__(rank, suit)
 
 
 class SkatDeck(Deck):
     def __init__(self, cards=None):
-        super().__init__(cards)
+        super().__init__(cards, card_type=SkatCard)
 
 
 class UnoCard(Card):
@@ -24,7 +32,7 @@ class UnoCard(Card):
              "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
     SUITS = ["Red", "Green", "Blue", "Yellow", "Wild"]
 
-    def __init__(self, suit, rank):
+    def __init__(self, rank, suit):
         super().__init__(rank, suit)
 
     def __str__(self):
@@ -33,7 +41,7 @@ class UnoCard(Card):
 
 class UnoDeck(Deck):
     def __init__(self, cards=None):
-        super().__init__(cards)
+        super().__init__(cards, card_type=UnoCard)
 
     def reset(self):
         # Clear the current cards list
@@ -82,7 +90,7 @@ class SixNimmtCard(Card):
 
 class SixNimmtDeck(Deck):
     def __init__(self, cards=None):
-        super().__init__(cards)
+        super().__init__(cards, card_type=SixNimmtCard)
 
     def reset(self):
         self.cards = [SixNimmtCard(value) for value in SixNimmtCard.RANKS]
