@@ -16,9 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Literal, Iterator
-
-from .types import Suit, Rank
+from typing import Optional, List, Union, Iterator, TypeVar, Generic, Literal
 
 
 class Card:
@@ -28,14 +26,17 @@ class Card:
     :param suit: The suit of the card.
     :param trump: Whether the card is a trump card.
     """
+    RankType = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
+                       "Queen", "King", "Ace"]
+    SuitType = Literal["Diamonds", "Clubs", "Hearts", "Spades"]
 
-    rank_names: list[Rank | str]
-    suit_names: list[Suit | str]
+    RANKS: List[RankType]
+    SUITS: List[SuitType]
 
     def __init__(self,
-                 rank: Rank | int | str | None,
-                 suit: Suit | int | str | None,
-                 trump: bool = False, **kwargs) -> None:
+                 rank: Optional[Union[RankType, int]] = None,
+                 suit: Optional[Union[SuitType, int]] = None,
+                 trump: Optional[bool] = False, **kwargs) -> None:
         """
         Creates a new card instance.
         :param rank: The card’s rank, provided either as a string
@@ -47,11 +48,11 @@ class Card:
         :raise ValueError: If the given rank or suit is not found or the
             index is out of range.
         """
-        self.rank: int | None = ...
-        self.suit: int | None = ...
+        self.rank: Optional[int] = ...
+        self.suit: Optional[int] = ...
         self.trump: bool = ...
 
-    def get_suit(self, as_index: bool = False) -> Suit | int | str:
+    def get_suit(self, as_index: bool = False) -> Union[SuitType, int, str]:
         """
         Returns the card’s suit.
         :param as_index: If `True`, returns the suit as an integer
@@ -60,7 +61,7 @@ class Card:
         """
         pass
 
-    def set_suit(self, suit: Suit | int | str) -> Card:
+    def set_suit(self, suit: Union[SuitType, int, str]) -> Card:
         """
         Sets the card’s suit. Accepts a suit name or an integer index.
         :param suit: The suit to set.
@@ -70,7 +71,7 @@ class Card:
         """
         pass
 
-    def get_rank(self, as_index: bool = False) -> Rank | int | str:
+    def get_rank(self, as_index: bool = False) -> Union[RankType, int, str]:
         """
         Returns the card’s rank.
         :param as_index: If `True`, the rank is returned as an integer
@@ -79,7 +80,7 @@ class Card:
         """
         pass
 
-    def set_rank(self, rank: Rank | int | str) -> Card:
+    def set_rank(self, rank: Union[RankType, int, str]) -> Card:
         """
         Sets the card’s rank. Accepts a rank name or an integer index.
         :param rank: The rank to set.
@@ -112,21 +113,24 @@ class Card:
     def __ne__(self, other: Card) -> bool: ...
 
 
-class Deck:
+T = TypeVar("T", bound=Card)
+
+
+class Deck(Generic[T]):
     """
     A deck of cards.
     :param cards: A list of cards to initialize the deck with.
     """
 
-    def __init__(self, cards: list[Card] = None) -> None:
+    def __init__(self, cards: Optional[List[T]] = None) -> None:
         """
         Creates a new deck instance.
         :param cards: A custom list of `Card` objects. If omitted, a
             full deck is created using the `reset()` method.
         """
-        self.cards: list[Card] = cards
+        self.cards: List[T] = cards
 
-    def reset(self) -> Deck:
+    def reset(self) -> Deck[T]:
         """
         Creates a full deck by iterating over every combination of suit
         and rank from the `Card` class, then sorts the deck.
@@ -134,7 +138,7 @@ class Deck:
         """
         pass
 
-    def count(self, card: Card | Rank | Suit | str) -> int:
+    def count(self, card: Union[T, T.RankType, T.SuitType, str]) -> int:
         """
         Counts the number of occurrences of a specific card, rank, or
         suit in the deck.
@@ -147,7 +151,7 @@ class Deck:
         """
         pass
 
-    def sort(self, by: Literal["suit", "rank"] = "suit") -> Deck:
+    def sort(self, by: Literal["suit", "rank"] = "suit") -> Deck[T]:
         """
         Sorts and returns the deck.
         :param by: The attribute to sort by.
@@ -157,14 +161,14 @@ class Deck:
         """
         pass
 
-    def shuffle(self) -> Deck:
+    def shuffle(self) -> Deck[T]:
         """
         Randomly shuffles the cards in the deck.
         :return: The deck instance.
         """
         pass
 
-    def draw(self, n: int = 1) -> list[Card]:
+    def draw(self, n: int = 1) -> List[T]:
         """
         Draw `n` cards from the top of the deck.
         :param n: The number of cards to draw. Defaults to `1`.
@@ -172,7 +176,7 @@ class Deck:
         """
         pass
 
-    def add(self, *cards: Card) -> Deck:
+    def add(self, *cards: T) -> Deck[T]:
         """
         Adds one or more cards to the bottom of the deck.
         :param cards: The cards to be added to the deck.
@@ -180,7 +184,7 @@ class Deck:
         """
         pass
 
-    def remove(self, *cards: Card) -> Deck:
+    def remove(self, *cards: T) -> Deck[T]:
         """
         The cards to be removed from the deck.
         :param cards: The cards to remove from the deck.
@@ -189,7 +193,7 @@ class Deck:
         """
         pass
 
-    def get_index(self, card: Card) -> list[int]:
+    def get_index(self, card: T) -> List[int]:
         """
         Returns the indices of all occurrences of a given card in the
         deck.
@@ -199,14 +203,14 @@ class Deck:
         """
         pass
 
-    def get_cards(self) -> list[Card]:
+    def get_cards(self) -> List[T]:
         """
         Retrieves the entire list of cards in the deck.
         :return: A list of all cards in the deck.
         """
         pass
 
-    def get_top_card(self) -> Card | None:
+    def get_top_card(self) -> Optional[T]:
         """
         Returns the card at the top of the deck without removing it.
         :return: The top card of the deck if the deck is not empty;
@@ -214,6 +218,6 @@ class Deck:
         """
         pass
 
-    def __getitem__(self, key: int | slice) -> Card | list[Card]: ...
+    def __getitem__(self, key: Union[int, slice]) -> Union[T, list[T]]: ...
     def __len__(self) -> int: ...
-    def __iter__(self) -> Iterator[Card]: ...
+    def __iter__(self) -> Iterator[T]: ...

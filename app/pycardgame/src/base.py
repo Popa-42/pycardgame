@@ -21,9 +21,9 @@ import random
 
 class Card:
     # Ascending order of suits and ranks
-    rank_names = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen",
-                  "King", "Ace"]
-    suit_names = ["Clubs", "Diamonds", "Hearts", "Spades"]
+    RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen",
+             "King", "Ace"]
+    SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
     def __init__(self, rank, suit, trump=False, **kwargs):
         self.rank = None
@@ -43,16 +43,16 @@ class Card:
     def get_suit(self, as_index=False):
         if self.suit is None:
             return None
-        return self.suit if as_index else Card.suit_names[self.suit]
+        return self.suit if as_index else self.__class__.SUITS[self.suit]
 
     def set_suit(self, suit):
         if isinstance(suit, str):
-            if suit not in Card.suit_names:
+            if suit not in self.__class__.SUITS:
                 raise ValueError(f"Invalid suit name: {suit}")
-            suit = Card.suit_names.index(suit)
+            suit = self.__class__.SUITS.index(suit)
         elif not isinstance(suit, int):
             raise TypeError("Suit must be None, an int, or a valid suit name")
-        if suit < 0 or suit >= len(Card.suit_names):
+        if suit < 0 or suit >= len(self.__class__.SUITS):
             raise ValueError(f"Invalid suit index: {suit}")
         self.suit = suit
         return self
@@ -60,16 +60,16 @@ class Card:
     def get_rank(self, as_index=False):
         if self.rank is None:
             return None
-        return self.rank if as_index else Card.rank_names[self.rank]
+        return self.rank if as_index else self.__class__.RANKS[self.rank]
 
     def set_rank(self, rank):
         if isinstance(rank, str):
-            if rank not in Card.rank_names:
+            if rank not in self.__class__.RANKS:
                 raise ValueError(f"Invalid rank name: {rank}")
-            rank = Card.rank_names.index(rank)
+            rank = self.__class__.RANKS.index(rank)
         elif not isinstance(rank, int):
             raise TypeError("Rank must be None, an int, or a valid rank name")
-        if rank < 0 or rank >= len(Card.rank_names):
+        if rank < 0 or rank >= len(self.__class__.RANKS):
             raise ValueError(f"Invalid rank index: {rank}")
         self.rank = rank
         return self
@@ -84,9 +84,9 @@ class Card:
         return self
 
     def __str__(self):
-        rank_str = Card.rank_names[self.rank] if self.rank is not None \
+        rank_str = self.__class__.RANKS[self.rank] if self.rank is not None \
             else "None"
-        suit_str = Card.suit_names[self.suit] if self.suit is not None \
+        suit_str = self.__class__.SUITS[self.suit] if self.suit is not None \
             else "None"
         return f"{rank_str} of {suit_str}{' (trump)' if self.trump else ''}"
 
@@ -128,17 +128,17 @@ class Deck:
             self.cards = cards
 
     def reset(self):
-        self.cards = [Card(rank, suit) for suit in range(len(Card.suit_names))
-                      for rank in range(len(Card.rank_names))]
+        self.cards = [Card(rank, suit) for suit in range(len(Card.SUITS))
+                      for rank in range(len(Card.RANKS))]
         return self.sort()
 
     def count(self, card):
         if isinstance(card, Card):
             return self.cards.count(card)
         elif isinstance(card, str):
-            if card in Card.rank_names:
+            if card in Card.RANKS:
                 return sum(1 for c in self.cards if c.get_rank() == card)
-            elif card in Card.suit_names:
+            elif card in Card.SUITS:
                 return sum(1 for c in self.cards if c.get_suit() == card)
             else:
                 raise ValueError(

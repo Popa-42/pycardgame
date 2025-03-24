@@ -18,8 +18,8 @@
 from app.pycardgame import *
 
 # Set the rank and suit names
-Card.rank_names = ["7", "8", "9", "10", "Esquire", "Knight", "King", "Ace"]
-Card.suit_names = ["Cups", "Golds", "Clubs", "Swords"]
+Card.RANKS = ["7", "8", "9", "10", "Esquire", "Knight", "King", "Ace"]
+Card.SUITS = ["Cups", "Golds", "Clubs", "Swords"]
 
 card1 = Card(2, 2)
 card2 = Card("Ace", "Golds")
@@ -32,10 +32,10 @@ print(f"{card1 > card2 = }")
 print(f"{card1 == card2 = }")
 print(f"card1 != card2 = {card1 != card2}")
 print(f"{card1 <= card2 = }")
-print(f"{card1 >= card2 = }\n\n")
+print(f"{card1 >= card2 = }", end="\n\n")
 
-deck = Deck().add(Card(None, None, joker=True),
-                  Card(None, None, joker=True)).shuffle()
+deck = PokerDeck().add(Card(None, None, joker=True),
+                       Card(None, None, joker=True)).shuffle()
 print(deck)  # Same effect as print(str(deck))
 print(repr(deck))  # Will print the object representation! (evaluable)
 
@@ -59,7 +59,7 @@ player3 = Player("Charlie")
 # Create a new game with the players
 game = Game(deck.shuffle(), "Cups", 4, player1, player2, player3)
 print(game)
-print(repr(game), "\n")
+print(repr(game), end="\n\n")
 
 print(str(game.deal().get_current_player()) + ":")
 [print(c) for c in game.get_current_player().get_hand()]

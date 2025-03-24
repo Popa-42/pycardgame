@@ -91,7 +91,7 @@ class Player:
 
 class Game:
     def __init__(self, deck=None, trump=None, hand_size=4, *players, **kwargs):
-        if trump is not None and trump not in Card.suit_names:
+        if trump is not None and trump not in Card.SUITS:
             raise ValueError(f"Invalid suit for trump: {trump}")
 
         self.deck = deck or Deck().shuffle()
@@ -140,7 +140,7 @@ class Game:
         return self.trump
 
     def set_trump(self, suit):
-        if suit not in Card.suit_names:
+        if suit not in Card.SUITS:
             raise ValueError(f"Invalid suit for trump: {suit}")
         self.trump = suit
         return self
