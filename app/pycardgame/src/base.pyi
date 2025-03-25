@@ -40,11 +40,11 @@ class GenericCard(Generic[_T_R, _T_S]):
     :param suit: The suit of the card.
     :param trump: Whether the card is a trump card.
     """
-    RANKS: Final[List[_T_R]] = ...
-    SUITS: Final[List[_T_S]] = ...
+    RANKS: List[_T_R] = ...
+    SUITS: List[_T_S] = ...
 
-    def __init__(self, rank: Optional[Union[_T_R, int]] = None,
-                 suit: Optional[Union[_T_S, int]] = None, trump: bool = False
+    def __init__(self, rank: Optional[Union[_T_R, int]],
+                 suit: Optional[Union[_T_S, int]], trump: bool = False
                  ) -> None:
         """
         Creates a new card instance.
@@ -74,7 +74,8 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
-    def set_rank(self, rank: Union[_T_R, int]) -> GenericCard[_T_R, _T_S]:
+    def set_rank(self, rank: Optional[Union[_T_R, int]]
+                 ) -> GenericCard[_T_R, _T_S]:
         """
         Sets the card’s rank. Accepts a rank name or an integer index.
         :param rank: The rank to set.
@@ -93,7 +94,8 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
-    def set_suit(self, suit: Union[_T_S, int]) -> GenericCard[_T_R, _T_S]:
+    def set_suit(self, suit: Optional[Union[_T_S, int]]
+                 ) -> GenericCard[_T_R, _T_S]:
         """
         Sets the card’s suit. Accepts a suit name or an integer index.
         :param suit: The suit to set.
@@ -129,7 +131,7 @@ class GenericCard(Generic[_T_R, _T_S]):
 _T_C = TypeVar("_T_C", bound=GenericCard)
 
 
-class GenericDeck(Generic[_T_C, _T_R, _T_S]):
+class GenericDeck(Generic[_T_C]):
     """
     A deck of cards.
     :param card_type: The type of card to use in the deck.
@@ -148,7 +150,7 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         self._card_type: Type[_T_C] = ...
         self.cards: List[_T_C] = ...
 
-    def reset(self) -> GenericDeck[_T_C, _T_R, _T_S]:
+    def reset(self) -> GenericDeck[_T_C]:
         """
         Creates a full deck by iterating over every combination of suit and rank
             from the `Card` class, then sorts the deck.
@@ -156,7 +158,7 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         """
         pass
 
-    def count(self, card: _T_C) -> int:
+    def count(self, card: Union[_T_C, _T_R, _T_S]) -> int:
         """
         Counts the number of occurrences of a specific card, rank, or
         suit in the deck.
@@ -170,11 +172,7 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         """
         pass
 
-    @overload
-    def count(self, card: Union[_T_R, _T_S]) -> int: ...
-
-    def sort(self, by: Literal["suit", "rank"] = "suit") -> GenericDeck[
-        _T_C, _T_R, _T_S]:
+    def sort(self, by: Literal["suit", "rank"] = "suit") -> GenericDeck[_T_C]:
         """
         Sorts and returns the deck.
         :param by: The attribute to sort by.
@@ -183,7 +181,7 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         """
         pass
 
-    def shuffle(self) -> GenericDeck[_T_C, _T_R, _T_S]:
+    def shuffle(self) -> GenericDeck[_T_C]:
         """
         Randomly shuffles the cards in the deck.
         :return: The deck instance.
@@ -198,7 +196,7 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         """
         pass
 
-    def add(self, *cards: _T_C) -> GenericDeck[_T_C, _T_R, _T_S]:
+    def add(self, *cards: _T_C) -> GenericDeck[_T_C]:
         """
         Adds one or more cards to the bottom of the deck.
         :param cards: The cards to be added to the deck.
@@ -206,7 +204,7 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         """
         pass
 
-    def remove(self, *cards: _T_C) -> GenericDeck[_T_C, _T_R, _T_S]:
+    def remove(self, *cards: _T_C) -> GenericDeck[_T_C]:
         """
         The cards to be removed from the deck.
         :param cards: The cards to remove from the deck.

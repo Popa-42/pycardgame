@@ -29,7 +29,7 @@ class GenericCard(Generic[_T_R, _T_S]):
     RANKS = []
     SUITS = []
 
-    def __init__(self, rank=None, suit=None, trump=False):
+    def __init__(self, rank, suit, trump=False):
         self.rank = None
         self.suit = None
 
@@ -87,7 +87,7 @@ class GenericCard(Generic[_T_R, _T_S]):
 
     def __repr__(self):
         return (f"{self.__class__.__name__}(rank={self.rank!r}, "
-                f"suit={self.suit!r}{', trump=True' if self.trump else ''}")
+                f"suit={self.suit!r}{', trump=True' if self.trump else ''})")
 
     def __lt__(self, other):
         if self.trump and not other.trump:
@@ -116,7 +116,7 @@ class GenericCard(Generic[_T_R, _T_S]):
 _T_C = TypeVar("_T_C", bound=GenericCard)
 
 
-class GenericDeck(Generic[_T_C, _T_R, _T_S]):
+class GenericDeck(Generic[_T_C]):
     def __init__(self, card_type, cards=None):
         self._card_type = card_type
 
@@ -158,7 +158,10 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         return self
 
     def shuffle(self):
-        random.shuffle(self.cards)
+        while True:
+            random.shuffle(self.cards)
+            if self.cards != sorted(self.cards):
+                break
         return self
 
     def draw(self, n=1):
