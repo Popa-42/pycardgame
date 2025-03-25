@@ -2,7 +2,7 @@ from typing import Literal, get_args
 
 import pytest
 
-from ...src.base import GenericCard, GenericDeck
+from ... import GenericCard, GenericDeck
 
 ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
 suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
@@ -116,5 +116,5 @@ def test_deck_str():
 def test_deck_repr():
     deck = TestingDeck(TestingCard)
     deck_repr = repr(deck)
-    assert deck_repr.startswith("PlayingDeck(cards=[PlayingCard(rank=0, suit=0),")
-    assert deck_repr.endswith("PlayingCard(rank=7, suit=3)])")
+    assert deck_repr.startswith("TestingDeck(cards=[TestingCard(rank=0, suit=0),")
+    assert deck_repr.endswith("TestingCard(rank=7, suit=3)])")

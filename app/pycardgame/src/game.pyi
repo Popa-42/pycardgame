@@ -16,7 +16,8 @@
 
 from __future__ import annotations
 
-from typing import Iterator, TypeVar, Generic, List, Optional, Union, Type
+from typing import Iterator, TypeVar, Generic, List, Optional, Union, Type, \
+    overload
 
 from .base import GenericCard, GenericDeck
 
@@ -109,8 +110,10 @@ class GenericPlayer(Generic[_T_C]):
         """
         pass
 
-    def __getitem__(self, item: Union[int, slice]
-                    ) -> Union[_T_C, List[_T_C]]: ...
+    @overload
+    def __getitem__(self, item: int) -> _T_C: ...
+    @overload
+    def __getitem__(self, item: slice) -> Union[List[_T_C], _T_C]: ...
 
     def __eq__(self, other: GenericPlayer[_T_C]) -> bool: ...
     def __lt__(self, other: GenericPlayer[_T_C]) -> bool: ...

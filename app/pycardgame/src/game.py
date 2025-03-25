@@ -92,7 +92,7 @@ class GenericPlayer(Generic[_T_C]):
     def __len__(self): return len(self.hand)
 
 
-class GenericGame(Generic[_T_C, _T_R, _T_S]):
+class GenericGame(Generic[_T_C]):
     def __init__(self, card_type, deck_type, deck=None, trump=None, hand_size=4,
                  *players):
         if trump is not None and trump not in _T_C.SUITS:

@@ -2,7 +2,7 @@ from typing import Literal, get_args
 
 import pytest
 
-from ...src.base import GenericCard
+from ... import GenericCard
 
 ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
 suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
@@ -109,13 +109,13 @@ def test_card_str():
 
 def test_card_repr():
     card1 = TestingCard(0, 0)
-    assert repr(card1) == "PlayingCard(rank=0, suit=0)"
+    assert repr(card1) == "TestingCard(rank=0, suit=0)"
 
     card2 = TestingCard(4, 2, True)
-    assert repr(card2) == "PlayingCard(rank=4, suit=2, trump=True)"
+    assert repr(card2) == "TestingCard(rank=4, suit=2, trump=True)"
 
     card3 = TestingCard(None, None)
-    assert repr(card3) == "PlayingCard(rank=None, suit=None)"
+    assert repr(card3) == "TestingCard(rank=None, suit=None)"
 
 
 def test_card_comparison():
