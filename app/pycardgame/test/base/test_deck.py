@@ -8,27 +8,27 @@ ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
 suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
 
 
-class PlayingCard(GenericCard[ranks, suits]):
+class TestingCard(GenericCard[ranks, suits]):
     RANKS = list(get_args(ranks))
     SUITS = list(get_args(suits))
 
 
-class PlayingDeck(GenericDeck[PlayingCard]): ...
+class TestingDeck(GenericDeck[TestingCard]): ...
 
 
 def test_deck_init():
-    deck1 = PlayingDeck(PlayingCard)
+    deck1 = TestingDeck(TestingCard)
     assert len(deck1.cards) == 32
-    assert all(isinstance(card, PlayingCard) for card in deck1)
+    assert all(isinstance(card, TestingCard) for card in deck1)
 
-    cards = [PlayingCard(0, 0)]
-    deck2 = PlayingDeck(PlayingCard, cards)
+    cards = [TestingCard(0, 0)]
+    deck2 = TestingDeck(TestingCard, cards)
     assert deck2.cards == cards
 
 
 def test_deck_count():
-    deck = PlayingDeck(PlayingCard)
-    assert deck.count(PlayingCard(0, 0)) == 1
+    deck = TestingDeck(TestingCard)
+    assert deck.count(TestingCard(0, 0)) == 1
     assert deck.count("7") == 4
     assert deck.count("Diamonds") == 8
 
@@ -36,11 +36,11 @@ def test_deck_count():
         deck.count("InvalidName")
 
     with pytest.raises(TypeError):
-        deck.count(PlayingCard(0, 0).rank)
+        deck.count(TestingCard(0, 0).rank)
 
 
 def test_deck_sort():
-    deck = PlayingDeck(PlayingCard).shuffle()
+    deck = TestingDeck(TestingCard).shuffle()
     deck.sort(by="rank")
     assert deck.cards == sorted(deck.cards, key=lambda c: (
         not c.trump, c.rank if c.rank is not None else -1,
@@ -54,12 +54,12 @@ def test_deck_sort():
 
 
 def test_deck_shuffle():
-    deck = PlayingDeck(PlayingCard).shuffle()
+    deck = TestingDeck(TestingCard).shuffle()
     assert deck.cards != sorted(deck.cards)
 
 
 def test_deck_draw():
-    deck = PlayingDeck(PlayingCard)
+    deck = TestingDeck(TestingCard)
     cards = deck.draw(5)
     assert len(cards) == 5
     assert len(deck.cards) == 27
@@ -70,51 +70,51 @@ def test_deck_draw():
 
 
 def test_deck_add():
-    deck = PlayingDeck(PlayingCard)
-    cards = [PlayingCard(0, 0), PlayingCard(1, 1)]
+    deck = TestingDeck(TestingCard)
+    cards = [TestingCard(0, 0), TestingCard(1, 1)]
     deck.add(*cards)
     assert deck.cards[-1] == cards[-1]
 
 
 def test_deck_remove():
-    deck = PlayingDeck(PlayingCard)
-    card = PlayingCard(0, 0)
+    deck = TestingDeck(TestingCard)
+    card = TestingCard(0, 0)
     deck.remove(card)
     assert card not in deck.cards
 
     with pytest.raises(ValueError):
-        deck.remove(PlayingCard(10, 10))
+        deck.remove(TestingCard(10, 10))
 
 
 def test_deck_get_index():
-    deck = PlayingDeck(PlayingCard)
-    card = PlayingCard(0, 0)
+    deck = TestingDeck(TestingCard)
+    card = TestingCard(0, 0)
     assert deck.get_index(card) == [0]
 
     with pytest.raises(ValueError):
-        deck.get_index(PlayingCard(10, 10))
+        deck.get_index(TestingCard(10, 10))
 
     with pytest.raises(TypeError):
         deck.get_index("Ace of Diamonds")
 
 
 def test_deck_get_cards():
-    deck = PlayingDeck(PlayingCard)
+    deck = TestingDeck(TestingCard)
     assert deck.get_cards() == deck.cards
 
 
 def test_deck_get_top_card():
-    deck = PlayingDeck(PlayingCard)
+    deck = TestingDeck(TestingCard)
     assert deck.get_top_card() == deck.cards[0]
 
 
 def test_deck_str():
-    deck = PlayingDeck(PlayingCard)
+    deck = TestingDeck(TestingCard)
     assert str(deck) == "Deck of 32 cards. Top card: 7 of Diamonds"
 
 
 def test_deck_repr():
-    deck = PlayingDeck(PlayingCard)
+    deck = TestingDeck(TestingCard)
     deck_repr = repr(deck)
     assert deck_repr.startswith("PlayingDeck(cards=[PlayingCard(rank=0, suit=0),")
     assert deck_repr.endswith("PlayingCard(rank=7, suit=3)])")
