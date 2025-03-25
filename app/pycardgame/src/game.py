@@ -13,19 +13,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from typing import TypeVar, Generic
 
-from .base import Deck, Card
+from .base import GenericCard
+
+_T_C = TypeVar("_T_C", bound=GenericCard)
+_T_R = TypeVar("_T_R")
+_T_S = TypeVar("_T_S")
 
 
-class Player:
-    def __init__(self, name, hand=None, score=0, **kwargs):
+class GenericPlayer(Generic[_T_C]):
+    __slots__ = ("name", "hand", "score")
+
+    def __init__(self, name, hand=None, score=0):
         self.name = name
         self.hand = hand or []
         self.score = score
-
-        # Set any additional attributes
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
     def add_card(self, *cards):
         self.hand.extend(cards)
@@ -89,13 +92,16 @@ class Player:
     def __len__(self): return len(self.hand)
 
 
-class Game:
-    def __init__(self, deck=None, trump=None, hand_size=4, *players, **kwargs):
-        if trump is not None and trump not in Card.SUITS:
+class GenericGame(Generic[_T_C, _T_R, _T_S]):
+    def __init__(self, card_type, deck_type, deck=None, trump=None, hand_size=4,
+                 *players):
+        if trump is not None and trump not in _T_C.SUITS:
             raise ValueError(f"Invalid suit for trump: {trump}")
+        self._card_type = card_type
+        self._deck_type = deck_type
 
-        self.deck = deck or Deck().shuffle()
-        self.discard_pile = Deck([])
+        self.deck = deck or self._deck_type(self._card_type).shuffle()
+        self.discard_pile = self._deck_type(self._card_type, [])
 
         self.trump = None
         if trump is not None:
@@ -107,10 +113,6 @@ class Game:
         for player in self.players:
             player.add_card(*self.deck.draw(self.hand_size))
         self.current_player_index = 0
-
-        # Set any additional attributes
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
     def add_players(self, *players):
         self.players.extend(players)
@@ -140,7 +142,7 @@ class Game:
         return self.trump
 
     def set_trump(self, suit):
-        if suit not in Card.SUITS:
+        if suit not in _T_C.SUITS:
             raise ValueError(f"Invalid suit for trump: {suit}")
         self.trump = suit
         return self
@@ -174,15 +176,10 @@ class Game:
         return f"Game of {len(self.players)} players"
 
     def __repr__(self):
-        keys = ["deck", "discard_pile", "players", "trump", "hand_size",
-                "current_player_index"]
-        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
-                               if k not in keys)
         return (f"{self.__class__.__name__}("
                 f"deck={self.deck!r}, "
                 f"discard_pile={self.discard_pile!r}"
                 f"trump={self.trump!r}, "
                 f"hand_size={self.hand_size!r}, "
                 f"players={self.players!r}, "
-                f"current_player_index={self.current_player_index!r}"
-                f"{f', {additional}' if additional else ''})")
+                f"current_player_index={self.current_player_index!r}")

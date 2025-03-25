@@ -192,11 +192,6 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
     def __repr__(self):
         return f"{self.__class__.__name__}(cards={self.cards!r})"
 
-    def __getitem__(self, key):
-        return self.cards[key]
-
-    def __len__(self):
-        return len(self.cards)
-
-    def __iter__(self):
-        return iter(self.cards)
+    def __getitem__(self, key): return self.cards[key]
+    def __len__(self): return len(self.cards)
+    def __iter__(self): return iter(self.cards)

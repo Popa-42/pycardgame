@@ -23,16 +23,17 @@ from typing import (
     List,
     Literal,
     Optional,
+    overload,
     Type,
     TypeVar,
-    Union, overload, Self,
+    Union,
 )
 
 _T_R = TypeVar("_T_R")
 _T_S = TypeVar("_T_S")
 
 
-class GenericCard(Generic[R, S]):
+class GenericCard(Generic[_T_R, _T_S]):
     """
     A playing card.
     :param rank: The rank of the card.
@@ -47,10 +48,13 @@ class GenericCard(Generic[R, S]):
                  ) -> None:
         """
         Creates a new card instance.
-        :param rank: The card’s rank, provided either as a string (e.g., `"Ace"`) or an integer index.
-        :param suit: The card’s suit, provided either as a string (e.g., `"Hearts"`) or an integer index.
+        :param rank: The card’s rank, provided either as a string (e.g.,
+            `"Ace"`) or an integer index.
+        :param suit: The card’s suit, provided either as a string (e.g.,
+            `"Hearts"`) or an integer index.
         :param trump: Whether the card is a trump card.
-        :raise ValueError: If the given rank or suit is not found or the index is out of range.
+        :raise ValueError: If the given rank or suit is not found or the index
+            is out of range.
         """
         self.rank: Optional[int] = ...
         self.suit: Optional[int] = ...
@@ -64,7 +68,8 @@ class GenericCard(Generic[R, S]):
     def get_rank(self, as_index: bool = False) -> Optional[Union[_T_R, int]]:
         """
         Returns the card’s rank.
-        :param as_index: If `True`, the rank is returned as an integer index; otherwise, as a string.
+        :param as_index: If `True`, the rank is returned as an integer index;
+            otherwise, as a string.
         :return: The rank of the card.
         """
         pass
@@ -74,14 +79,16 @@ class GenericCard(Generic[R, S]):
         Sets the card’s rank. Accepts a rank name or an integer index.
         :param rank: The rank to set.
         :return: The card with the rank set.
-        :raise ValueError: If the given string is not found in `rank_names` or the index is out of range.
+        :raise ValueError: If the given string is not found in `rank_names` or
+            the index is out of range.
         """
         pass
 
     def get_suit(self, as_index: bool = False) -> Optional[Union[_T_S, int]]:
         """
         Returns the card’s suit.
-        :param as_index: If `True`, returns the suit as an integer index; otherwise, as a string.
+        :param as_index: If `True`, returns the suit as an integer index;
+            otherwise, as a string.
         :return: The suit of the card.
         """
         pass
@@ -91,7 +98,8 @@ class GenericCard(Generic[R, S]):
         Sets the card’s suit. Accepts a suit name or an integer index.
         :param suit: The suit to set.
         :return: The card instance with the updated suit.
-        :raise ValueError: If the given string is not found in `suit_names` or the index is out of range.
+        :raise ValueError: If the given string is not found in `suit_names` or
+            the index is out of range.
         """
         pass
 
@@ -124,21 +132,26 @@ _T_C = TypeVar("_T_C", bound=GenericCard)
 class GenericDeck(Generic[_T_C, _T_R, _T_S]):
     """
     A deck of cards.
-    :param cards: A list of cards to initialize the deck with.
+    :param card_type: The type of card to use in the deck.
+    :param cards: A custom list of `Card` objects. If omitted, a full deck is
+        created using the `reset()` method.
     """
 
     def __init__(self, card_type: Type[_T_C],
                  cards: Optional[List[_T_C]] = None) -> None:
         """
         Creates a new deck instance.
-        :param cards: A custom list of `Card` objects. If omitted, a full deck is created using the `reset()` method.
+        :param card_type: The type of card to use in the deck.
+        :param cards: A custom list of `Card` objects. If omitted, a full deck
+            is created using the `reset()` method.
         """
         self._card_type: Type[_T_C] = ...
         self.cards: List[_T_C] = ...
 
     def reset(self) -> GenericDeck[_T_C, _T_R, _T_S]:
         """
-        Creates a full deck by iterating over every combination of suit and rank from the `Card` class, then sorts the deck.
+        Creates a full deck by iterating over every combination of suit and rank
+            from the `Card` class, then sorts the deck.
         :return: The deck instance.
         """
         pass
@@ -147,9 +160,12 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
         """
         Counts the number of occurrences of a specific card, rank, or
         suit in the deck.
-        :param card: Either a card instance, a rank (as a `string`), or a suit (as a `string`).
-        :return: The number of occurrences of the specified card, rank, or suit in the deck.
-        :raise ValueError: If the given card is not a valid card instance, rank, or suit.
+        :param card: Either a card instance, a rank (as a `string`), or a suit
+            (as a `string`).
+        :return: The number of occurrences of the specified card, rank, or suit
+            in the deck.
+        :raise ValueError: If the given card is not a valid card instance, rank,
+            or suit.
         :raise TypeError: If the given input is not a valid type.
         """
         pass
@@ -218,7 +234,8 @@ class GenericDeck(Generic[_T_C, _T_R, _T_S]):
     def get_top_card(self) -> Optional[_T_C]:
         """
         Returns the card at the top of the deck without removing it.
-        :return: The top card of the deck if the deck is not empty; otherwise, `None`.
+        :return: The top card of the deck if the deck is not empty; otherwise,
+            `None`.
         """
         pass
 
