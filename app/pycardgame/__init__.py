@@ -20,13 +20,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from .src.base import Card, Deck
+from .src.base import GenericCard, GenericDeck
 from .src.game import Game, Player
 from .src.presets import UnoCard, UnoDeck, PokerDeck, SkatCard, SkatDeck
 
 __all__ = [
-    "Card",
-    "Deck",
+    "GenericCard",
+    "GenericDeck",
     "Game",
     "Player",
     "PokerDeck",
