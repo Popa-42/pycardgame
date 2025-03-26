@@ -193,8 +193,18 @@ class GenericDeck(Generic[_T_C]):
         return deck_string + top_card
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(cards={self.cards!r})"
+        return (f"{self.__class__.__name__}("
+                f"card_type={self._card_type!r}, "
+                f"cards={self.cards!r})")
 
     def __getitem__(self, key): return self.cards[key]
     def __len__(self): return len(self.cards)
     def __iter__(self): return iter(self.cards)
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__): return NotImplemented
+        return self.cards == other.cards and self._card_type == other._card_type
+
+    def __neq__(self, other): return not self.__eq__(other)
+
+    __hash__ = None

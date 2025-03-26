@@ -17,13 +17,12 @@
 from __future__ import annotations
 
 from typing import (
-    Final,
+    overload,
     Generic,
     Iterator,
     List,
     Literal,
     Optional,
-    overload,
     Type,
     TypeVar,
     Union,
@@ -238,9 +237,12 @@ class GenericDeck(Generic[_T_C]):
         pass
 
     @overload
-    def __getitem__(self, key: int) -> _T_C: ...
+    def __getitem__(self, index: int) -> _T_C: ...
     @overload
-    def __getitem__(self, key: slice) -> List[_T_C]: ...
+    def __getitem__(self, s: slice) -> List[_T_C]: ...
+    def __getitem__(self, key): ...
 
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[_T_C]: ...
+    def __eq__(self, other: GenericDeck[_T_C]) -> bool: ...
+    def __neq__(self, other: GenericDeck[_T_C]) -> bool: ...

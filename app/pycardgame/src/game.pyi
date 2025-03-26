@@ -16,8 +16,16 @@
 
 from __future__ import annotations
 
-from typing import Iterator, TypeVar, Generic, List, Optional, Union, Type, \
-    overload
+from typing import (
+    overload,
+    Generic,
+    Iterator,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from .base import GenericCard, GenericDeck
 
@@ -111,9 +119,10 @@ class GenericPlayer(Generic[_T_C]):
         pass
 
     @overload
-    def __getitem__(self, item: int) -> _T_C: ...
+    def __getitem__(self, index: int) -> _T_C: ...
     @overload
-    def __getitem__(self, item: slice) -> Union[List[_T_C], _T_C]: ...
+    def __getitem__(self, s: slice) -> List[_T_C]: ...
+    def __getitem__(self, key): ...
 
     def __eq__(self, other: GenericPlayer[_T_C]) -> bool: ...
     def __lt__(self, other: GenericPlayer[_T_C]) -> bool: ...
@@ -136,11 +145,13 @@ class GenericGame(Generic[_T_C]):
     """
 
     def __init__(self,
-                 card_type: Type[GenericCard[_T_C]],
+                 card_type: Type[_T_C],
                  deck_type: Type[GenericDeck[_T_C]],
                  deck: Optional[GenericDeck[_T_C]] = None,
+                 discard_pile: Optional[GenericDeck[_T_C]] = None,
                  trump: Optional[Union[_T_C.SuitType, str]] = None,
                  hand_size: int = 4,
+                 starting_player_index: int = 0,
                  *players: GenericPlayer[_T_C]) -> None:
         """
         Constructor for the Game class.

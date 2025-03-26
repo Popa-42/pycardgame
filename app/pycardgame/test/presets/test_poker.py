@@ -99,5 +99,6 @@ def test_deck_str():
 def test_deck_repr():
     deck = PokerDeck()
     deck_repr = repr(deck)
-    assert deck_repr.startswith("PokerDeck(cards=[PokerCard(rank=0, suit=0),")
+    assert deck_repr.startswith("PokerDeck(card_type=<class")
+    assert "cards=[PokerCard(rank=0, suit=0)," in deck_repr
     assert deck_repr.endswith("PokerCard(rank=12, suit=3)])")

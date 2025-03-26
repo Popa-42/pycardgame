@@ -62,27 +62,21 @@ class GenericPlayer(Generic[_T_C]):
         self.name = name
         return self
 
-    def __getitem__(self, item):
-        return self.hand[item]
+    def __getitem__(self, key): return self.hand[key]
 
     def __str__(self):
         return f"Player {self.name} ({len(self.hand)} card(s))"
 
     def __repr__(self):
-        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
-                               if k not in ["name", "hand", "score"])
         return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r}, "
-                f"score={self.score!r}"
-                f"{f', {additional}' if additional else ''})")
+                f"score={self.score!r})")
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__): return NotImplemented
         return (self.score == other.score and self.hand == other.hand and
                 self.name == other.name)
 
-    def __ne__(self, other):
-        return (self.score != other.score or self.hand != other.hand or
-                self.name != other.name)
-
+    def __ne__(self, other): return not self.__eq__(other)
     def __lt__(self, other): return self.score < other.score
     def __le__(self, other): return self.score <= other.score
     def __gt__(self, other): return self.score > other.score
@@ -93,15 +87,17 @@ class GenericPlayer(Generic[_T_C]):
 
 
 class GenericGame(Generic[_T_C]):
-    def __init__(self, card_type, deck_type, deck=None, trump=None, hand_size=4,
-                 *players):
-        if trump is not None and trump not in _T_C.SUITS:
-            raise ValueError(f"Invalid suit for trump: {trump}")
+    def __init__(self, card_type, deck_type, deck=None, discard_pile=None,
+                 trump=None, hand_size=4, starting_player_index=0, *players):
         self._card_type = card_type
         self._deck_type = deck_type
 
-        self.deck = deck or self._deck_type(self._card_type).shuffle()
-        self.discard_pile = self._deck_type(self._card_type, [])
+        if trump is not None and trump not in self._card_type.SUITS:
+            raise ValueError(f"Invalid suit for trump: {trump}")
+
+        self.deck = deck or self._deck_type(card_type=self._card_type).shuffle()
+        self.discard_pile = discard_pile or \
+            self._deck_type(card_type=self._card_type, cards=[])
 
         self.trump = None
         if trump is not None:
@@ -109,10 +105,15 @@ class GenericGame(Generic[_T_C]):
         self.apply_trump()
 
         self.hand_size = hand_size
+
         self.players = list(players)
         for player in self.players:
             player.add_card(*self.deck.draw(self.hand_size))
-        self.current_player_index = 0
+
+        start_idx = starting_player_index
+        if start_idx < 0 or start_idx > 0 and start_idx >= len(self.players):
+            raise ValueError("Invalid starting player index")
+        self.current_player_index = start_idx
 
     def add_players(self, *players):
         self.players.extend(players)
@@ -142,14 +143,14 @@ class GenericGame(Generic[_T_C]):
         return self.trump
 
     def set_trump(self, suit):
-        if suit not in _T_C.SUITS:
+        if suit not in self._card_type.SUITS:
             raise ValueError(f"Invalid suit for trump: {suit}")
         self.trump = suit
         return self
 
     def apply_trump(self):
         for card in self.deck:
-            if card.get_suit() == self.trump:
+            if card.get_suit(as_index=False) == self.trump:
                 card.set_trump(True)
             else:
                 card.set_trump(False)
@@ -177,9 +178,11 @@ class GenericGame(Generic[_T_C]):
 
     def __repr__(self):
         return (f"{self.__class__.__name__}("
+                f"card_type={self._card_type!r}, "
+                f"deck_type={self._deck_type!r}, "
                 f"deck={self.deck!r}, "
-                f"discard_pile={self.discard_pile!r}"
+                f"discard_pile={self.discard_pile!r}, "
                 f"trump={self.trump!r}, "
                 f"hand_size={self.hand_size!r}, "
-                f"players={self.players!r}, "
-                f"current_player_index={self.current_player_index!r}")
+                f"starting_player_index={self.current_player_index!r}, "
+                f"*{self.players!r}")

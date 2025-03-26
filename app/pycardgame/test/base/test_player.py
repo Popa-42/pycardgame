@@ -2,8 +2,7 @@ from typing import Literal, get_args
 
 import pytest
 
-from ... import GenericPlayer
-from ... import GenericCard, GenericDeck
+from ... import GenericCard, GenericPlayer
 
 ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
 suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
@@ -14,7 +13,6 @@ class TestingCard(GenericCard[ranks, suits]):
     SUITS = list(get_args(suits))
 
 
-class TestingDeck(GenericDeck[TestingCard]): ...
 class TestingPlayer(GenericPlayer[TestingCard]): ...
 
 
@@ -89,3 +87,25 @@ def test_player_getitem():
     player = TestingPlayer("Alice", cards)
     assert player[0] == cards[0]
     assert player[1:-1:-1] == cards[1:-1:-1]
+
+
+def test_player_str():
+    player = TestingPlayer("Alice", [TestingCard("10", "Hearts")])
+    assert str(player) == "Player Alice (1 card(s))"
+
+
+def test_player_repr():
+    player = TestingPlayer("Alice", [TestingCard("10", "Hearts")])
+    player_repr = repr(player)
+    assert player_repr.startswith("TestingPlayer('Alice', hand=[")
+    assert "TestingCard(rank=3, suit=1)" in player_repr
+    assert player_repr.endswith(", score=0)")
+
+
+def test_player_equalities():
+    player1 = TestingPlayer("Alice", [TestingCard("10", "Hearts")])
+    player2 = TestingPlayer("Alice", [TestingCard("10", "Hearts")])
+    assert player1 == player2
+    assert player1 != TestingPlayer("Bob", [TestingCard("10", "Hearts")])
+    assert player1 != TestingPlayer("Alice", [TestingCard("J", "Diamonds")])
+    assert player1 != TestingPlayer("Alice", [TestingCard("10", "Hearts")], 10)
