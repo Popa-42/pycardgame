@@ -1,4 +1,4 @@
-from typing import Literal, get_args, List
+from typing import Literal, get_args
 
 from .. import GenericCard, GenericDeck, GenericPlayer, GenericGame
 
@@ -13,17 +13,19 @@ class PokerCard(GenericCard[ranks, suits]):
 
 
 class PokerDeck(GenericDeck[PokerCard]):
-    def __init__(self):
-        super().__init__(PokerCard)
+    def __init__(self, cards=None, card_type=PokerCard):
+        super().__init__(card_type, cards=cards)
 
 
-class PokerPlayer(GenericPlayer[PokerCard]): ...
+class PokerPlayer(GenericPlayer[PokerCard]):
+    ...
 
 
 class PokerGame(GenericGame[PokerCard]):
     def __init__(self, starting_player_index=0, *players):
-        super().__init__(PokerCard, PokerDeck, None, None, None, 2,
-                         starting_player_index, *players)
+        super().__init__(PokerCard, PokerDeck, deck=None, discard_pile=None,
+                         trump=None, hand_size=2,
+                         starting_player_index=starting_player_index, *players)
         self.trash_pile = []
         self.trash_pile_limit = 2
         self.trash_pile_index = 0

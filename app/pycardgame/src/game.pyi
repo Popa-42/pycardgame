@@ -137,10 +137,16 @@ class GenericPlayer(Generic[_T_C]):
 
 class GenericGame(Generic[_T_C]):
     """
-    A class representing a card game.
-    :param deck: The deck of cards to use in the game. If not provided, a new
-        deck will be created.
-    :param trump: The trump suit for the game.
+    The base class for a card game.
+    :param card_type: The type of card to use.
+    :param deck_type: The type of deck to use.
+    :param deck: The predefined deck of cards. If not provided, a new deck will
+        be created.
+    :param discard_pile: A discard pile for the game. If not provided, a new
+        empty discard pile will be created.
+    :param trump: The trump suit for the game, if any.
+    :param hand_size: The size of each player's hand.
+    :param starting_player_index: The index of the starting player.
     :param players: The players in the game.
     """
 
@@ -154,13 +160,17 @@ class GenericGame(Generic[_T_C]):
                  starting_player_index: int = 0,
                  *players: GenericPlayer[_T_C]) -> None:
         """
-        Constructor for the Game class.
-        :param card_type: The type of card to use in the game.
-        :param deck_type: The type of deck to use in the game.
-        :param deck: The deck of cards to use in the game. If not provided, a
-            new deck will be created.
-        :param hand_size: The number of cards to deal to each player.
-        :param trump: The trump suit for the game.
+        Constructor for the GenericGame class.
+        :param card_type: The type of card to use.
+        :param deck_type: The type of deck to use.
+        :param deck: The predefined deck of cards. If not provided, a new deck
+            will be created.
+        :param discard_pile: A discard pile for the game. If not provided, a
+            new empty discard pile will be created.
+        :param trump: The trump suit for the game, if any.
+        :param hand_size: The size of each player's hand. Default is 4.
+        :param starting_player_index: The index of the starting player. Defaults
+            to 0.
         :param players: The players in the game.
         """
         self._card_type: Type[_T_C] = ...
