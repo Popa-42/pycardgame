@@ -22,14 +22,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .src.base import GenericCard, GenericDeck
 from .src.game import GenericGame, GenericPlayer
-from .src.presets import PokerDeck  # , SkatCard, SkatDeck, UnoCard, UnoDeck
+from .src.presets import PokerCard, PokerDeck, PokerPlayer, PokerGame  # , SkatCard, SkatDeck, UnoCard, UnoDeck
 
 __all__ = [
     "GenericCard",
     "GenericDeck",
     "GenericGame",
     "GenericPlayer",
+    "PokerCard",
     "PokerDeck",
+    "PokerPlayer",
+    "PokerGame",
     # "SkatCard",
     # "SkatDeck",
     # "UnoCard",

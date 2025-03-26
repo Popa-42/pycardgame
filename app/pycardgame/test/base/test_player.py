@@ -1,7 +1,5 @@
 from typing import Literal, get_args
 
-import pytest
-
 from ... import GenericCard, GenericPlayer
 
 ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
