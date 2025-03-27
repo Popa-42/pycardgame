@@ -1,7 +1,13 @@
 from typing import Literal
 
-from .. import GenericCard, GenericDeck, GenericPlayer, GenericGame, CardMeta, \
-    DeckMeta
+from .. import (
+    CardMeta,
+    DeckMeta,
+    GenericCard,
+    GenericDeck,
+    GenericGame,
+    GenericPlayer,
+)
 
 T_Ranks = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
                   "Queen", "King", "Ace"]
@@ -31,9 +37,8 @@ class PokerPlayer(GenericPlayer[PokerCard]):
 
 class PokerGame(GenericGame[PokerCard]):
     def __init__(self, starting_player_index=0, *players):
-        super().__init__(PokerCard, PokerDeck, deck=None, discard_pile=None,
-                         trump=None, hand_size=2,
-                         starting_player_index=starting_player_index, *players)
+        super().__init__(PokerCard, PokerDeck, None, None, None, 2,
+                         starting_player_index, *players)
         self.trash_pile = []
         self.trash_pile_limit = 2
         self.trash_pile_index = 0

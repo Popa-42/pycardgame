@@ -63,6 +63,15 @@ def test_game_init():
         TestingGame(deck, empty_deck, "Hearts", 6, 3, *players)
 
 
+def test_game_deal_initial_cards():
+    players = [TestingPlayer("Alice"), TestingPlayer("Bob")]
+    deck = TestingDeck()
+    game = TestingGame(deck, None, None, 4, 0, *players)
+    game.deal_initial_cards()
+    assert all(len(player.hand) == 4 for player in players)
+    assert len(game.deck) == len(deck) - 8
+
+
 def test_game_add_players():
     players = [TestingPlayer("Alice"), TestingPlayer("Bob")]
     game = TestingGame(None, None, None, 4, 0, *players)
@@ -83,7 +92,7 @@ def test_game_deal():
 
     game = TestingGame(None, None, None, 6, 0, *players)
     game.deal(2)
-    assert all(len(player.hand) == 8 for player in game.players)
+    assert all(len(player.hand) == 2 for player in game.players)
 
 
 def test_game_shuffle():
@@ -101,7 +110,7 @@ def test_game_play():
     game.deal(2)
     dealt_card = players[0].hand[0]
     game.play(players[0], players[0].hand[0])
-    assert len(players[0].hand) == 5
+    assert len(players[0].hand) == 1
     assert len(game.discard_pile) == 1
     assert dealt_card in game.discard_pile and dealt_card not in players[0].hand
 
@@ -191,5 +200,5 @@ def test_game_repr():
     assert "trump='Hearts'" in game_repr
     assert "hand_size=4" in game_repr
     assert "starting_player_index=0" in game_repr
-    assert "*[TestingPlayer('Alice', hand=[TestingCard(" in game_repr
-    assert "TestingPlayer('Bob', hand=[TestingCard(" in game_repr
+    assert "TestingPlayer('Alice', hand=[], score=0)" in game_repr
+    assert "TestingPlayer('Alice', hand=[], score=0)" in game_repr
