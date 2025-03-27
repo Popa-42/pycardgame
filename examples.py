@@ -28,13 +28,13 @@ from app.pycardgame import (
     PokerPlayer,
 )
 
-
 # Example 1: Using Generic Card Game Classes
 # ------------------------------------------
 
 # Define custom rank and suit types
-Rank = Literal["1", "2", "3", "4", "5"]
-Suit = Literal["Red", "Blue", "Green"]
+Rank = Literal["1", "2", "3"]
+Suit = Literal["Red", "Green", "Blue"]
+
 
 # Create a custom card class
 class CustomCard(
@@ -42,13 +42,23 @@ class CustomCard(
     metaclass=CardMeta,
     rank_type=Rank,
     suit_type=Suit,
-): ...
+):
+    # Customise the string representation of the card
+    def __str__(self):
+        return (f"{self.get_suit()} {self.get_rank()}"
+                f"{' (trump)' if self.get_trump() else ''}")
+
 
 # Create a custom deck class
-class CustomDeck(GenericDeck[CustomCard], metaclass=DeckMeta, card_type=CustomCard): ...
+class CustomDeck(GenericDeck[CustomCard], metaclass=DeckMeta,
+                 card_type=CustomCard):
+    ...
+
 
 # Create a custom player class
-class CustomPlayer(GenericPlayer[CustomCard]): ...
+class CustomPlayer(GenericPlayer[CustomCard]):
+    ...
+
 
 # Create a custom game class
 class CustomGame(GenericGame[CustomCard]):
@@ -56,6 +66,7 @@ class CustomGame(GenericGame[CustomCard]):
                  starting_player_index=0, *players):
         super().__init__(CustomCard, CustomDeck, deck, discard_pile, trump,
                          hand_size, starting_player_index, *players)
+
 
 # Demonstrate generic card game functionality
 print("Example 1: Generic Card Game")
@@ -70,20 +81,21 @@ print(f"Created cards: {card1}, {card2}, {card3}")
 
 # Create a deck and add cards
 deck = CustomDeck()
-deck.add(card1, card2, card3).shuffle()
-print(f"\nDeck contents: {deck}")
+deck.add(card1, card2, card3)
+print(f"\nCreated {deck}. Contents:")
+[print(f"- {card}") for card in deck]
 
 # Create players
 player1 = CustomPlayer("Alice")
 player2 = CustomPlayer("Bob")
 
 # Create a game
-game = CustomGame(deck, None, "Red", 2, 0, player1, player2)
+game = CustomGame(deck.shuffle(), None, "Red", 3, 0, player1, player2)
 print(f"\nGame created: {game}")
 
 # Deal cards and demonstrate gameplay
-game.deal()
-print("\nAfter dealing:")
+game.deal_initial_cards()
+print("\nAfter dealing first round:")
 for player in game.get_players():
     print(f"{player.name}'s hand: {[str(card) for card in player.get_hand()]}")
 
@@ -91,11 +103,12 @@ for player in game.get_players():
 # ----------------------------------------
 
 print("\n\nExample 2: Poker Card Game")
-print("-" * 24)
+print("-" * 26)
 
 # Create a poker deck
 poker_deck = PokerDeck()
-print(f"Created poker deck: {poker_deck}")
+print(f"\nCreated {poker_deck}. Contents:")
+[print(f"- {card}") for card in poker_deck]
 
 # Create poker players
 poker_player1 = PokerPlayer("Charlie")
@@ -106,8 +119,8 @@ poker_game = PokerGame(0, poker_player1, poker_player2)
 print(f"\nCreated poker game: {poker_game}")
 
 # Deal cards and demonstrate gameplay
-poker_game.deal()
-print("\nAfter dealing:")
+poker_game.deal_initial_cards()
+print("\nAfter dealing first round:")
 for player in poker_game.get_players():
     print(f"{player.name}'s hand: {[str(card) for card in player.get_hand()]}")
 
@@ -116,8 +129,8 @@ ace_hearts = PokerCard("Ace", "Hearts")
 king_spades = PokerCard("King", "Spades")
 
 print("\nCard comparison:")
-print(f"{ace_hearts} > {king_spades}: {ace_hearts > king_spades}")
-print(f"{ace_hearts} == {king_spades}: {ace_hearts == king_spades}")
+print(f"{ace_hearts > king_spades = } (Spades > Hearts)")
+print(f"{ace_hearts != king_spades = }")
 
 # Demonstrate deck operations
 print("\nDeck operations:")
@@ -135,7 +148,14 @@ print(f"Current player: {current_player}")
 
 # Play a card
 if current_player.get_hand():
+    print(f"{current_player.name}'s hand before playing: "
+          f"{[str(card) for card in current_player.get_hand()]}")
     played_card = current_player.get_hand()[0]
     poker_game.play(current_player, played_card)
     print(f"Played card: {played_card}")
     print(f"Discard pile: {poker_game.discard_pile}")
+    print(f"{current_player.name}'s hand after playing: "
+          f"{[str(card) for card in current_player.get_hand()]}")
+    poker_game.deal_initial_cards(current_player)
+    print(f"After dealing to {current_player.name}: "
+          f"{[str(card) for card in current_player.get_hand()]}")
