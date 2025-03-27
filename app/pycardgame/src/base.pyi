@@ -133,20 +133,17 @@ _T_C = TypeVar("_T_C", bound=GenericCard)
 class GenericDeck(Generic[_T_C]):
     """
     A deck of cards.
-    :param card_type: The type of card to use in the deck.
     :param cards: A custom list of `Card` objects. If omitted, a full deck is
         created using the `reset()` method.
     """
+    _card_type: Type[_T_C]
 
-    def __init__(self, card_type: Type[_T_C],
-                 cards: Optional[List[_T_C]] = None) -> None:
+    def __init__(self, cards: Optional[List[_T_C]] = None) -> None:
         """
         Creates a new deck instance.
-        :param card_type: The type of card to use in the deck.
         :param cards: A custom list of `Card` objects. If omitted, a full deck
             is created using the `reset()` method.
         """
-        self._card_type: Type[_T_C] = ...
         self.cards: List[_T_C] = ...
 
     def reset(self) -> GenericDeck[_T_C]:
@@ -246,3 +243,38 @@ class GenericDeck(Generic[_T_C]):
     def __iter__(self) -> Iterator[_T_C]: ...
     def __eq__(self, other: GenericDeck[_T_C]) -> bool: ...
     def __neq__(self, other: GenericDeck[_T_C]) -> bool: ...
+
+
+class CardMeta(type):
+    """
+    A metaclass for creating custom card classes.
+    """
+    def __new__(cls, name: str, bases: tuple, class_dict: dict,
+                rank_type: Type[_T_R], suit_type: Type[_T_S]) -> CardMeta:
+        """
+        Creates a new card class with the given rank and suit types.
+        :param name: The name of the class.
+        :param bases: The base classes of the new class.
+        :param class_dict: The class dictionary.
+        :param rank_type: The type of the card rank.
+        :param suit_type: The type of the card suit.
+        :return: The new card class.
+        """
+        pass
+
+
+class DeckMeta(type):
+    """
+    A metaclass for creating custom deck classes.
+    """
+    def __new__(cls, name: str, bases: tuple, class_dict: dict,
+                card_type: Type[_T_C]) -> DeckMeta:
+        """
+        Creates a new deck class with the given card type.
+        :param name: The name of the class.
+        :param bases: The base classes of the new class.
+        :param class_dict: The class dictionary.
+        :param card_type: The type of the card to use in the deck.
+        :return: The new deck class.
+        """
+        pass

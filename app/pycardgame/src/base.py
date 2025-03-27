@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import random
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, get_args, Type
 
 _T_R = TypeVar("_T_R")
 _T_S = TypeVar("_T_S")
@@ -117,9 +117,9 @@ _T_C = TypeVar("_T_C", bound=GenericCard)
 
 
 class GenericDeck(Generic[_T_C]):
-    def __init__(self, card_type, cards=None):
-        self._card_type = card_type
+    _card_type: Type[_T_C]
 
+    def __init__(self, cards=None):
         if cards is None:
             self.cards = self.reset().get_cards()
         else:
@@ -202,9 +202,23 @@ class GenericDeck(Generic[_T_C]):
     def __iter__(self): return iter(self.cards)
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__): return NotImplemented
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.cards == other.cards and self._card_type == other._card_type
 
     def __neq__(self, other): return not self.__eq__(other)
 
     __hash__ = None
+
+
+class CardMeta(type):
+    def __new__(cls, name, bases, class_dict, rank_type, suit_type):
+        class_dict["RANKS"] = list(get_args(rank_type))
+        class_dict["SUITS"] = list(get_args(suit_type))
+        return super().__new__(cls, name, bases, class_dict)
+
+
+class DeckMeta(type):
+    def __new__(cls, name, bases, class_dict, card_type):
+        class_dict["_card_type"] = card_type
+        return super().__new__(cls, name, bases, class_dict)

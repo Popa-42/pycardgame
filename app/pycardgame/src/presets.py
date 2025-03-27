@@ -1,20 +1,28 @@
-from typing import Literal, get_args
+from typing import Literal
 
-from .. import GenericCard, GenericDeck, GenericPlayer, GenericGame
+from .. import GenericCard, GenericDeck, GenericPlayer, GenericGame, CardMeta, \
+    DeckMeta
 
-ranks = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen",
-                "King", "Ace"]
-suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
-
-
-class PokerCard(GenericCard[ranks, suits]):
-    RANKS = list(get_args(ranks))
-    SUITS = list(get_args(suits))
+T_Ranks = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
+                  "Queen", "King", "Ace"]
+T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
 
 
-class PokerDeck(GenericDeck[PokerCard]):
-    def __init__(self, cards=None, card_type=PokerCard):
-        super().__init__(card_type, cards=cards)
+class PokerCard(
+    GenericCard[T_Ranks, T_Suits],
+    metaclass=CardMeta,
+    rank_type=T_Ranks,
+    suit_type=T_Suits
+):
+    ...
+
+
+class PokerDeck(
+    GenericDeck[PokerCard],
+    metaclass=DeckMeta,
+    card_type=PokerCard
+):
+    ...
 
 
 class PokerPlayer(GenericPlayer[PokerCard]):

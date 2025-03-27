@@ -1,4 +1,4 @@
-from typing import Literal, get_args, List, Type
+from typing import Literal, List, Type
 
 from .. import GenericCard, GenericDeck, GenericPlayer, GenericGame
 

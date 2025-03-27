@@ -72,7 +72,8 @@ class GenericPlayer(Generic[_T_C]):
                 f"score={self.score!r})")
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__): return NotImplemented
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (self.score == other.score and self.hand == other.hand and
                 self.name == other.name)
 
@@ -95,9 +96,9 @@ class GenericGame(Generic[_T_C]):
         if trump is not None and trump not in self._card_type.SUITS:
             raise ValueError(f"Invalid suit for trump: {trump}")
 
-        self.deck = deck or self._deck_type(card_type=self._card_type).shuffle()
+        self.deck = deck or self._deck_type().shuffle()
         self.discard_pile = discard_pile or \
-            self._deck_type(card_type=self._card_type, cards=[])
+            self._deck_type(cards=[])
 
         self.trump = None
         if trump is not None:

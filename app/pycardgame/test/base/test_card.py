@@ -1,16 +1,20 @@
-from typing import Literal, get_args
+from typing import Literal
 
 import pytest
 
-from ... import GenericCard
+from ... import GenericCard, CardMeta
 
-ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
-suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+T_Ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
+T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
 
 
-class TestingCard(GenericCard[ranks, suits]):
-    RANKS = list(get_args(ranks))
-    SUITS = list(get_args(suits))
+class TestingCard(
+    GenericCard[T_Ranks, T_Suits],
+    metaclass=CardMeta,
+    rank_type=T_Ranks,
+    suit_type=T_Suits
+):
+    ...
 
 
 def test_card_init():

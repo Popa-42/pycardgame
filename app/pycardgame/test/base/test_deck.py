@@ -1,21 +1,28 @@
-from typing import Literal, get_args
+from typing import Literal
 
 import pytest
 
-from ... import GenericCard, GenericDeck
+from ... import CardMeta, DeckMeta, GenericCard, GenericDeck
 
-ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
-suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
-
-
-class TestingCard(GenericCard[ranks, suits]):
-    RANKS = list(get_args(ranks))
-    SUITS = list(get_args(suits))
+T_Ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
+T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
 
 
-class TestingDeck(GenericDeck[TestingCard]):
-    def __init__(self, cards=None):
-        super().__init__(TestingCard, cards)
+class TestingCard(
+    GenericCard[T_Ranks, T_Suits],
+    metaclass=CardMeta,
+    rank_type=T_Ranks,
+    suit_type=T_Suits
+):
+    ...
+
+
+class TestingDeck(
+    GenericDeck[TestingCard],
+    metaclass=DeckMeta,
+    card_type=TestingCard
+):
+    ...
 
 
 def test_deck_init():
