@@ -18,8 +18,6 @@ from typing import TypeVar, Generic
 from .base import GenericCard
 
 _T_C = TypeVar("_T_C", bound=GenericCard)
-_T_R = TypeVar("_T_R")
-_T_S = TypeVar("_T_S")
 
 
 class GenericPlayer(Generic[_T_C]):
@@ -72,8 +70,7 @@ class GenericPlayer(Generic[_T_C]):
                 f"score={self.score!r})")
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return NotImplemented
+        if not isinstance(other, self.__class__): return NotImplemented
         return (self.score == other.score and self.hand == other.hand and
                 self.name == other.name)
 
@@ -108,13 +105,19 @@ class GenericGame(Generic[_T_C]):
         self.hand_size = hand_size
 
         self.players = list(players)
-        for player in self.players:
-            player.add_card(*self.deck.draw(self.hand_size))
 
         start_idx = starting_player_index
         if start_idx < 0 or start_idx > 0 and start_idx >= len(self.players):
             raise ValueError("Invalid starting player index")
         self.current_player_index = start_idx
+
+    def deal_initial_cards(self, *players):
+        players_to_deal = players or self.players
+        for player in players_to_deal:
+            cards_needed = max(0, self.hand_size - len(player.hand))
+            if cards_needed > 0:
+                player.add_card(*self.deck.draw(cards_needed))
+        return self
 
     def add_players(self, *players):
         self.players.extend(players)

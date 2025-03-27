@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from typing import (
+    Any,
     overload,
     Generic,
     Iterator,
@@ -120,14 +121,20 @@ class GenericCard(Generic[_T_R, _T_S]):
         pass
 
     def __lt__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    @overload
     def __eq__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    @overload
+    def __eq__(self, other: object) -> bool: ...
     def __gt__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
     def __le__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
     def __ge__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    @overload
     def __ne__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    @overload
+    def __ne__(self, other: object) -> bool: ...
 
 
-_T_C = TypeVar("_T_C", bound=GenericCard)
+_T_C = TypeVar("_T_C", bound=GenericCard)  # type: ignore
 
 
 class GenericDeck(Generic[_T_C]):
@@ -237,20 +244,26 @@ class GenericDeck(Generic[_T_C]):
     def __getitem__(self, index: int) -> _T_C: ...
     @overload
     def __getitem__(self, s: slice) -> List[_T_C]: ...
-    def __getitem__(self, key): ...
 
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[_T_C]: ...
+    @overload
     def __eq__(self, other: GenericDeck[_T_C]) -> bool: ...
-    def __neq__(self, other: GenericDeck[_T_C]) -> bool: ...
+    @overload
+    def __eq__(self, other: object) -> bool: ...
+    @overload
+    def __ne__(self, other: GenericDeck[_T_C]) -> bool: ...
+    @overload
+    def __ne__(self, other: object) -> bool: ...
 
 
 class CardMeta(type):
     """
     A metaclass for creating custom card classes.
     """
-    def __new__(cls, name: str, bases: tuple, class_dict: dict,
-                rank_type: Type[_T_R], suit_type: Type[_T_S]) -> CardMeta:
+    def __new__(cls, name: str, bases: tuple[Any, ...],
+                class_dict: dict[str, Any], rank_type: Type[_T_R],
+                suit_type: Type[_T_S]) -> CardMeta:
         """
         Creates a new card class with the given rank and suit types.
         :param name: The name of the class.
@@ -267,8 +280,8 @@ class DeckMeta(type):
     """
     A metaclass for creating custom deck classes.
     """
-    def __new__(cls, name: str, bases: tuple, class_dict: dict,
-                card_type: Type[_T_C]) -> DeckMeta:
+    def __new__(cls, name: str, bases: tuple[Any, ...],
+                class_dict: dict[str, Any], card_type: Type[_T_C]) -> DeckMeta:
         """
         Creates a new deck class with the given card type.
         :param name: The name of the class.

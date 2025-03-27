@@ -59,7 +59,7 @@ def test_deck_sort():
     assert deck.cards == sorted(deck.cards)
 
     with pytest.raises(ValueError):
-        deck.sort(by="invalid_key")
+        deck.sort(by="invalid_key")  # type: ignore
 
 
 def test_deck_shuffle():
@@ -104,7 +104,7 @@ def test_deck_get_index():
         deck.get_index(TestingCard(10, 10))
 
     with pytest.raises(TypeError):
-        deck.get_index("Ace of Diamonds")
+        deck.get_index("Ace of Diamonds")  # type: ignore
 
 
 def test_deck_get_cards():

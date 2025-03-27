@@ -207,8 +207,7 @@ class GenericDeck(Generic[_T_C]):
         return self.cards == other.cards and self._card_type == other._card_type
 
     def __neq__(self, other): return not self.__eq__(other)
-
-    __hash__ = None
+    def __hash__(self): raise TypeError("GenericDeck objects are not hashable")
 
 
 class CardMeta(type):

@@ -29,9 +29,9 @@ def test_card_init():
     assert card2.trump is True
 
     with pytest.raises(ValueError):
-        TestingCard("InvalidRank", "Diamonds")
+        TestingCard("InvalidRank", "Diamonds")  # type: ignore
     with pytest.raises(ValueError):
-        TestingCard("10", "InvalidSuit")
+        TestingCard("10", "InvalidSuit")  # type: ignore
 
 
 def test_card_get_rank():
@@ -54,7 +54,7 @@ def test_card_set_rank():
     assert card.rank is None
 
     with pytest.raises(ValueError):
-        card.set_rank("InvalidRank")
+        card.set_rank("InvalidRank")  # type: ignore
 
     with pytest.raises(ValueError):
         card.set_rank(10)
@@ -80,7 +80,7 @@ def test_card_set_suit():
     assert card.suit is None
 
     with pytest.raises(ValueError):
-        card.set_suit("InvalidSuit")
+        card.set_suit("InvalidSuit")  # type: ignore
 
     with pytest.raises(ValueError):
         card.set_suit(10)
@@ -97,7 +97,7 @@ def test_card_set_trump():
     assert card.trump is True
 
     with pytest.raises(TypeError):
-        card.set_trump(1)
+        card.set_trump(1)  # type: ignore
 
 
 def test_card_str():

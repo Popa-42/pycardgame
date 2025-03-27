@@ -32,7 +32,7 @@ class PokerDeck(GenericDeck[PokerCard]):
     :param cards: The cards in the deck.
     :param card_type: The type of card to use.
     """
-    def __init__(self, cards: List[PokerCard] = None,
+    def __init__(self, cards: List[PokerCard] = None,  # type: ignore
                  card_type: Type[PokerCard] = PokerCard) -> None:
         """
         Initialize the deck.
@@ -50,7 +50,7 @@ class PokerPlayer(GenericPlayer[PokerCard]):
     :param score: The player's score.
     """
 
-    def __init__(self, name: str, hand: List[PokerCard] = None,
+    def __init__(self, name: str, hand: List[PokerCard] = None,  # type: ignore
                  score: int = 0) -> None:
         """
         Initialize the player.
