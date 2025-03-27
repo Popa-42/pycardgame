@@ -14,61 +14,128 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import Literal
+from app.pycardgame import (
+    CardMeta,
+    DeckMeta,
+    GenericCard,
+    GenericDeck,
+    GenericGame,
+    GenericPlayer,
+    PokerCard,
+    PokerDeck,
+    PokerGame,
+    PokerPlayer,
+)
 
-from app.pycardgame import *
 
-# Set the rank and suit names
-Card.RANKS = ["7", "8", "9", "10", "Esquire", "Knight", "King", "Ace"]
-Card.SUITS = ["Cups", "Golds", "Clubs", "Swords"]
+# Example 1: Using Generic Card Game Classes
+# ------------------------------------------
 
-card1 = Card(2, 2)
-card2 = Card("Ace", "Golds")
+# Define custom rank and suit types
+Rank = Literal["1", "2", "3", "4", "5"]
+Suit = Literal["Red", "Blue", "Green"]
 
-print(f"card1 = {repr(card1)}")
-print(f"card1 = {repr(card2)}\n")
+# Create a custom card class
+class CustomCard(
+    GenericCard[Rank, Suit],
+    metaclass=CardMeta,
+    rank_type=Rank,
+    suit_type=Suit,
+): ...
 
-print(f"{card1 < card2 = }")
-print(f"{card1 > card2 = }")
-print(f"{card1 == card2 = }")
-print(f"card1 != card2 = {card1 != card2}")
-print(f"{card1 <= card2 = }")
-print(f"{card1 >= card2 = }", end="\n\n")
+# Create a custom deck class
+class CustomDeck(GenericDeck[CustomCard], metaclass=DeckMeta, card_type=CustomCard): ...
 
-deck = PokerDeck().add(Card(None, None, joker=True),
-                       Card(None, None, joker=True)).shuffle()
-print(deck)  # Same effect as print(str(deck))
-print(repr(deck))  # Will print the object representation! (evaluable)
+# Create a custom player class
+class CustomPlayer(GenericPlayer[CustomCard]): ...
 
-for card in deck:
-    # Make all Golds trumps
-    if card.get_suit(as_index=True) == 1:
-        card.trump = True
-    print("-", card)
-print()
+# Create a custom game class
+class CustomGame(GenericGame[CustomCard]):
+    def __init__(self, deck=None, discard_pile=None, trump=None, hand_size=4,
+                 starting_player_index=0, *players):
+        super().__init__(CustomCard, CustomDeck, deck, discard_pile, trump,
+                         hand_size, starting_player_index, *players)
 
-deck.sort()
-for card in deck:
-    print("-", card)
-print()
+# Demonstrate generic card game functionality
+print("Example 1: Generic Card Game")
+print("-" * 28)
 
-# Create a few players
-player1 = Player("Alice")
-player2 = Player("Bob")
-player3 = Player("Charlie")
+# Create and configure cards
+card1 = CustomCard("1", "Red")
+card2 = CustomCard("2", "Blue")
+card3 = CustomCard("3", "Green")
 
-# Create a new game with the players
-game = Game(deck.shuffle(), "Cups", 4, player1, player2, player3)
-print(game)
-print(repr(game), end="\n\n")
+print(f"Created cards: {card1}, {card2}, {card3}")
 
-print(str(game.deal().get_current_player()) + ":")
-[print(c) for c in game.get_current_player().get_hand()]
-print()
+# Create a deck and add cards
+deck = CustomDeck()
+deck.add(card1, card2, card3).shuffle()
+print(f"\nDeck contents: {deck}")
 
-game.play(game.get_current_player(), game.get_current_player().get_hand()[0])
-print(str(game.get_current_player()) + ":")
-[print(c) for c in game.get_current_player().get_hand()]
-print("Discard Pile:", game.discard_pile, end="\n\n")
+# Create players
+player1 = CustomPlayer("Alice")
+player2 = CustomPlayer("Bob")
 
-uno_deck = UnoDeck()
-print(repr(uno_deck))
+# Create a game
+game = CustomGame(deck, None, "Red", 2, 0, player1, player2)
+print(f"\nGame created: {game}")
+
+# Deal cards and demonstrate gameplay
+game.deal()
+print("\nAfter dealing:")
+for player in game.get_players():
+    print(f"{player.name}'s hand: {[str(card) for card in player.get_hand()]}")
+
+# Example 2: Using Poker Card Game Classes
+# ----------------------------------------
+
+print("\n\nExample 2: Poker Card Game")
+print("-" * 24)
+
+# Create a poker deck
+poker_deck = PokerDeck()
+print(f"Created poker deck: {poker_deck}")
+
+# Create poker players
+poker_player1 = PokerPlayer("Charlie")
+poker_player2 = PokerPlayer("David")
+
+# Create a poker game
+poker_game = PokerGame(0, poker_player1, poker_player2)
+print(f"\nCreated poker game: {poker_game}")
+
+# Deal cards and demonstrate gameplay
+poker_game.deal()
+print("\nAfter dealing:")
+for player in poker_game.get_players():
+    print(f"{player.name}'s hand: {[str(card) for card in player.get_hand()]}")
+
+# Demonstrate card comparison
+ace_hearts = PokerCard("Ace", "Hearts")
+king_spades = PokerCard("King", "Spades")
+
+print("\nCard comparison:")
+print(f"{ace_hearts} > {king_spades}: {ace_hearts > king_spades}")
+print(f"{ace_hearts} == {king_spades}: {ace_hearts == king_spades}")
+
+# Demonstrate deck operations
+print("\nDeck operations:")
+poker_deck.shuffle()
+print(f"After shuffling: {poker_deck}")
+
+drawn_cards = poker_deck.draw(3)
+print(f"Drawn cards: {[str(card) for card in drawn_cards]}")
+print(f"Remaining cards: {len(poker_deck)}")
+
+# Demonstrate game operations
+print("\nGame operations:")
+current_player = poker_game.get_current_player()
+print(f"Current player: {current_player}")
+
+# Play a card
+if current_player.get_hand():
+    played_card = current_player.get_hand()[0]
+    poker_game.play(current_player, played_card)
+    print(f"Played card: {played_card}")
+    print(f"Discard pile: {poker_game.discard_pile}")
