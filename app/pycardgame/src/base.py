@@ -17,8 +17,8 @@
 from __future__ import annotations
 
 import random
-from typing import Generic, TypeVar, get_args, Type
 from abc import ABC, ABCMeta
+from typing import Generic, TypeVar, get_args, Type
 
 _RankT = TypeVar("_RankT")
 _SuitT = TypeVar("_SuitT")
@@ -106,15 +106,22 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         return (suit1, rank1) < (suit2, rank2)
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (self.suit == other.suit and self.rank == other.rank and
                 self.trump == other.trump)
 
     def __gt__(self, other):
         return not self.__lt__(other) and not self.__eq__(other)
 
-    def __le__(self, other): return not self.__gt__(other)
-    def __ge__(self, other): return not self.__lt__(other)
-    def __ne__(self, other): return not self.__eq__(other)
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 _CardT = TypeVar("_CardT", bound=GenericCard)
@@ -204,11 +211,20 @@ class GenericDeck(ABC, Generic[_CardT]):
             return NotImplemented
         return self.cards == other.cards
 
-    def __ne__(self, other): return not self.__eq__(other)
-    def __copy__(self): return self.__class__(cards=self.cards.copy())
-    def __getitem__(self, key): return self.cards[key]
-    def __len__(self): return len(self.cards)
-    def __iter__(self): return iter(self.cards)
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __copy__(self):
+        return self.__class__(cards=self.cards.copy())
+
+    def __getitem__(self, key):
+        return self.cards[key]
+
+    def __len__(self):
+        return len(self.cards)
+
+    def __iter__(self):
+        return iter(self.cards)
 
 
 class CardMeta(ABCMeta):

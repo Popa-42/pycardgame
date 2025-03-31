@@ -106,6 +106,9 @@ def test_player_getitem():
     player = DummyPlayer("Alice", cards)
     assert player[0] == cards[0]
     assert player[1:-1:-1] == cards[1:-1:-1]
+    for card in player:
+        assert card in cards
+    assert len(player) == len(cards)
 
 
 def test_player_str():
@@ -128,3 +131,14 @@ def test_player_equalities():
     assert player1 != DummyPlayer("Bob", [DummyCard("10", "Hearts")])
     assert player1 != DummyPlayer("Alice", [DummyCard("J", "Diamonds")])
     assert player1 != DummyPlayer("Alice", [DummyCard("10", "Hearts")], 10)
+    assert not player1 == "InvalidType"  # type: ignore
+
+
+def test_player_comparisons():
+    player1 = DummyPlayer("Alice", [DummyCard("10", "Hearts")], 10)
+    player2 = DummyPlayer("Bob", [DummyCard("10", "Hearts")], 20)
+    assert player1 < player2
+    assert player1 <= player2
+    assert player2 > player1
+    assert player2 >= player1
+    assert not player1 < DummyPlayer("Alice")

@@ -77,14 +77,29 @@ class GenericPlayer(ABC, Generic[_CardT]):
         return (self.score == other.score and self.hand == other.hand and
                 self.name == other.name)
 
-    def __ne__(self, other): return not self.__eq__(other)
-    def __lt__(self, other): return self.score < other.score
-    def __le__(self, other): return self.score <= other.score
-    def __gt__(self, other): return self.score > other.score
-    def __ge__(self, other): return self.score >= other.score
-    def __bool__(self): return bool(self.hand) and self.score >= 0
-    def __iter__(self): return iter(self.hand)
-    def __len__(self): return len(self.hand)
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        return self.score < other.score
+
+    def __le__(self, other):
+        return self.score <= other.score
+
+    def __gt__(self, other):
+        return self.score > other.score
+
+    def __ge__(self, other):
+        return self.score >= other.score
+
+    def __bool__(self):
+        return bool(self.hand) and self.score >= 0
+
+    def __iter__(self):
+        return iter(self.hand)
+
+    def __len__(self):
+        return len(self.hand)
 
 
 class GenericGame(ABC, Generic[_CardT]):
@@ -100,8 +115,7 @@ class GenericGame(ABC, Generic[_CardT]):
             raise ValueError(f"Invalid suit for trump: {trump}")
 
         self.deck = deck or self._deck_type().shuffle()
-        self.discard_pile = discard_pile or \
-            self._deck_type(cards=[])
+        self.discard_pile = discard_pile or self._deck_type(cards=[])
 
         self.trump = None
         if trump is not None:

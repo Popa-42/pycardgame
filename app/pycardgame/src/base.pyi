@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, ABCMeta
 from typing import (
     Any,
     overload,
@@ -274,7 +274,7 @@ class GenericDeck(ABC, Generic[_CardT]):
     def __ne__(self, other: object) -> bool: ...
 
 
-class CardMeta(type):
+class CardMeta(ABCMeta):
     """A metaclass for automatically creating custom card classes."""
     def __new__(cls, name: str, bases: tuple[Any, ...],
                 class_dict: dict[str, Any], rank_type: Type[_RankT],
@@ -291,7 +291,7 @@ class CardMeta(type):
         pass
 
 
-class DeckMeta(type):
+class DeckMeta(ABCMeta):
     """A metaclass for automatically creating custom deck classes."""
     def __new__(cls, name: str, bases: tuple[Any, ...],
                 class_dict: dict[str, Any], card_type: Type[_CardT]) -> DeckMeta:
