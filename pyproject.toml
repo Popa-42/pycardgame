@@ -16,7 +16,7 @@ authors = [
 description = "A base library for creating card games in Python"
 readme = "README.md"
 requires-python = ">=3.8"
-optional-dependencies = {dev=["pytest>=7.0", "twine>=4.0.2"]}
+optional-dependencies = {dev=["pytest>=8.0", "twine>=4.0.2"]}
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
