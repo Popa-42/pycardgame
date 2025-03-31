@@ -130,6 +130,15 @@ def test_deck_repr():
     assert deck_repr.endswith("TestingCard(rank=7, suit=3)])")
 
 
+def test_deck_copy():
+    deck1 = TestingDeck()
+    deck2 = deck1.__copy__()
+    assert deck1 is not deck2
+    assert deck1.cards == deck2.cards
+    assert deck1.cards is not deck2.cards
+    assert isinstance(deck2, TestingDeck)
+
+
 def test_deck_getitem():
     deck = TestingDeck()
     assert deck[0] == deck.cards[0]

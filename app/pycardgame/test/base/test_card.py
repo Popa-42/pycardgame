@@ -100,6 +100,24 @@ def test_card_set_trump():
         card.set_trump(1)  # type: ignore
 
 
+def test_card_copy():
+    card1 = TestingCard(0, 0)
+    card2 = card1.__copy__()
+    assert card1 is not card2
+    assert card1 == card2
+    assert card1.rank == card2.rank
+    assert card1.suit == card2.suit
+    assert card1.trump == card2.trump
+
+    card3 = TestingCard(None, None)
+    card4 = card3.__copy__()
+    assert card3 is not card4
+    assert card3 == card4
+    assert card3.rank is None
+    assert card3.suit is None
+    assert card3.trump is False
+
+
 def test_card_str():
     card1 = TestingCard(0, 0)
     assert str(card1) == "7 of Diamonds"

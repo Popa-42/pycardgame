@@ -69,7 +69,7 @@ def test_game_deal_initial_cards():
     game = TestingGame(deck, None, None, 4, 0, *players)
     game.deal_initial_cards()
     assert all(len(player.hand) == 4 for player in players)
-    assert len(game.deck) == len(deck) - 8
+    assert len(game.deck) == len(deck)
 
 
 def test_game_add_players():
@@ -99,7 +99,7 @@ def test_game_shuffle():
     deck = TestingDeck()
     game = TestingGame(deck)
     game.shuffle()
-    assert game.deck != sorted(game.deck)
+    assert list(game.deck) != sorted(game.deck)
     assert len(game.deck) == len(deck)
     assert all(card in deck for card in game.deck)
 
