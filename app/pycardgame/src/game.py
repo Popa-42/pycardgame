@@ -66,11 +66,12 @@ class GenericPlayer(Generic[_CardT]):
         return f"Player {self.name} ({len(self.hand)} card(s))"
 
     def __repr__(self):
-        return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r}, "
-                f"score={self.score!r})")
+        return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r},"
+                f" score={self.score!r})")
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__): return NotImplemented
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (self.score == other.score and self.hand == other.hand and
                 self.name == other.name)
 

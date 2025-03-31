@@ -209,7 +209,8 @@ class GenericDeck(Generic[_CardT]):
     def __iter__(self): return iter(self.cards)
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__): return NotImplemented
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self.cards == other.cards
 
     def __ne__(self, other): return not self.__eq__(other)
