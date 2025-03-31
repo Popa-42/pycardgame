@@ -98,10 +98,10 @@ class GenericCard(Generic[_RankT, _SuitT]):
         if not self.trump and other.trump:
             return True
         # Defined cards are always greater than None
-        suit1 = self.suit if self.suit is not None else -1e9
-        suit2 = other.suit if other.suit is not None else -1e9
-        rank1 = self.rank if self.rank is not None else -1e9
-        rank2 = other.rank if other.rank is not None else -1e9
+        suit1 = self.suit if self.suit is not None else float("-inf")
+        suit2 = other.suit if other.suit is not None else float("-inf")
+        rank1 = self.rank if self.rank is not None else float("-inf")
+        rank2 = other.rank if other.rank is not None else float("-inf")
         return (suit1, rank1) < (suit2, rank2)
 
     def __eq__(self, other):
