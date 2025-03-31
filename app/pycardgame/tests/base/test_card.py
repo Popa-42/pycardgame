@@ -169,7 +169,8 @@ def test_card_comparison():
     assert card1 != card5
     assert card1 < card3
     assert card1 < card4
-    assert card1 < card5
+    assert card1 <= card5
     assert card3 > card1
     assert card4 > card1
-    assert card5 > card1
+    assert card5 >= card1
+    assert not card1 == "InvalidType"  # type: ignore

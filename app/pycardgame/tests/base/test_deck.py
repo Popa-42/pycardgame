@@ -159,3 +159,4 @@ def test_deck_getitem():
     deck = DummyDeck()
     assert deck[0] == deck.cards[0]
     assert deck[1:-1:-1] == deck.cards[1:-1:-1]
+    assert not deck == "InvalidType"  # type: ignore

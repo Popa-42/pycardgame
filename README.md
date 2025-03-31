@@ -22,97 +22,134 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 pip install -i https://test.pypi.org/simple/ pycardgame
 ```
 
+## Quick Start
+
+A detailed guide on how to use the library can be found in our
+[Wiki](https://github.com/Popa-42/pycardgame/wiki) section.
+
 ## Usage
 
-### `Card` class
+PyCardGame provides both generic base classes for creating custom card games and
+preset implementations for common card games.
 
-The `Card` class represents a single playing card. It includes attributes for
-rank, suit, and whether the card is a trump card.
+### Generic Base Classes
 
-**Example:**
+The library provides generic base classes that can be used to create custom card
+games:
+
+- [`GenericCard`](https://github.com/Popa-42/pycardgame/wiki/GenericCard): Base
+  class for playing cards
+- [`GenericDeck`](https://github.com/Popa-42/pycardgame/wiki/GenericDeck): Base
+  class for card decks
+- [`GenericPlayer`](https://github.com/Popa-42/pycardgame/wiki/GenericPlayer):
+  Base class for game players
+- [`GenericGame`](https://github.com/Popa-42/pycardgame/wiki/GenericGame): Base
+  class for card games
+
+These classes are generic and can be used to create any type of card game. They
+provide methods for managing cards, decks, players, and game logic. The generic
+classes are designed to be flexible and extensible, allowing you to create
+custom card games with different rules and mechanics.
+
+For a detailed explanation of each class, please refer to our
+[Wiki](https://github.com/Popa-42/pycardgame/wiki).
+
+### Preset Implementations
+
+The library includes preset implementations for common card games:
+
+#### Poker
+
+- `PokerCard`: Standard playing card implementation
+- `PokerDeck`: Standard 52-card deck implementation
+- `PokerPlayer`: Player implementation for poker-style games
+- `PokerGame`: Game implementation for poker-style games
+
+> [!NOTE]
+> More implementation will follow.
+
+### Examples
+
+#### Using Preset Classes
 
 ```python
-from pycardgame import Card
+from pycardgame import PokerCard, PokerDeck, PokerPlayer, PokerGame
 
-print(Card.SUITS)  # Output: ["Clubs", "Diamonds", "Hearts", "Spades"]
-print(Card.RANKS)  # Output: ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+# Create cards
+ace_hearts = PokerCard("Ace", "Hearts")
+king_spades = PokerCard("King", "Spades")
 
-card1 = Card(12, 1)
-card2 = Card("4", "Hearts")
-card3 = Card(9, "Hearts")
-card4 = Card("Jack", 2)
+# Create a deck
+deck = PokerDeck().shuffle()
+print(deck)  # Output: Deck of 52 cards
 
-print(card1)  # Output: Ace of Diamonds
-print(card2)  # Output: 4 of Hearts
-print(card3)  # Output: Jack of Hearts
-print(card4)  # Output: Jack of Hearts
+# Create players
+player1 = PokerPlayer("Alice")
+player2 = PokerPlayer("Bob")
+
+# Create a game
+game = PokerGame(0, player1, player2)
+game.deal_initial_cards()
 
 # Compare cards
-print(card1 < card2)  # Output: True => Diamonds < Hearts
-print(card2 >= card3)  # Output: False => 4 < Jack
-print(card3 == card4)  # Output: True => Jack of Hearts == Jack of Hearts
+print(ace_hearts > king_spades)  # Output: True (Spades > Hearts)
 ```
 
-**Example:**
+#### Creating Custom Card Games
 
 ```python
-from pycardgame import Deck
+from pycardgame import GenericCard, GenericDeck, GenericPlayer, GenericGame
 
-deck = Deck().shuffle()
-print(deck)  # Output: Deck of 52 cards
+# Define a new type of card
+class CustomCard(GenericCard):
+    RANKS = ["1", "2", "3"]
+    SUITS = ["Red", "Blue", "Green"]
 
-card = deck.draw()
-print(card)  # Output: (random card from the deck)
+# Use custom cards
+card1 = CustomCard("1", "Red")
+card2 = CustomCard("2", "Blue")
+
+
+# Create a custom deck class
+class CustomDeck(GenericDeck[CustomCard]):
+    pass
+
+# Create a deck and add the predefined cards from above
+deck = CustomDeck()
+deck.add(card1, card2)
+
+
+# Create a custom player class
+class CustomPlayer(GenericPlayer[CustomCard]):
+    pass
+
+# Create some new players
+player1 = CustomPlayer("Alice")
+player2 = CustomPlayer("Bob")
+
+
+# Create a custom game class
+class CustomGame(GenericGame[CustomCard]):
+    def __init__(self, deck=None, discard_pile=None, trump=None, hand_size=4,
+                 starting_player_index=0, *players):
+        super().__init__(CustomCard, CustomDeck, deck, discard_pile, trump,
+                         hand_size, starting_player_index, *players)
+
+    def play_round(self):
+        # Some custom game logic
+        current = self.get_current_player()
+        self.play(current, current.play_card(self.get_current_player().hand[0])[0])
+
+# ...and use the newly created classes
+game = CustomGame(deck.shuffle(), None, "Red", 3, 0, player1, player2)
+game.deal_initial_cards()
+game.play_round()
 ```
 
-### `Deck` class
+## Documentation
 
-The `Deck` class represents a collection of Card objects. It includes methods
-for shuffling, drawing, adding, and sorting cards.
-
-**Example:**
-
-```python
-from pycardgame import Deck
-
-deck = Deck().shuffle()
-print(deck)  # Output: Deck of 52 cards
-
-card = deck.draw()
-print(card)  # Output: (random card from the deck)
-```
-
-#### Class methods
-
-- `reset()`: Resets the deck to its original state.
-- `count()`: Counts the occurrences of a specific card, rank, or suit in the
-  deck.
-- `sort(by="suit")`: Sorts the deck by suit or rank.
-- `shuffle()`: Shuffles the deck.
-- `draw(n=1)`: Draws `n` cards from the deck.
-- `add(card)`: Adds a card to the deck.
-- `get_index(card)`: Returns the indices of all occurrences of a card in the
-  deck.
-- `get_cards()`: Returns a list of all cards in the deck.
-
-**Example:**
-
-```python
-from pycardgame import Deck
-
-# Create and shuffle deck
-deck = Deck().shuffle()
-print(deck)
-
-# Draw a card
-drawn_card = deck.draw()
-print(drawn_card)
-
-# Sort the deck
-deck.sort()
-for card in deck:
-    print(card)
-```
+For more detailed documentation, including examples and explanations of each of
+the classes, please read our [Wiki](https://github.com/Popa-42/pycardgame/wiki).
 
 ## Contributing
 
@@ -123,5 +160,5 @@ with the project.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the
+This project is licensed under the GNU General Public License v3.0 — see the
 [LICENSE](LICENSE) file for details.
