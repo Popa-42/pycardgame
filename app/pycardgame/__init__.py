@@ -36,10 +36,6 @@ __all__ = [
     "PokerDeck",
     "PokerPlayer",
     "PokerGame",
-    # "SkatCard",
-    # "SkatDeck",
-    # "UnoCard",
-    # "UnoDeck",
 ]
 
 print("""
