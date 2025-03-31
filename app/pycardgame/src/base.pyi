@@ -29,22 +29,22 @@ from typing import (
     Union,
 )
 
-_T_R = TypeVar("_T_R")
-_T_S = TypeVar("_T_S")
+_RankT = TypeVar("_RankT")
+_SuitT = TypeVar("_SuitT")
 
 
-class GenericCard(Generic[_T_R, _T_S]):
+class GenericCard(Generic[_RankT, _SuitT]):
     """
     A playing card.
     :param rank: The rank of the card.
     :param suit: The suit of the card.
     :param trump: Whether the card is a trump card.
     """
-    RANKS: List[_T_R] = ...
-    SUITS: List[_T_S] = ...
+    RANKS: List[_RankT] = ...
+    SUITS: List[_SuitT] = ...
 
-    def __init__(self, rank: Optional[Union[_T_R, int]],
-                 suit: Optional[Union[_T_S, int]], trump: bool = False
+    def __init__(self, rank: Optional[Union[_RankT, int]],
+                 suit: Optional[Union[_SuitT, int]], trump: bool = False
                  ) -> None:
         """
         Creates a new card instance.
@@ -61,11 +61,11 @@ class GenericCard(Generic[_T_R, _T_S]):
         self.trump: bool = ...
 
     @staticmethod
-    def _set_value(value: Optional[Union[_T_R, _T_S, int]],
-                   values_list: List[Union[_T_R, _T_S]], value_name: str
+    def _set_value(value: Optional[Union[_RankT, _SuitT, int]],
+                   values_list: List[Union[_RankT, _SuitT]], value_name: str
                    ) -> Optional[int]: ...
 
-    def get_rank(self, as_index: bool = False) -> Optional[Union[_T_R, int]]:
+    def get_rank(self, as_index: bool = False) -> Optional[Union[_RankT, int]]:
         """
         Returns the card’s rank.
         :param as_index: If `True`, the rank is returned as an integer index;
@@ -74,8 +74,8 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
-    def set_rank(self, rank: Optional[Union[_T_R, int]]
-                 ) -> GenericCard[_T_R, _T_S]:
+    def set_rank(self, rank: Optional[Union[_RankT, int]]
+                 ) -> GenericCard[_RankT, _SuitT]:
         """
         Sets the card’s rank. Accepts a rank name or an integer index.
         :param rank: The rank to set.
@@ -85,7 +85,7 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
-    def get_suit(self, as_index: bool = False) -> Optional[Union[_T_S, int]]:
+    def get_suit(self, as_index: bool = False) -> Optional[Union[_SuitT, int]]:
         """
         Returns the card’s suit.
         :param as_index: If `True`, returns the suit as an integer index;
@@ -94,8 +94,8 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
-    def set_suit(self, suit: Optional[Union[_T_S, int]]
-                 ) -> GenericCard[_T_R, _T_S]:
+    def set_suit(self, suit: Optional[Union[_SuitT, int]]
+                 ) -> GenericCard[_RankT, _SuitT]:
         """
         Sets the card’s suit. Accepts a suit name or an integer index.
         :param suit: The suit to set.
@@ -112,7 +112,7 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
-    def set_trump(self, trump: bool) -> GenericCard[_T_R, _T_S]:
+    def set_trump(self, trump: bool) -> GenericCard[_RankT, _SuitT]:
         """
         Set whether the card is a trump card.
         :param trump: Whether the card is a trump card.
@@ -120,47 +120,47 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
-    def __copy__(self) -> GenericCard[_T_R, _T_S]:
+    def __copy__(self) -> GenericCard[_RankT, _SuitT]:
         """
         Creates a shallow copy of the card.
         :return: A new card instance with the same rank, suit, and trump status.
         """
         pass
 
-    def __lt__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    def __lt__(self, other: GenericCard[_RankT, _SuitT]) -> bool: ...
     @overload
-    def __eq__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    def __eq__(self, other: GenericCard[_RankT, _SuitT]) -> bool: ...
     @overload
     def __eq__(self, other: object) -> bool: ...
-    def __gt__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
-    def __le__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
-    def __ge__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    def __gt__(self, other: GenericCard[_RankT, _SuitT]) -> bool: ...
+    def __le__(self, other: GenericCard[_RankT, _SuitT]) -> bool: ...
+    def __ge__(self, other: GenericCard[_RankT, _SuitT]) -> bool: ...
     @overload
-    def __ne__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
+    def __ne__(self, other: GenericCard[_RankT, _SuitT]) -> bool: ...
     @overload
     def __ne__(self, other: object) -> bool: ...
 
 
-_T_C = TypeVar("_T_C", bound=GenericCard)  # type: ignore
+_CardT = TypeVar("_CardT", bound=GenericCard)  # type: ignore
 
 
-class GenericDeck(Generic[_T_C]):
+class GenericDeck(Generic[_CardT]):
     """
     A deck of cards.
     :param cards: A custom list of `Card` objects. If omitted, a full deck is
         created using the `reset()` method.
     """
-    _card_type: Type[_T_C]
+    _card_type: Type[_CardT]
 
-    def __init__(self, cards: Optional[List[_T_C]] = None) -> None:
+    def __init__(self, cards: Optional[List[_CardT]] = None) -> None:
         """
         Creates a new deck instance.
         :param cards: A custom list of `Card` objects. If omitted, a full deck
             is created using the `reset()` method.
         """
-        self.cards: List[_T_C] = ...
+        self.cards: List[_CardT] = ...
 
-    def reset(self) -> GenericDeck[_T_C]:
+    def reset(self) -> GenericDeck[_CardT]:
         """
         Creates a full deck by iterating over every combination of suit and rank
             from the `Card` class, then sorts the deck.
@@ -168,7 +168,7 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def count(self, card: Union[_T_C, _T_R, _T_S]) -> int:
+    def count(self, card: Union[_CardT, _RankT, _SuitT]) -> int:
         """
         Counts the number of occurrences of a specific card, rank, or
         suit in the deck.
@@ -182,7 +182,7 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def sort(self, by: Literal["suit", "rank"] = "suit") -> GenericDeck[_T_C]:
+    def sort(self, by: Literal["suit", "rank"] = "suit") -> GenericDeck[_CardT]:
         """
         Sorts and returns the deck.
         :param by: The attribute to sort by.
@@ -191,14 +191,14 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def shuffle(self) -> GenericDeck[_T_C]:
+    def shuffle(self) -> GenericDeck[_CardT]:
         """
         Randomly shuffles the cards in the deck.
         :return: The deck instance.
         """
         pass
 
-    def draw(self, n: int = 1) -> List[_T_C]:
+    def draw(self, n: int = 1) -> List[_CardT]:
         """
         Draw `n` cards from the top of the deck.
         :param n: The number of cards to draw. Defaults to `1`.
@@ -206,7 +206,7 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def add(self, *cards: _T_C) -> GenericDeck[_T_C]:
+    def add(self, *cards: _CardT) -> GenericDeck[_CardT]:
         """
         Adds one or more cards to the bottom of the deck.
         :param cards: The cards to be added to the deck.
@@ -214,7 +214,7 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def remove(self, *cards: _T_C) -> GenericDeck[_T_C]:
+    def remove(self, *cards: _CardT) -> GenericDeck[_CardT]:
         """
         The cards to be removed from the deck.
         :param cards: The cards to remove from the deck.
@@ -223,7 +223,7 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def get_index(self, card: _T_C) -> List[int]:
+    def get_index(self, card: _CardT) -> List[int]:
         """
         Returns the indices of all occurrences of a given card in the deck.
         :param card: The card to search for in the deck.
@@ -232,14 +232,14 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def get_cards(self) -> List[_T_C]:
+    def get_cards(self) -> List[_CardT]:
         """
         Retrieves the entire list of cards in the deck.
         :return: A list of all cards in the deck.
         """
         pass
 
-    def get_top_card(self) -> Optional[_T_C]:
+    def get_top_card(self) -> Optional[_CardT]:
         """
         Returns the card at the top of the deck without removing it.
         :return: The top card of the deck if the deck is not empty; otherwise,
@@ -247,7 +247,7 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
-    def __copy__(self) -> GenericDeck[_T_C]:
+    def __copy__(self) -> GenericDeck[_CardT]:
         """
         Creates a shallow copy of the deck.
         :return: A new deck instance with the same cards.
@@ -255,20 +255,20 @@ class GenericDeck(Generic[_T_C]):
         pass
 
     @overload
-    def __getitem__(self, index: int) -> _T_C: ...
+    def __getitem__(self, index: int) -> _CardT: ...
     @overload
-    def __getitem__(self, s: slice) -> List[_T_C]: ...
+    def __getitem__(self, s: slice) -> List[_CardT]: ...
 
     def __len__(self) -> int: ...
-    def __iter__(self) -> Iterator[_T_C]: ...
+    def __iter__(self) -> Iterator[_CardT]: ...
 
     @overload
-    def __eq__(self, other: GenericDeck[_T_C]) -> bool: ...
+    def __eq__(self, other: GenericDeck[_CardT]) -> bool: ...
     @overload
     def __eq__(self, other: object) -> bool: ...
 
     @overload
-    def __ne__(self, other: GenericDeck[_T_C]) -> bool: ...
+    def __ne__(self, other: GenericDeck[_CardT]) -> bool: ...
     @overload
     def __ne__(self, other: object) -> bool: ...
 
@@ -276,8 +276,8 @@ class GenericDeck(Generic[_T_C]):
 class CardMeta(type):
     """A metaclass for automatically creating custom card classes."""
     def __new__(cls, name: str, bases: tuple[Any, ...],
-                class_dict: dict[str, Any], rank_type: Type[_T_R],
-                suit_type: Type[_T_S]) -> CardMeta:
+                class_dict: dict[str, Any], rank_type: Type[_RankT],
+                suit_type: Type[_SuitT]) -> CardMeta:
         """
         Creates a new card class with the given rank and suit types.
         :param name: The name of the class.
@@ -293,7 +293,7 @@ class CardMeta(type):
 class DeckMeta(type):
     """A metaclass for automatically creating custom deck classes."""
     def __new__(cls, name: str, bases: tuple[Any, ...],
-                class_dict: dict[str, Any], card_type: Type[_T_C]) -> DeckMeta:
+                class_dict: dict[str, Any], card_type: Type[_CardT]) -> DeckMeta:
         """
         Creates a new deck class with the given card type.
         :param name: The name of the class.

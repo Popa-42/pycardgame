@@ -29,12 +29,12 @@ from typing import (
 
 from .base import GenericCard, GenericDeck
 
-_T_R = TypeVar("_T_R")
-_T_S = TypeVar("_T_S")
-_T_C = TypeVar("_T_C", bound=GenericCard)  # type: ignore
+_RankT = TypeVar("_RankT")
+_SuitT = TypeVar("_SuitT")
+_CardT = TypeVar("_CardT", bound=GenericCard)  # type: ignore
 
 
-class GenericPlayer(Generic[_T_C]):
+class GenericPlayer(Generic[_CardT]):
     """
     A class representing a player in a card game.
     :param name: The name of the player.
@@ -43,7 +43,7 @@ class GenericPlayer(Generic[_T_C]):
 
     def __init__(self,
                  name: str,
-                 hand: Optional[List[_T_C]] = None,
+                 hand: Optional[List[_CardT]] = None,
                  score: int = 0) -> None:
         """
         Constructor for the Player class.
@@ -52,10 +52,10 @@ class GenericPlayer(Generic[_T_C]):
         :param score: The player's initial score.
         """
         self.name: str = ...
-        self.hand: List[_T_C] = ...
+        self.hand: List[_CardT] = ...
         self.score: int = ...
 
-    def add_card(self, *cards: _T_C) -> GenericPlayer[_T_C]:
+    def add_card(self, *cards: _CardT) -> GenericPlayer[_CardT]:
         """
         Add a card to the player's hand.
         :param cards: The card(s) to add.
@@ -63,7 +63,7 @@ class GenericPlayer(Generic[_T_C]):
         """
         pass
 
-    def remove_card(self, *cards: _T_C) -> GenericPlayer[_T_C]:
+    def remove_card(self, *cards: _CardT) -> GenericPlayer[_CardT]:
         """
         Remove a card from the player's hand.
         :param cards: The card(s) to remove.
@@ -71,7 +71,7 @@ class GenericPlayer(Generic[_T_C]):
         """
         pass
 
-    def play_card(self, *cards: _T_C) -> List[_T_C]:
+    def play_card(self, *cards: _CardT) -> List[_CardT]:
         """
         Play a card from the player's hand. The card will be removed from the
             hand.
@@ -80,7 +80,7 @@ class GenericPlayer(Generic[_T_C]):
         """
         pass
 
-    def get_hand(self) -> List[_T_C]:
+    def get_hand(self) -> List[_CardT]:
         """
         Get the player's hand of cards.
         :return: The player's hand.
@@ -94,7 +94,7 @@ class GenericPlayer(Generic[_T_C]):
         """
         pass
 
-    def set_score(self, score: int) -> GenericPlayer[_T_C]:
+    def set_score(self, score: int) -> GenericPlayer[_CardT]:
         """
         Set the player's score.
         :param score: The score to set.
@@ -109,7 +109,7 @@ class GenericPlayer(Generic[_T_C]):
         """
         pass
 
-    def set_name(self, name: str) -> GenericPlayer[_T_C]:
+    def set_name(self, name: str) -> GenericPlayer[_CardT]:
         """
         Set the player's name.
         :param name: The name to set.
@@ -118,27 +118,27 @@ class GenericPlayer(Generic[_T_C]):
         pass
 
     @overload
-    def __getitem__(self, index: int) -> _T_C: ...
+    def __getitem__(self, index: int) -> _CardT: ...
     @overload
-    def __getitem__(self, s: slice) -> List[_T_C]: ...
+    def __getitem__(self, s: slice) -> List[_CardT]: ...
     @overload
-    def __eq__(self, other: GenericPlayer[_T_C]) -> bool: ...
+    def __eq__(self, other: GenericPlayer[_CardT]) -> bool: ...
     @overload
     def __eq__(self, other: object) -> bool: ...
-    def __lt__(self, other: GenericPlayer[_T_C]) -> bool: ...
-    def __le__(self, other: GenericPlayer[_T_C]) -> bool: ...
-    def __gt__(self, other: GenericPlayer[_T_C]) -> bool: ...
-    def __ge__(self, other: GenericPlayer[_T_C]) -> bool: ...
+    def __lt__(self, other: GenericPlayer[_CardT]) -> bool: ...
+    def __le__(self, other: GenericPlayer[_CardT]) -> bool: ...
+    def __gt__(self, other: GenericPlayer[_CardT]) -> bool: ...
+    def __ge__(self, other: GenericPlayer[_CardT]) -> bool: ...
     @overload
-    def __ne__(self, other: GenericPlayer[_T_C]) -> bool: ...
+    def __ne__(self, other: GenericPlayer[_CardT]) -> bool: ...
     @overload
     def __ne__(self, other: object) -> bool: ...
     def __bool__(self) -> bool: ...
-    def __iter__(self) -> Iterator[_T_C]: ...
+    def __iter__(self) -> Iterator[_CardT]: ...
     def __len__(self) -> int: ...
 
 
-class GenericGame(Generic[_T_C]):
+class GenericGame(Generic[_CardT]):
     """
     The base class for a card game.
     :param card_type: The type of card to use.
@@ -155,14 +155,14 @@ class GenericGame(Generic[_T_C]):
     """
 
     def __init__(self,
-                 card_type: Type[_T_C],
-                 deck_type: Type[GenericDeck[_T_C]],
-                 deck: Optional[GenericDeck[_T_C]] = None,
-                 discard_pile: Optional[GenericDeck[_T_C]] = None,
-                 trump: Optional[_T_S] = None,
+                 card_type: Type[_CardT],
+                 deck_type: Type[GenericDeck[_CardT]],
+                 deck: Optional[GenericDeck[_CardT]] = None,
+                 discard_pile: Optional[GenericDeck[_CardT]] = None,
+                 trump: Optional[_SuitT] = None,
                  hand_size: int = 4,
                  starting_player_index: int = 0,
-                 *players: GenericPlayer[_T_C]) -> None:
+                 *players: GenericPlayer[_CardT]) -> None:
         """
         Constructor for the GenericGame class.
         :param card_type: The type of card to use.
@@ -179,19 +179,19 @@ class GenericGame(Generic[_T_C]):
         :param players: The players in the game.
         :raises ValueError: If trump is not None and not in card_type.SUITS.
         """
-        self._card_type: Type[_T_C] = ...
-        self._deck_type: Type[GenericDeck[_T_C]] = ...
+        self._card_type: Type[_CardT] = ...
+        self._deck_type: Type[GenericDeck[_CardT]] = ...
 
-        self.deck: GenericDeck[_T_C] = ...
-        self.discard_pile: GenericDeck[_T_C] = ...
+        self.deck: GenericDeck[_CardT] = ...
+        self.discard_pile: GenericDeck[_CardT] = ...
 
         self.trump: Optional[str] = ...
         self.hand_size: int = ...
-        self.players: List[GenericPlayer[_T_C]] = ...
+        self.players: List[GenericPlayer[_CardT]] = ...
         self.current_player_index: int = ...
 
-    def deal_initial_cards(self, *players: GenericPlayer[_T_C]
-                          ) -> GenericGame[_T_C]:
+    def deal_initial_cards(self, *players: GenericPlayer[_CardT]
+                          ) -> GenericGame[_CardT]:
         """
         Deal initial cards to specified players until they have at least
         hand_size cards. If no players are specified, deals to all players.
@@ -202,8 +202,8 @@ class GenericGame(Generic[_T_C]):
         """
         pass
 
-    def add_players(self, *players: GenericPlayer[_T_C]
-                    ) -> GenericGame[_T_C]:
+    def add_players(self, *players: GenericPlayer[_CardT]
+                    ) -> GenericGame[_CardT]:
         """
         Add one or multiple players to the game.
         :param players: The players to add.
@@ -211,8 +211,8 @@ class GenericGame(Generic[_T_C]):
         """
         pass
 
-    def remove_players(self, *players: GenericPlayer[_T_C]
-                       ) -> GenericGame[_T_C]:
+    def remove_players(self, *players: GenericPlayer[_CardT]
+                       ) -> GenericGame[_CardT]:
         """
         Remove one or multiple players from the game.
         :param players: The players to remove.
@@ -220,8 +220,8 @@ class GenericGame(Generic[_T_C]):
         """
         pass
 
-    def deal(self, num_cards: int = 1, *players: GenericPlayer[_T_C]
-             ) -> GenericGame[_T_C]:
+    def deal(self, num_cards: int = 1, *players: GenericPlayer[_CardT]
+             ) -> GenericGame[_CardT]:
         """
         Deal cards to a player in the game.
         :param num_cards: The number of cards to deal. Default is 1.
@@ -231,15 +231,15 @@ class GenericGame(Generic[_T_C]):
         """
         pass
 
-    def shuffle(self) -> GenericGame[_T_C]:
+    def shuffle(self) -> GenericGame[_CardT]:
         """
         Shuffle the deck of cards.
         :return: The game object.
         """
         pass
 
-    def play(self, player: Optional[GenericPlayer[_T_C]] = None, *cards: _T_C
-             ) -> GenericGame[_T_C]:
+    def play(self, player: Optional[GenericPlayer[_CardT]] = None, *cards: _CardT
+             ) -> GenericGame[_CardT]:
         """
         Play one or more cards from a player's hand. The cards will be added to
         the discard pile.
@@ -258,7 +258,7 @@ class GenericGame(Generic[_T_C]):
         """
         pass
 
-    def set_trump(self, suit: Optional[_T_S]) -> GenericGame[_T_C]:
+    def set_trump(self, suit: Optional[_SuitT]) -> GenericGame[_CardT]:
         """
         Set the trump suit for the game.
         :param suit: The trump suit to set. Must be one of the suits defined in
@@ -268,22 +268,22 @@ class GenericGame(Generic[_T_C]):
         """
         pass
 
-    def apply_trump(self) -> GenericGame[_T_C]:
+    def apply_trump(self) -> GenericGame[_CardT]:
         """
         Apply the trump suit to all cards in the deck.
         :return: The game object.
         """
         pass
 
-    def get_current_player(self) -> GenericPlayer[_T_C]:
+    def get_current_player(self) -> GenericPlayer[_CardT]:
         """
         Get the current player.
         :return: The current player.
         """
         pass
 
-    def set_current_player(self, player: GenericPlayer[_T_C]
-                           ) -> GenericGame[_T_C]:
+    def set_current_player(self, player: GenericPlayer[_CardT]
+                           ) -> GenericGame[_CardT]:
         """
         Set the current player.
         :param player: The player to set as current.
@@ -291,22 +291,22 @@ class GenericGame(Generic[_T_C]):
         """
         pass
 
-    def get_players(self) -> List[GenericPlayer[_T_C]]:
+    def get_players(self) -> List[GenericPlayer[_CardT]]:
         """
         Get all players in the game.
         :return: The list of players.
         """
         pass
 
-    def get_deck(self) -> GenericDeck[_T_C]:
+    def get_deck(self) -> GenericDeck[_CardT]:
         """
         Get the deck of cards.
         :return: The deck of cards.
         """
         pass
 
-    def set_deck(self, deck: GenericDeck[_T_C]
-                 ) -> GenericGame[_T_C]:
+    def set_deck(self, deck: GenericDeck[_CardT]
+                 ) -> GenericGame[_CardT]:
         """
         Set the deck of cards.
         :param deck: The deck to set.

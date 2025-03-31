@@ -19,11 +19,11 @@ from __future__ import annotations
 import random
 from typing import Generic, TypeVar, get_args, Type
 
-_T_R = TypeVar("_T_R")
-_T_S = TypeVar("_T_S")
+_RankT = TypeVar("_RankT")
+_SuitT = TypeVar("_SuitT")
 
 
-class GenericCard(Generic[_T_R, _T_S]):
+class GenericCard(Generic[_RankT, _SuitT]):
     __slots__ = ("rank", "suit", "trump")
 
     RANKS = []
@@ -116,11 +116,12 @@ class GenericCard(Generic[_T_R, _T_S]):
     def __ne__(self, other): return not self.__eq__(other)
 
 
-_T_C = TypeVar("_T_C", bound=GenericCard)
+_CardT = TypeVar("_CardT", bound=GenericCard)
 
 
-class GenericDeck(Generic[_T_C]):
-    _card_type: Type[_T_C]
+class GenericDeck(Generic[_CardT]):
+    _card_type: Type[_CardT]
+    __hash__ = None  # Mutable type, so hash is not defined
 
     def __init__(self, cards=None):
         if cards is None:
@@ -212,7 +213,6 @@ class GenericDeck(Generic[_T_C]):
         return self.cards == other.cards
 
     def __ne__(self, other): return not self.__eq__(other)
-    def __hash__(self): raise TypeError("GenericDeck objects are not hashable")
 
 
 class CardMeta(type):

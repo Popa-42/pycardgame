@@ -17,10 +17,10 @@ from typing import TypeVar, Generic
 
 from .base import GenericCard
 
-_T_C = TypeVar("_T_C", bound=GenericCard)
+_CardT = TypeVar("_CardT", bound=GenericCard)
 
 
-class GenericPlayer(Generic[_T_C]):
+class GenericPlayer(Generic[_CardT]):
     __slots__ = ("name", "hand", "score")
 
     def __init__(self, name, hand=None, score=0):
@@ -84,7 +84,7 @@ class GenericPlayer(Generic[_T_C]):
     def __len__(self): return len(self.hand)
 
 
-class GenericGame(Generic[_T_C]):
+class GenericGame(Generic[_CardT]):
     def __init__(self, card_type, deck_type, deck=None, discard_pile=None,
                  trump=None, hand_size=4, starting_player_index=0, *players):
         self._card_type = card_type

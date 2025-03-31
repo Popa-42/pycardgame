@@ -2,21 +2,21 @@ from typing import Literal, List, Type
 
 from .. import GenericCard, GenericDeck, GenericPlayer, GenericGame
 
-_T_Ranks = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
+_RanksT = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
 "Queen", "King", "Ace"]
-_T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+_SuitsT = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
 
 
-class PokerCard(GenericCard[_T_Ranks, _T_Suits]):
+class PokerCard(GenericCard[_RanksT, _SuitsT]):
     """
     A card for a standard 52-card deck.
     :param rank: The rank of the card.
     :param suit: The suit of the card
     """
-    RANKS: List[_T_Ranks] = ...
-    SUITS: List[_T_Suits] = ...
+    RANKS: List[_RanksT] = ...
+    SUITS: List[_SuitsT] = ...
 
-    def __init__(self, rank: _T_Ranks, suit: _T_Suits) -> None:
+    def __init__(self, rank: _RanksT, suit: _SuitsT) -> None:
         """
         Initialize the card.
         :param rank: The rank of the card.
