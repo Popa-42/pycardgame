@@ -162,10 +162,7 @@ class GenericDeck(Generic[_CardT]):
         return self
 
     def shuffle(self):
-        while True:
-            random.shuffle(self.cards)
-            if self.cards != sorted(self.cards):
-                break
+        random.shuffle(self.cards)
         return self
 
     def draw(self, n=1):
