@@ -87,7 +87,7 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
     def __str__(self):
         rank_str = str(self.get_rank(as_index=False))
         suit_str = str(self.get_suit(as_index=False))
-        return f"{rank_str} of {suit_str}{' (trump)' if self.trump else ''}"
+        return f"{suit_str} {rank_str}{' (trump)' if self.trump else ''}"
 
     def __repr__(self):
         return (f"{self.__class__.__name__}(rank={self.rank!r}, "

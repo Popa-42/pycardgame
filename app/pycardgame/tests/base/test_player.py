@@ -28,7 +28,10 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    ...
+    # Update string representation (e.g. "10 of Hearts" instead of "Hearts 10")
+    def __str__(self):
+        return (f"{self.get_rank()} of {self.get_suit()}"
+                f"{' (trump)' if self.get_trump() else ''}")
 
 
 class DummyPlayer(GenericPlayer[DummyCard]):
