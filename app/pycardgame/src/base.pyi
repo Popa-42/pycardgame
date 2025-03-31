@@ -274,9 +274,7 @@ class GenericDeck(Generic[_T_C]):
 
 
 class CardMeta(type):
-    """
-    A metaclass for creating custom card classes.
-    """
+    """A metaclass for automatically creating custom card classes."""
     def __new__(cls, name: str, bases: tuple[Any, ...],
                 class_dict: dict[str, Any], rank_type: Type[_T_R],
                 suit_type: Type[_T_S]) -> CardMeta:
@@ -293,9 +291,7 @@ class CardMeta(type):
 
 
 class DeckMeta(type):
-    """
-    A metaclass for creating custom deck classes.
-    """
+    """A metaclass for automatically creating custom deck classes."""
     def __new__(cls, name: str, bases: tuple[Any, ...],
                 class_dict: dict[str, Any], card_type: Type[_T_C]) -> DeckMeta:
         """

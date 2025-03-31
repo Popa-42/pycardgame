@@ -1,3 +1,5 @@
+import pytest
+
 from ... import PokerCard, PokerDeck, PokerPlayer, PokerGame
 
 
@@ -8,10 +10,25 @@ def test_deck_init():
 
 
 def test_player_init():
-    player1 = PokerPlayer("Player 1", [], 0)
+    player1 = PokerPlayer("Player 1")
     assert player1.name == "Player 1"
     assert len(player1.hand) == 0
-    assert player1.score == 0
+    assert player1.bankroll == 1000
+
+
+def test_player_bet():
+    player1 = PokerPlayer("Player 1", 1000)
+    player1.bet(100)
+    assert player1.bankroll == 900
+
+    with pytest.raises(ValueError):
+        player1.bet(2000)
+
+
+def test_player_win():
+    player1 = PokerPlayer("Player 1", 900)
+    player1.win(100)
+    assert player1.bankroll == 1000
 
 
 def test_game_init():

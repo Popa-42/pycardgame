@@ -32,7 +32,19 @@ class PokerDeck(
 
 
 class PokerPlayer(GenericPlayer[PokerCard]):
-    ...
+    def __init__(self, name, bankroll=1000):
+        super().__init__(name, [])
+        self.bankroll = bankroll
+
+    def bet(self, amount):
+        if amount > self.bankroll:
+            raise ValueError("Bet exceeds bankroll")
+        self.bankroll -= amount
+        return self
+
+    def win(self, amount):
+        self.bankroll += amount
+        return self
 
 
 class PokerGame(GenericGame[PokerCard]):
@@ -42,3 +54,5 @@ class PokerGame(GenericGame[PokerCard]):
         self.trash_pile = []
         self.trash_pile_limit = 2
         self.trash_pile_index = 0
+        self.pot = 0
+        self.current_bet = 0
