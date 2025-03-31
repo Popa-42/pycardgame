@@ -13,19 +13,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from typing import TypeVar, Generic
+from abc import ABC
 
-from .base import Deck, Card
+from .base import GenericCard
+
+_CardT = TypeVar("_CardT", bound=GenericCard)
 
 
-class Player:
-    def __init__(self, name, hand=None, score=0, **kwargs):
+class GenericPlayer(ABC, Generic[_CardT]):
+    __slots__ = ("name", "hand", "score")
+
+    def __init__(self, name, hand=None, score=0):
         self.name = name
         self.hand = hand or []
         self.score = score
-
-        # Set any additional attributes
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
     def add_card(self, *cards):
         self.hand.extend(cards)
@@ -59,27 +61,23 @@ class Player:
         self.name = name
         return self
 
-    def __getitem__(self, item):
-        return self.hand[item]
+    def __getitem__(self, key):
+        return self.hand[key]
 
     def __str__(self):
         return f"Player {self.name} ({len(self.hand)} card(s))"
 
     def __repr__(self):
-        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
-                               if k not in ["name", "hand", "score"])
-        return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r}, "
-                f"score={self.score!r}"
-                f"{f', {additional}' if additional else ''})")
+        return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r},"
+                f" score={self.score!r})")
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (self.score == other.score and self.hand == other.hand and
                 self.name == other.name)
 
-    def __ne__(self, other):
-        return (self.score != other.score or self.hand != other.hand or
-                self.name != other.name)
-
+    def __ne__(self, other): return not self.__eq__(other)
     def __lt__(self, other): return self.score < other.score
     def __le__(self, other): return self.score <= other.score
     def __gt__(self, other): return self.score > other.score
@@ -89,13 +87,21 @@ class Player:
     def __len__(self): return len(self.hand)
 
 
-class Game:
-    def __init__(self, deck=None, trump=None, hand_size=4, *players, **kwargs):
-        if trump is not None and trump not in Card.suit_names:
+class GenericGame(ABC, Generic[_CardT]):
+    __slots__ = ("_card_type", "_deck_type", "deck", "discard_pile", "trump",
+                 "hand_size", "players", "current_player_index")
+
+    def __init__(self, card_type, deck_type, deck=None, discard_pile=None,
+                 trump=None, hand_size=4, starting_player_index=0, *players):
+        self._card_type = card_type
+        self._deck_type = deck_type
+
+        if trump is not None and trump not in self._card_type.SUITS:
             raise ValueError(f"Invalid suit for trump: {trump}")
 
-        self.deck = deck or Deck().shuffle()
-        self.discard_pile = Deck([])
+        self.deck = deck or self._deck_type().shuffle()
+        self.discard_pile = discard_pile or \
+            self._deck_type(cards=[])
 
         self.trump = None
         if trump is not None:
@@ -103,14 +109,22 @@ class Game:
         self.apply_trump()
 
         self.hand_size = hand_size
-        self.players = list(players)
-        for player in self.players:
-            player.add_card(*self.deck.draw(self.hand_size))
-        self.current_player_index = 0
 
-        # Set any additional attributes
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        self.players = list(players)
+
+        start_idx = starting_player_index
+        if start_idx < 0 or start_idx >= len(self.players):
+            if start_idx != 0:  # 0 is a valid index
+                raise ValueError("Invalid starting player index")
+        self.current_player_index = start_idx
+
+    def deal_initial_cards(self, *players):
+        players_to_deal = players or self.players
+        for player in players_to_deal:
+            cards_needed = max(0, self.hand_size - len(player.hand))
+            if cards_needed > 0:
+                player.add_card(*self.deck.draw(cards_needed))
+        return self
 
     def add_players(self, *players):
         self.players.extend(players)
@@ -140,7 +154,7 @@ class Game:
         return self.trump
 
     def set_trump(self, suit):
-        if suit not in Card.suit_names:
+        if suit not in self._card_type.SUITS:
             raise ValueError(f"Invalid suit for trump: {suit}")
         self.trump = suit
         return self
@@ -174,15 +188,12 @@ class Game:
         return f"Game of {len(self.players)} players"
 
     def __repr__(self):
-        keys = ["deck", "discard_pile", "players", "trump", "hand_size",
-                "current_player_index"]
-        additional = ", ".join(f"{k}={v!r}" for k, v in vars(self).items()
-                               if k not in keys)
         return (f"{self.__class__.__name__}("
+                f"card_type={self._card_type!r}, "
+                f"deck_type={self._deck_type!r}, "
                 f"deck={self.deck!r}, "
-                f"discard_pile={self.discard_pile!r}"
+                f"discard_pile={self.discard_pile!r}, "
                 f"trump={self.trump!r}, "
                 f"hand_size={self.hand_size!r}, "
-                f"players={self.players!r}, "
-                f"current_player_index={self.current_player_index!r}"
-                f"{f', {additional}' if additional else ''})")
+                f"starting_player_index={self.current_player_index!r}, "
+                f"*{self.players!r}")

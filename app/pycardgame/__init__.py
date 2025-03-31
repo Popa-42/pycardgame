@@ -1,10 +1,8 @@
 """
-PyCardGame - A base library for creating card games in Python
+PyCardGame — A base library for creating card games in Python
 
 License
 -------
-
-PyCardGame - A base library for creating card games in Python
 
 Copyright (C) 2025  Popa-42
 
@@ -22,10 +20,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from .src.base import Card, Deck
-from .src.game import Game, Player
+from .src.base import GenericCard, GenericDeck, CardMeta, DeckMeta
+from .src.game import GenericGame, GenericPlayer
+from .src.presets import PokerCard, PokerDeck, PokerPlayer, PokerGame
+# , SkatCard, SkatDeck, UnoCard, UnoDeck
 
-__all__ = ["Card", "Deck", "Game", "Player"]
+__all__ = [
+    "CardMeta",
+    "DeckMeta",
+    "GenericCard",
+    "GenericDeck",
+    "GenericGame",
+    "GenericPlayer",
+    "PokerCard",
+    "PokerDeck",
+    "PokerPlayer",
+    "PokerGame",
+]
 
 print("""
     PyCardGame  Copyright (C) 2025  Popa-42

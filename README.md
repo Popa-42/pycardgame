@@ -26,16 +26,16 @@ pip install -i https://test.pypi.org/simple/ pycardgame
 
 ### `Card` class
 
-The `Card` class represents a single playing card. It includes attributes for rank, suit, and whether the card is a
-trump card.
+The `Card` class represents a single playing card. It includes attributes for
+rank, suit, and whether the card is a trump card.
 
 **Example:**
 
 ```python
 from pycardgame import Card
 
-print(Card.suit_names)  # Output: ["Clubs", "Diamonds", "Hearts", "Spades"]
-print(Card.rank_names)  # Output: ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+print(Card.SUITS)  # Output: ["Clubs", "Diamonds", "Hearts", "Spades"]
+print(Card.RANKS)  # Output: ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
 
 card1 = Card(12, 1)
 card2 = Card("4", "Hearts")
@@ -67,8 +67,8 @@ print(card)  # Output: (random card from the deck)
 
 ### `Deck` class
 
-The `Deck` class represents a collection of Card objects. It includes methods for shuffling, drawing, adding, and
-sorting cards.
+The `Deck` class represents a collection of Card objects. It includes methods
+for shuffling, drawing, adding, and sorting cards.
 
 **Example:**
 
@@ -85,12 +85,14 @@ print(card)  # Output: (random card from the deck)
 #### Class methods
 
 - `reset()`: Resets the deck to its original state.
-- `count()`: Counts the occurrences of a specific card, rank, or suit in the deck.
+- `count()`: Counts the occurrences of a specific card, rank, or suit in the
+  deck.
 - `sort(by="suit")`: Sorts the deck by suit or rank.
 - `shuffle()`: Shuffles the deck.
 - `draw(n=1)`: Draws `n` cards from the deck.
 - `add(card)`: Adds a card to the deck.
-- `get_index(card)`: Returns the indices of all occurrences of a card in the deck.
+- `get_index(card)`: Returns the indices of all occurrences of a card in the
+  deck.
 - `get_cards()`: Returns a list of all cards in the deck.
 
 **Example:**
@@ -114,8 +116,12 @@ for card in deck:
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome. For major changes, please open an issue first to
+discuss what you would like to change. Please also note that we have a
+[code of conduct](CODE_OF_CONDUCT.md), please follow it in all your interactions
+with the project.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the
+[LICENSE](LICENSE) file for details.

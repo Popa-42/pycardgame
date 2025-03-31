@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
+[project]
+name = "pycardgame"
+version = "0.1.6"
+authors = [
+    { name="Popa", email="contact@just-popa.de" }
+]
+description = "A base library for creating card games in Python"
+readme = "README.md"
+requires-python = ">=3.8"
+optional-dependencies = {dev=["pytest>=8.0", "twine>=4.0.2"]}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "GPL-3.0"
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/Popa-42/pycardgame"
+Issues = "https://github.com/Popa-42/pycardgame/issues"
