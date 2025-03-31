@@ -18,12 +18,13 @@ from __future__ import annotations
 
 import random
 from typing import Generic, TypeVar, get_args, Type
+from abc import ABC, ABCMeta
 
 _RankT = TypeVar("_RankT")
 _SuitT = TypeVar("_SuitT")
 
 
-class GenericCard(Generic[_RankT, _SuitT]):
+class GenericCard(ABC, Generic[_RankT, _SuitT]):
     __slots__ = ("rank", "suit", "trump")
 
     RANKS = []
@@ -119,9 +120,9 @@ class GenericCard(Generic[_RankT, _SuitT]):
 _CardT = TypeVar("_CardT", bound=GenericCard)
 
 
-class GenericDeck(Generic[_CardT]):
+class GenericDeck(ABC, Generic[_CardT]):
     _card_type: Type[_CardT]
-    __hash__ = None  # Mutable type, so hash is not defined
+    __hash__ = None  # type: ignore  # Mutable type, so hash is not defined
 
     def __init__(self, cards=None):
         if cards is None:
@@ -198,29 +199,26 @@ class GenericDeck(Generic[_CardT]):
                 f"card_type={self._card_type!r}, "
                 f"cards={self.cards!r})")
 
-    def __copy__(self):
-        return self.__class__(self.cards.copy())
-
-    def __getitem__(self, key): return self.cards[key]
-    def __len__(self): return len(self.cards)
-    def __iter__(self): return iter(self.cards)
-
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.cards == other.cards
 
     def __ne__(self, other): return not self.__eq__(other)
+    def __copy__(self): return self.__class__(cards=self.cards.copy())
+    def __getitem__(self, key): return self.cards[key]
+    def __len__(self): return len(self.cards)
+    def __iter__(self): return iter(self.cards)
 
 
-class CardMeta(type):
+class CardMeta(ABCMeta):
     def __new__(cls, name, bases, class_dict, rank_type, suit_type):
         class_dict["RANKS"] = list(get_args(rank_type))
         class_dict["SUITS"] = list(get_args(suit_type))
         return super().__new__(cls, name, bases, class_dict)
 
 
-class DeckMeta(type):
+class DeckMeta(ABCMeta):
     def __new__(cls, name, bases, class_dict, card_type):
         class_dict["_card_type"] = card_type
         return super().__new__(cls, name, bases, class_dict)

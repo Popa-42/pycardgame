@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import TypeVar, Generic
+from abc import ABC
 
 from .base import GenericCard
 
 _CardT = TypeVar("_CardT", bound=GenericCard)
 
 
-class GenericPlayer(Generic[_CardT]):
+class GenericPlayer(ABC, Generic[_CardT]):
     __slots__ = ("name", "hand", "score")
 
     def __init__(self, name, hand=None, score=0):
@@ -60,7 +61,8 @@ class GenericPlayer(Generic[_CardT]):
         self.name = name
         return self
 
-    def __getitem__(self, key): return self.hand[key]
+    def __getitem__(self, key):
+        return self.hand[key]
 
     def __str__(self):
         return f"Player {self.name} ({len(self.hand)} card(s))"
@@ -85,7 +87,10 @@ class GenericPlayer(Generic[_CardT]):
     def __len__(self): return len(self.hand)
 
 
-class GenericGame(Generic[_CardT]):
+class GenericGame(ABC, Generic[_CardT]):
+    __slots__ = ("_card_type", "_deck_type", "deck", "discard_pile", "trump",
+                 "hand_size", "players", "current_player_index")
+
     def __init__(self, card_type, deck_type, deck=None, discard_pile=None,
                  trump=None, hand_size=4, starting_player_index=0, *players):
         self._card_type = card_type
@@ -156,7 +161,7 @@ class GenericGame(Generic[_CardT]):
 
     def apply_trump(self):
         for card in self.deck:
-            if card.get_suit(as_index=False) == self.trump:
+            if card.get_suit() == self.trump:
                 card.set_trump(True)
             else:
                 card.set_trump(False)

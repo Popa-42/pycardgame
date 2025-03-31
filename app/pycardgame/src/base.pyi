@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from abc import ABC
 from typing import (
     Any,
     overload,
@@ -33,7 +34,7 @@ _RankT = TypeVar("_RankT")
 _SuitT = TypeVar("_SuitT")
 
 
-class GenericCard(Generic[_RankT, _SuitT]):
+class GenericCard(ABC, Generic[_RankT, _SuitT]):
     """
     A playing card.
     :param rank: The rank of the card.
@@ -144,7 +145,7 @@ class GenericCard(Generic[_RankT, _SuitT]):
 _CardT = TypeVar("_CardT", bound=GenericCard)  # type: ignore
 
 
-class GenericDeck(Generic[_CardT]):
+class GenericDeck(ABC, Generic[_CardT]):
     """
     A deck of cards.
     :param cards: A custom list of `Card` objects. If omitted, a full deck is

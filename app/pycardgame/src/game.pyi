@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from abc import ABC
 from typing import (
     Any,
     overload,
@@ -34,7 +35,7 @@ _SuitT = TypeVar("_SuitT")
 _CardT = TypeVar("_CardT", bound=GenericCard)  # type: ignore
 
 
-class GenericPlayer(Generic[_CardT]):
+class GenericPlayer(ABC, Generic[_CardT]):
     """
     A class representing a player in a card game.
     :param name: The name of the player.
@@ -138,7 +139,7 @@ class GenericPlayer(Generic[_CardT]):
     def __len__(self) -> int: ...
 
 
-class GenericGame(Generic[_CardT]):
+class GenericGame(ABC, Generic[_CardT]):
     """
     The base class for a card game.
     :param card_type: The type of card to use.
