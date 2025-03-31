@@ -91,7 +91,7 @@ print(card)  # Output: (random card from the deck)
 - `shuffle()`: Shuffles the deck.
 - `draw(n=1)`: Draws `n` cards from the deck.
 - `add(card)`: Adds a card to the deck.
-- `get_index(card)`: Returns the indices of all occurrences of a card in the#
+- `get_index(card)`: Returns the indices of all occurrences of a card in the
   deck.
 - `get_cards()`: Returns a list of all cards in the deck.
 

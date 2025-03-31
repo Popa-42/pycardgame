@@ -108,8 +108,9 @@ class GenericGame(Generic[_CardT]):
         self.players = list(players)
 
         start_idx = starting_player_index
-        if start_idx < 0 or start_idx > 0 and start_idx >= len(self.players):
-            raise ValueError("Invalid starting player index")
+        if start_idx < 0 or start_idx >= len(self.players):
+            if start_idx != 0:  # 0 is a valid index
+                raise ValueError("Invalid starting player index")
         self.current_player_index = start_idx
 
     def deal_initial_cards(self, *players):
