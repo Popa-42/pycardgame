@@ -80,6 +80,9 @@ class GenericCard(Generic[_T_R, _T_S]):
         self.trump = trump
         return self
 
+    def __copy__(self):
+        return GenericCard(self.rank, self.suit, self.trump)
+
     def __str__(self):
         rank_str = str(self.get_rank(as_index=False))
         suit_str = str(self.get_suit(as_index=False))
@@ -197,6 +200,9 @@ class GenericDeck(Generic[_T_C]):
                 f"card_type={self._card_type!r}, "
                 f"cards={self.cards!r})")
 
+    def __copy__(self):
+        return self.__class__(self.cards.copy())
+
     def __getitem__(self, key): return self.cards[key]
     def __len__(self): return len(self.cards)
     def __iter__(self): return iter(self.cards)
@@ -206,7 +212,7 @@ class GenericDeck(Generic[_T_C]):
             return NotImplemented
         return self.cards == other.cards and self._card_type == other._card_type
 
-    def __neq__(self, other): return not self.__eq__(other)
+    def __ne__(self, other): return not self.__eq__(other)
     def __hash__(self): raise TypeError("GenericDeck objects are not hashable")
 
 

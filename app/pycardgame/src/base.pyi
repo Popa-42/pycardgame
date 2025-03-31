@@ -120,6 +120,13 @@ class GenericCard(Generic[_T_R, _T_S]):
         """
         pass
 
+    def __copy__(self) -> GenericCard[_T_R, _T_S]:
+        """
+        Creates a shallow copy of the card.
+        :return: A new card instance with the same rank, suit, and trump status.
+        """
+        pass
+
     def __lt__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
     @overload
     def __eq__(self, other: GenericCard[_T_R, _T_S]) -> bool: ...
@@ -240,6 +247,13 @@ class GenericDeck(Generic[_T_C]):
         """
         pass
 
+    def __copy__(self) -> GenericDeck[_T_C]:
+        """
+        Creates a shallow copy of the deck.
+        :return: A new deck instance with the same cards.
+        """
+        pass
+
     @overload
     def __getitem__(self, index: int) -> _T_C: ...
     @overload
@@ -247,10 +261,12 @@ class GenericDeck(Generic[_T_C]):
 
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[_T_C]: ...
+
     @overload
     def __eq__(self, other: GenericDeck[_T_C]) -> bool: ...
     @overload
     def __eq__(self, other: object) -> bool: ...
+
     @overload
     def __ne__(self, other: GenericDeck[_T_C]) -> bool: ...
     @overload
