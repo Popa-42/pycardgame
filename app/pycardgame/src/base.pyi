@@ -24,10 +24,10 @@ from typing import (
     List,
     Literal,
     Optional,
+    overload,
     Type,
     TypeVar,
     Union,
-    overload,
 )
 
 _RankT = TypeVar("_RankT")
@@ -45,8 +45,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
     SUITS: List[_SuitT] = ...
 
     def __init__(self, rank: Optional[Union[_RankT, int]],
-                 suit: Optional[Union[_SuitT, int]], trump: bool = False
-                 ) -> None:
+                 suit: Optional[Union[_SuitT, int]],
+                 trump: bool = False) -> None:
         """
         Creates a new card instance.
         :param rank: The card’s rank, provided either as a string (e.g.,
@@ -63,8 +63,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
 
     @staticmethod
     def _set_value(value: Optional[Union[_RankT, _SuitT, int]],
-                   values_list: List[Union[_RankT, _SuitT]], value_name: str
-                   ) -> Optional[int]: ...
+                   values_list: List[Union[_RankT, _SuitT]],
+                   value_name: str) -> Optional[int]: ...
 
     def get_rank(self, as_index: bool = False) -> Optional[Union[_RankT, int]]:
         """
@@ -75,8 +75,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         """
         pass
 
-    def set_rank(self, rank: Optional[Union[_RankT, int]]
-                 ) -> GenericCard[_RankT, _SuitT]:
+    def set_rank(self, rank: Optional[Union[_RankT, int]]) -> GenericCard[
+        _RankT, _SuitT]:
         """
         Sets the card’s rank. Accepts a rank name or an integer index.
         :param rank: The rank to set.
@@ -95,8 +95,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         """
         pass
 
-    def set_suit(self, suit: Optional[Union[_SuitT, int]]
-                 ) -> GenericCard[_RankT, _SuitT]:
+    def set_suit(self, suit: Optional[Union[_SuitT, int]]) -> GenericCard[
+        _RankT, _SuitT]:
         """
         Sets the card’s suit. Accepts a suit name or an integer index.
         :param suit: The suit to set.
@@ -327,9 +327,7 @@ class GenericPlayer(ABC, Generic[_CardT]):
     :param hand: The player's hand of cards.
     """
 
-    def __init__(self,
-                 name: str,
-                 hand: Optional[List[_CardT]] = None,
+    def __init__(self, name: str, hand: Optional[List[_CardT]] = None,
                  score: int = 0) -> None:
         """
         Constructor for the Player class.
@@ -488,8 +486,8 @@ class GenericGame(ABC, Generic[_CardT]):
         self.players: List[GenericPlayer[_CardT]] = ...
         self.current_player_index: int = ...
 
-    def deal_initial_cards(self, *players: GenericPlayer[_CardT]
-                           ) -> GenericGame[_CardT]:
+    def deal_initial_cards(self, *players: GenericPlayer[_CardT]) -> \
+    GenericGame[_CardT]:
         """
         Deal initial cards to specified players until they have at least
         hand_size cards. If no players are specified, deals to all players.
@@ -500,8 +498,8 @@ class GenericGame(ABC, Generic[_CardT]):
         """
         pass
 
-    def add_players(self, *players: GenericPlayer[_CardT]
-                    ) -> GenericGame[_CardT]:
+    def add_players(self, *players: GenericPlayer[_CardT]) -> GenericGame[
+        _CardT]:
         """
         Add one or multiple players to the game.
         :param players: The players to add.
@@ -509,8 +507,8 @@ class GenericGame(ABC, Generic[_CardT]):
         """
         pass
 
-    def remove_players(self, *players: GenericPlayer[_CardT]
-                       ) -> GenericGame[_CardT]:
+    def remove_players(self, *players: GenericPlayer[_CardT]) -> GenericGame[
+        _CardT]:
         """
         Remove one or multiple players from the game.
         :param players: The players to remove.
@@ -518,8 +516,8 @@ class GenericGame(ABC, Generic[_CardT]):
         """
         pass
 
-    def deal(self, num_cards: int = 1, *players: GenericPlayer[_CardT]
-             ) -> GenericGame[_CardT]:
+    def deal(self, num_cards: int = 1, *players: GenericPlayer[_CardT]) -> \
+    GenericGame[_CardT]:
         """
         Deal cards to a player in the game.
         :param num_cards: The number of cards to deal. Default is 1.
@@ -537,8 +535,7 @@ class GenericGame(ABC, Generic[_CardT]):
         pass
 
     def play(self, player: Optional[GenericPlayer[_CardT]] = None,
-             *cards: _CardT
-             ) -> GenericGame[_CardT]:
+             *cards: _CardT) -> GenericGame[_CardT]:
         """
         Play one or more cards from a player's hand. The cards will be added to
         the discard pile.
@@ -581,8 +578,8 @@ class GenericGame(ABC, Generic[_CardT]):
         """
         pass
 
-    def set_current_player(self, player: GenericPlayer[_CardT]
-                           ) -> GenericGame[_CardT]:
+    def set_current_player(self, player: GenericPlayer[_CardT]) -> GenericGame[
+        _CardT]:
         """
         Set the current player.
         :param player: The player to set as current.
@@ -604,8 +601,7 @@ class GenericGame(ABC, Generic[_CardT]):
         """
         pass
 
-    def set_deck(self, deck: GenericDeck[_CardT]
-                 ) -> GenericGame[_CardT]:
+    def set_deck(self, deck: GenericDeck[_CardT]) -> GenericGame[_CardT]:
         """
         Set the deck of cards.
         :param deck: The deck to set.

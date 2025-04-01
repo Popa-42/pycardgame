@@ -28,8 +28,7 @@ from .src.base import (
     GenericGame,
     GenericPlayer
 )
-from .src.presets import PokerCard, PokerDeck, PokerPlayer, PokerGame
-# , SkatCard, SkatDeck, UnoCard, UnoDeck
+from .src.presets import UnoCard, UnoDeck, UnoGame, UnoPlayer
 
 __all__ = [
     "CardMeta",
@@ -38,10 +37,10 @@ __all__ = [
     "GenericDeck",
     "GenericGame",
     "GenericPlayer",
-    "PokerCard",
-    "PokerDeck",
-    "PokerPlayer",
-    "PokerGame",
+    "UnoCard",
+    "UnoDeck",
+    "UnoPlayer",
+    "UnoGame",
 ]
 
 print("""

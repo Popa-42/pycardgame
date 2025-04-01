@@ -25,50 +25,56 @@ from .. import (
     GenericPlayer,
 )
 
-T_Ranks = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
-                  "Queen", "King", "Ace"]
-T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
+                     "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
+T_UnoSuits = Literal["Red", "Green", "Blue", "Yellow", "Wild"]
 
 
-class PokerCard(
-    GenericCard[T_Ranks, T_Suits],
+class UnoCard(
+    GenericCard[T_UnoRanks, T_UnoSuits],
     metaclass=CardMeta,
-    rank_type=T_Ranks,
-    suit_type=T_Suits
+    rank_type=T_UnoRanks,
+    suit_type=T_UnoSuits
 ):
-    ...
+    pass
 
 
-class PokerDeck(
-    GenericDeck[PokerCard],
+class UnoDeck(
+    GenericDeck[UnoCard],
     metaclass=DeckMeta,
-    card_type=PokerCard
+    card_type=UnoCard
 ):
-    ...
+    def __init__(self, cards=None):
+        super().__init__()
+        self.cards = cards if cards is not None else [
+            UnoCard(rank, suit)  # type: ignore
+            for suit in ["Red", "Green", "Blue", "Yellow"]
+            for rank in ["0"] + [str(i) for i in range(1, 10)] * 2 +
+                        ["Skip", "Reverse", "Draw Two"] * 2
+        ] + [
+            UnoCard("Wild", "Wild"),
+            UnoCard("Wild Draw Four", "Wild")
+        ] * 4
+
+    def __str__(self) -> str:
+        return f"UNO Deck with {len(self.cards)} cards"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(cards={self.cards!r})"
 
 
-class PokerPlayer(GenericPlayer[PokerCard]):
-    def __init__(self, name, bankroll=1000):
-        super().__init__(name, [])
-        self.bankroll = bankroll
+class UnoPlayer(GenericPlayer[UnoCard]):
+    def __init__(self, name, hand=None, score=0):
+        super().__init__(name, hand, score)
 
-    def bet(self, amount):
-        if amount > self.bankroll:
-            raise ValueError("Bet exceeds bankroll")
-        self.bankroll -= amount
-        return self
-
-    def win(self, amount):
-        self.bankroll += amount
-        return self
+    def __str__(self) -> str:
+        return f"Player {self.name} with {len(self.hand)} cards"
 
 
-class PokerGame(GenericGame[PokerCard]):
-    def __init__(self, starting_player_index=0, *players):
-        super().__init__(PokerCard, PokerDeck, None, None, None, 2,
-                         starting_player_index, *players)
-        self.trash_pile = []
-        self.trash_pile_limit = 2
-        self.trash_pile_index = 0
-        self.pot = 0
-        self.current_bet = 0
+class UnoGame(GenericGame[UnoCard]):
+    def __init__(self, deck=None, discard_pile=None,
+                 hand_size=7, *players):
+        super().__init__(UnoCard, UnoDeck, deck, discard_pile, None,
+                         hand_size, 0, *players)
+        self.deck = deck or UnoDeck()
+        self.discard_pile = discard_pile or UnoDeck([])
