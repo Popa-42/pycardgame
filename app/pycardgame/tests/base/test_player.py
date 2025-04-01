@@ -18,8 +18,8 @@ from typing import Literal
 
 from ... import GenericCard, GenericPlayer, CardMeta
 
-T_Ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
-T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+T_Ranks = Literal["1", "2", "3"]
+T_Suits = Literal["Red", "Green", "Blue"]
 
 
 class DummyCard(
@@ -28,18 +28,15 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    # Update string representation (e.g. "10 of Hearts" instead of "Hearts 10")
-    def __str__(self):
-        return (f"{self.get_rank()} of {self.get_suit()}"
-                f"{' (trump)' if self.get_trump() else ''}")
+    pass
 
 
 class DummyPlayer(GenericPlayer[DummyCard]):
-    ...
+    pass
 
 
 def test_player_init():
-    cards = [DummyCard("10", "Hearts"), DummyCard("J", "Diamonds")]
+    cards = [DummyCard("2", "Green"), DummyCard("3", "Blue")]
     player = DummyPlayer("Alice", cards, 10)
     assert player.name == "Alice"
     assert player.hand == cards
@@ -48,7 +45,7 @@ def test_player_init():
 
 def test_player_add_card():
     player = DummyPlayer("Alice")
-    card = DummyCard("10", "Hearts")
+    card = DummyCard("2", "Green")
     player.add_card(card)
     assert player.hand == [card]
     player.add_card(card, card)
@@ -56,7 +53,7 @@ def test_player_add_card():
 
 
 def test_player_remove_card():
-    card = DummyCard("10", "Hearts")
+    card = DummyCard("2", "Green")
     player = DummyPlayer("Alice", [card, card, card])
     player.remove_card(card)
     assert player.hand == [card, card]
@@ -65,8 +62,8 @@ def test_player_remove_card():
 
 
 def test_player_play_card():
-    card1 = DummyCard("10", "Hearts")
-    card2 = DummyCard("J", "Diamonds")
+    card1 = DummyCard("2", "Green")
+    card2 = DummyCard("3", "Blue")
     player = DummyPlayer("Alice", [card1, card2])
     assert player.play_card() == [card2]
     assert player.hand == [card1]
@@ -75,7 +72,7 @@ def test_player_play_card():
 
 
 def test_player_get_hand():
-    cards = [DummyCard("10", "Hearts"), DummyCard("J", "Diamonds")]
+    cards = [DummyCard("2", "Green"), DummyCard("3", "Blue")]
     player = DummyPlayer("Alice", cards)
     assert player.get_hand() == cards
 
@@ -105,7 +102,7 @@ def test_player_set_name():
 
 
 def test_player_getitem():
-    cards = [DummyCard("10", "Hearts"), DummyCard("J", "Diamonds")]
+    cards = [DummyCard("2", "Green"), DummyCard("3", "Blue")]
     player = DummyPlayer("Alice", cards)
     assert player[0] == cards[0]
     assert player[1:-1:-1] == cards[1:-1:-1]
@@ -115,31 +112,31 @@ def test_player_getitem():
 
 
 def test_player_str():
-    player = DummyPlayer("Alice", [DummyCard("10", "Hearts")])
+    player = DummyPlayer("Alice", [DummyCard("3", "Blue")])
     assert str(player) == "Player Alice (1 card(s))"
 
 
 def test_player_repr():
-    player = DummyPlayer("Alice", [DummyCard("10", "Hearts")])
+    player = DummyPlayer("Alice", [DummyCard("3", "Blue")])
     player_repr = repr(player)
     assert player_repr.startswith("DummyPlayer('Alice', hand=[")
-    assert "DummyCard(rank=3, suit=1)" in player_repr
+    assert "DummyCard(rank=2, suit=2)" in player_repr
     assert player_repr.endswith(", score=0)")
 
 
 def test_player_equalities():
-    player1 = DummyPlayer("Alice", [DummyCard("10", "Hearts")])
-    player2 = DummyPlayer("Alice", [DummyCard("10", "Hearts")])
+    player1 = DummyPlayer("Alice", [DummyCard("2", "Green")])
+    player2 = DummyPlayer("Alice", [DummyCard("2", "Green")])
     assert player1 == player2
-    assert player1 != DummyPlayer("Bob", [DummyCard("10", "Hearts")])
-    assert player1 != DummyPlayer("Alice", [DummyCard("J", "Diamonds")])
-    assert player1 != DummyPlayer("Alice", [DummyCard("10", "Hearts")], 10)
+    assert player1 != DummyPlayer("Bob", [DummyCard("2", "Green")])
+    assert player1 != DummyPlayer("Alice", [DummyCard("3", "Blue")])
+    assert player1 != DummyPlayer("Alice", [DummyCard("2", "Green")], 10)
     assert not player1 == "InvalidType"  # type: ignore
 
 
 def test_player_comparisons():
-    player1 = DummyPlayer("Alice", [DummyCard("10", "Hearts")], 10)
-    player2 = DummyPlayer("Bob", [DummyCard("10", "Hearts")], 20)
+    player1 = DummyPlayer("Alice", [DummyCard("2", "Green")], 10)
+    player2 = DummyPlayer("Bob", [DummyCard("2", "Green")], 20)
     assert player1 < player2
     assert player1 <= player2
     assert player2 > player1

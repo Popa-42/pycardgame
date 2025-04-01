@@ -20,8 +20,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from .src.base import GenericCard, GenericDeck, CardMeta, DeckMeta
-from .src.game import GenericGame, GenericPlayer
+from .src.base import (
+    CardMeta,
+    DeckMeta,
+    GenericCard,
+    GenericDeck,
+    GenericGame,
+    GenericPlayer
+)
 from .src.presets import PokerCard, PokerDeck, PokerPlayer, PokerGame
 # , SkatCard, SkatDeck, UnoCard, UnoDeck
 

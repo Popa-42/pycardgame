@@ -27,8 +27,8 @@ from ... import (
     GenericPlayer,
 )
 
-T_Ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
-T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+T_Ranks = Literal["1", "2", "3"]
+T_Suits = Literal["Red", "Green", "Blue"]
 
 
 class DummyCard(
@@ -37,10 +37,7 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    # Update string representation (e.g. "10 of Hearts" instead of "Hearts 10")
-    def __str__(self):
-        return (f"{self.get_rank()} of {self.get_suit()}"
-                f"{' (trump)' if self.get_trump() else ''}")
+    pass
 
 
 class DummyDeck(
@@ -48,11 +45,11 @@ class DummyDeck(
     metaclass=DeckMeta,
     card_type=DummyCard
 ):
-    ...
+    pass
 
 
 class DummyPlayer(GenericPlayer[DummyCard]):
-    ...
+    pass
 
 
 class DummyGame(GenericGame[DummyCard]):
@@ -67,33 +64,35 @@ def test_game_init():
     empty_deck = DummyDeck(cards=[])
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
 
-    game = DummyGame(deck, empty_deck, "Hearts", 6, 1, *players)
+    game = DummyGame(deck, empty_deck, "Green", 2, 1, *players)
     assert game.deck == deck
     assert game.discard_pile == empty_deck
-    assert game.trump == "Hearts"
-    assert game.hand_size == 6
+    assert game.trump == "Green"
+    assert game.hand_size == 2
     assert game.players == players
     assert game.current_player_index == 1
 
+    # Invalid trump suit
     with pytest.raises(ValueError):
-        DummyGame(deck, empty_deck, "InvalidSuit", 6, 1, *players)
+        DummyGame(deck, empty_deck, "InvalidSuit", 2, 1, *players)
 
+    # Invalid player count
     with pytest.raises(ValueError):
-        DummyGame(deck, empty_deck, "Hearts", 6, 3, *players)
+        DummyGame(deck, empty_deck, "Green", 2, 3, *players)
 
 
 def test_game_deal_initial_cards():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
     deck = DummyDeck()
-    game = DummyGame(deck, None, None, 4, 0, *players)
+    game = DummyGame(deck, None, None, 2, 0, *players)
     game.deal_initial_cards()
-    assert all(len(player.hand) == 4 for player in players)
+    assert all(len(player.hand) == 2 for player in players)
     assert len(game.deck) == len(deck)
 
 
 def test_game_add_players():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(None, None, None, 4, 0, *players)
+    game = DummyGame(None, None, None, 2, 0, *players)
     new_players = [DummyPlayer("Charlie"), DummyPlayer("David")]
     game.add_players(*new_players)
     assert game.players == players + new_players
@@ -101,7 +100,7 @@ def test_game_add_players():
 
 def test_game_remove_players():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(None, None, None, 4, 0, *players)
+    game = DummyGame(None, None, None, 2, 0, *players)
     game.remove_players(players[0])
     assert game.players == players[1:]
 
@@ -109,9 +108,9 @@ def test_game_remove_players():
 def test_game_deal():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
 
-    game = DummyGame(None, None, None, 6, 0, *players)
-    game.deal(2)
-    assert all(len(player.hand) == 2 for player in game.players)
+    game = DummyGame(None, None, None, 2, 0, *players)
+    game.deal(3)
+    assert all(len(player.hand) == 3 for player in game.players)
 
 
 def test_game_shuffle():
@@ -125,7 +124,7 @@ def test_game_shuffle():
 
 def test_game_play():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(None, None, None, 4, 0, *players)
+    game = DummyGame(None, None, None, 2, 0, *players)
     game.deal(2)
     dealt_card = players[0].hand[0]
     game.play(players[0], players[0].hand[0])
@@ -139,48 +138,48 @@ def test_game_get_trump():
     game1 = DummyGame()
     assert game1.get_trump() is None
 
-    game2 = DummyGame(trump="Hearts")
-    assert game2.get_trump() == "Hearts"
+    game2 = DummyGame(trump="Red")
+    assert game2.get_trump() == "Red"
 
 
 def test_game_set_trump():
     game = DummyGame()
-    game.set_trump("Hearts")
-    assert game.trump == "Hearts"
+    game.set_trump("Red")
+    assert game.trump == "Red"
 
     with pytest.raises(ValueError):
         game.set_trump("InvalidSuit")
 
 
 def test_game_apply_trump():
-    game = DummyGame(DummyDeck(), DummyDeck([]), trump="Hearts")
+    game = DummyGame(DummyDeck(), DummyDeck([]), trump="Red")
     game.apply_trump()
     assert all(card.trump for card in game.deck
-               if card.get_suit() == "Hearts")
+               if card.get_suit() == "Red")
     assert not any(card.trump for card in game.deck
-                   if card.get_suit() != "Hearts")
+                   if card.get_suit() != "Red")
     assert all(card.trump for player in game.players for card in player.hand
-               if card.get_suit() == "Hearts")
+               if card.get_suit() == "Red")
     assert not any(card.trump for player in game.players for card in
-                   player.hand if card.get_suit() != "Hearts")
+                   player.hand if card.get_suit() != "Red")
 
 
 def test_game_get_current_player():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(None, None, None, 4, 0, *players)
+    game = DummyGame(None, None, None, 2, 0, *players)
     assert game.get_current_player() == players[0]
 
 
 def test_game_set_current_player():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(None, None, None, 4, 0, *players)
+    game = DummyGame(None, None, None, 2, 0, *players)
     game.set_current_player(players[1])
     assert game.current_player_index == 1
 
 
 def test_game_get_players():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(None, None, None, 4, 0, *players)
+    game = DummyGame(None, None, None, 2, 0, *players)
     assert game.get_players() == players
 
 
@@ -200,7 +199,7 @@ def test_game_set_deck():
 
 def test_game_str():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(None, None, None, 4, 0, *players)
+    game = DummyGame(None, None, None, 2, 0, *players)
     assert str(game) == "Game of 2 players"
 
 
@@ -208,7 +207,7 @@ def test_game_repr():
     deck = DummyDeck()
     discard_pile = DummyDeck([])
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(deck, discard_pile, "Hearts", 4, 0, *players)
+    game = DummyGame(deck, discard_pile, "Green", 2, 0, *players)
     game_repr = repr(game)
 
     assert game_repr.startswith("DummyGame(card_type=<class ")
@@ -217,8 +216,8 @@ def test_game_repr():
     assert "cards=[DummyCard(" in game_repr
     assert "DummyCard(rank=0, suit=0)" in game_repr
     assert "discard_pile=DummyDeck(card_type=<class " in game_repr
-    assert "trump='Hearts'" in game_repr
-    assert "hand_size=4" in game_repr
+    assert "trump='Green'" in game_repr
+    assert "hand_size=2" in game_repr
     assert "starting_player_index=0" in game_repr
     assert "DummyPlayer('Alice', hand=[], score=0)" in game_repr
     assert "DummyPlayer('Alice', hand=[], score=0)" in game_repr

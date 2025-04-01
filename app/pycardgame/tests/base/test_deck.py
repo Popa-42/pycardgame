@@ -20,8 +20,8 @@ import pytest
 
 from ... import CardMeta, DeckMeta, GenericCard, GenericDeck
 
-T_Ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
-T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+T_Ranks = Literal["1", "2", "3"]
+T_Suits = Literal["Red", "Green", "Blue"]
 
 
 class DummyCard(
@@ -30,10 +30,7 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    # Update string representation (e.g. "10 of Hearts" instead of "Hearts 10")
-    def __str__(self):
-        return (f"{self.get_rank()} of {self.get_suit()}"
-                f"{' (trump)' if self.get_trump() else ''}")
+    pass
 
 
 class DummyDeck(
@@ -41,12 +38,12 @@ class DummyDeck(
     metaclass=DeckMeta,
     card_type=DummyCard
 ):
-    ...
+    pass
 
 
 def test_deck_init():
     deck1 = DummyDeck()
-    assert len(deck1.cards) == 32
+    assert len(deck1.cards) == 9
     assert all(isinstance(card, DummyCard) for card in deck1)
 
     cards = [DummyCard(0, 0)]
@@ -57,8 +54,8 @@ def test_deck_init():
 def test_deck_count():
     deck = DummyDeck()
     assert deck.count(DummyCard(0, 0)) == 1
-    assert deck.count("7") == 4
-    assert deck.count("Diamonds") == 8
+    assert deck.count("2") == 3
+    assert deck.count("Blue") == 3
 
     with pytest.raises(ValueError):
         deck.count("InvalidName")
@@ -90,11 +87,11 @@ def test_deck_draw():
     deck = DummyDeck()
     cards = deck.draw(5)
     assert len(cards) == 5
-    assert len(deck.cards) == 27
+    assert len(deck.cards) == 4
 
     cards = deck.draw()
     assert len(cards) == 1
-    assert len(deck.cards) == 26
+    assert len(deck.cards) == 3
 
 
 def test_deck_add():
@@ -123,7 +120,7 @@ def test_deck_get_index():
         deck.get_index(DummyCard(10, 10))
 
     with pytest.raises(TypeError):
-        deck.get_index("Ace of Diamonds")  # type: ignore
+        deck.get_index("Red 1")  # type: ignore
 
 
 def test_deck_get_cards():
@@ -138,7 +135,7 @@ def test_deck_get_top_card():
 
 def test_deck_str():
     deck = DummyDeck()
-    assert str(deck) == "Deck of 32 cards. Top card: 7 of Diamonds"
+    assert str(deck) == "Deck of 9 cards. Top card: Red 1"
 
 
 def test_deck_repr():
@@ -146,7 +143,7 @@ def test_deck_repr():
     deck_repr = repr(deck)
     assert deck_repr.startswith("DummyDeck(card_type=<class")
     assert "cards=[DummyCard(rank=0, suit=0)," in deck_repr
-    assert deck_repr.endswith("DummyCard(rank=7, suit=3)])")
+    assert deck_repr.endswith("DummyCard(rank=2, suit=2)])")
 
 
 def test_deck_copy():

@@ -20,8 +20,8 @@ import pytest
 
 from ... import CardMeta, GenericCard
 
-T_Ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
-T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+T_Ranks = Literal["1", "2", "3"]
+T_Suits = Literal["Red", "Green", "Blue"]
 
 
 class DummyCard(
@@ -30,32 +30,29 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    # Update string representation (e.g. "10 of Hearts" instead of "Hearts 10")
-    def __str__(self):
-        return (f"{self.get_rank()} of {self.get_suit()}"
-                f"{' (trump)' if self.get_trump() else ''}")
+    pass
 
 
 def test_card_init():
-    card1 = DummyCard("10", "Hearts")
-    assert card1.rank == 3
-    assert card1.suit == 1
+    card1 = DummyCard(rank="2", suit="Blue")
+    assert card1.rank == 1
+    assert card1.suit == 2
     assert card1.trump is False
 
-    card2 = DummyCard(4, 2, True)
-    assert card2.rank == 4
+    card2 = DummyCard(1, 2, True)
+    assert card2.rank == 1
     assert card2.suit == 2
     assert card2.trump is True
 
     with pytest.raises(ValueError):
-        DummyCard("InvalidRank", "Diamonds")  # type: ignore
+        DummyCard("InvalidRank", "Red")  # type: ignore
     with pytest.raises(ValueError):
-        DummyCard("10", "InvalidSuit")  # type: ignore
+        DummyCard("1", "InvalidSuit")  # type: ignore
 
 
 def test_card_get_rank():
     card1 = DummyCard(0, 0)
-    assert card1.get_rank() == "7"
+    assert card1.get_rank() == "1"
     assert card1.get_rank(as_index=True) == 0
 
     card2 = DummyCard(None, None)
@@ -65,8 +62,8 @@ def test_card_get_rank():
 
 def test_card_set_rank():
     card = DummyCard(0, 0)
-    card.set_rank("K")
-    assert card.rank == 6
+    card.set_rank("2")
+    assert card.rank == 1
     card.set_rank(2)
     assert card.rank == 2
     card.set_rank(None)
@@ -81,7 +78,7 @@ def test_card_set_rank():
 
 def test_card_get_suit():
     card1 = DummyCard(0, 0)
-    assert card1.get_suit() == "Diamonds"
+    assert card1.get_suit() == "Red"
     assert card1.get_suit(as_index=True) == 0
 
     card2 = DummyCard(None, None)
@@ -91,10 +88,10 @@ def test_card_get_suit():
 
 def test_card_set_suit():
     card = DummyCard(0, 0)
-    card.set_suit("Clubs")
-    assert card.suit == 3
-    card.set_suit(1)
+    card.set_suit("Green")
     assert card.suit == 1
+    card.set_suit(2)
+    assert card.suit == 2
     card.set_suit(None)
     assert card.suit is None
 
@@ -139,21 +136,21 @@ def test_card_copy():
 
 def test_card_str():
     card1 = DummyCard(0, 0)
-    assert str(card1) == "7 of Diamonds"
+    assert str(card1) == "Red 1"
 
-    card2 = DummyCard(4, 2, True)
-    assert str(card2) == "J of Spades (trump)"
+    card2 = DummyCard(1, 2, True)
+    assert str(card2) == "Blue 2 (trump)"
 
     card3 = DummyCard(None, None)
-    assert str(card3) == "None of None"
+    assert str(card3) == "None None"
 
 
 def test_card_repr():
     card1 = DummyCard(0, 0)
     assert repr(card1) == "DummyCard(rank=0, suit=0)"
 
-    card2 = DummyCard(4, 2, True)
-    assert repr(card2) == "DummyCard(rank=4, suit=2, trump=True)"
+    card2 = DummyCard(2, 1, True)
+    assert repr(card2) == "DummyCard(rank=2, suit=1, trump=True)"
 
     card3 = DummyCard(None, None)
     assert repr(card3) == "DummyCard(rank=None, suit=None)"
