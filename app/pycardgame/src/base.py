@@ -20,8 +20,8 @@ import random
 from abc import ABC, ABCMeta
 from typing import Generic, TypeVar, get_args, Type
 
-_RankT = TypeVar("_RankT")
-_SuitT = TypeVar("_SuitT")
+_RankT = TypeVar("_RankT", bound=str)
+_SuitT = TypeVar("_SuitT", bound=str)
 
 
 class GenericCard(ABC, Generic[_RankT, _SuitT]):
@@ -174,7 +174,10 @@ class GenericDeck(ABC, Generic[_CardT]):
         return self
 
     def draw(self, n=1):
-        return [self.cards.pop(0) for _ in range(n)]
+        if n < 1 or n > len(self.cards):
+            raise ValueError("Cannot draw less or more than one card")
+        return self.cards.pop(0) if n == 1 else [self.cards.pop(0) for _ in (
+            range(n))]
 
     def add(self, *cards):
         self.cards.extend(cards)
@@ -226,6 +229,14 @@ class GenericDeck(ABC, Generic[_CardT]):
     def __iter__(self):
         return iter(self.cards)
 
+    def __contains__(self, item):
+        if not isinstance(item, self._card_type):
+            raise TypeError("Invalid card type: must be a Card object")
+        return item in self.cards
+
+    def __bool__(self):
+        return bool(self.cards)
+
 
 class CardMeta(ABCMeta):
     def __new__(cls, name, bases, class_dict, rank_type, suit_type):
@@ -248,17 +259,17 @@ class GenericPlayer(ABC, Generic[_CardT]):
         self.hand = hand or []
         self.score = score
 
-    def add_card(self, *cards):
+    def add_cards(self, *cards):
         self.hand.extend(cards)
 
-    def remove_card(self, *cards):
+    def remove_cards(self, *cards):
         for card in cards:
             self.hand.remove(card)
         return self
 
-    def play_card(self, *cards):
+    def play_cards(self, *cards):
         if not cards:
-            return [self.hand.pop()]
+            cards = self.hand
         for card in cards:
             self.hand.remove(card)
         return list(cards)
@@ -356,7 +367,7 @@ class GenericGame(ABC, Generic[_CardT]):
         for player in players_to_deal:
             cards_needed = max(0, self.hand_size - len(player.hand))
             if cards_needed > 0:
-                player.add_card(*self.deck.draw(cards_needed))
+                player.add_cards(*self.deck.draw(cards_needed))
         return self
 
     def add_players(self, *players):
@@ -371,7 +382,7 @@ class GenericGame(ABC, Generic[_CardT]):
     def deal(self, num_cards=1, *players):
         players = players or self.players
         for player in players:
-            player.add_card(*self.deck.draw(num_cards))
+            player.add_cards(*self.deck.draw(num_cards))
         return self
 
     def shuffle(self):
@@ -380,7 +391,7 @@ class GenericGame(ABC, Generic[_CardT]):
 
     def play(self, player=None, *cards):
         player = player or self.get_current_player()
-        self.discard_pile.add(*player.play_card(*cards))
+        self.discard_pile.add(*player.play_cards(*cards))
         return self
 
     def get_trump(self):

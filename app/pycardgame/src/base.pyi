@@ -30,8 +30,26 @@ from typing import (
     Union,
 )
 
-_RankT = TypeVar("_RankT")
-_SuitT = TypeVar("_SuitT")
+_RankT = TypeVar("_RankT", bound=str)
+_SuitT = TypeVar("_SuitT", bound=str)
+
+
+class CardMeta(ABCMeta):
+    """A metaclass for automatically creating custom card classes."""
+
+    def __new__(cls, name: str, bases: tuple[Any, ...],
+                class_dict: dict[str, Any], rank_type: Type[_RankT],
+                suit_type: Type[_SuitT]) -> CardMeta:
+        """
+        Creates a new card class with the given rank and suit types.
+        :param name: The name of the class.
+        :param bases: The base classes of the new class.
+        :param class_dict: The class dictionary.
+        :param rank_type: The type of the card rank.
+        :param suit_type: The type of the card suit.
+        :return: The new card class.
+        """
+        pass
 
 
 class GenericCard(ABC, Generic[_RankT, _SuitT]):
@@ -152,6 +170,23 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
 _CardT = TypeVar("_CardT", bound=GenericCard)  # type: ignore
 
 
+class DeckMeta(ABCMeta):
+    """A metaclass for automatically creating custom deck classes."""
+
+    def __new__(cls, name: str, bases: tuple[Any, ...],
+                class_dict: dict[str, Any],
+                card_type: Type[_CardT]) -> DeckMeta:
+        """
+        Creates a new deck class with the given card type.
+        :param name: The name of the class.
+        :param bases: The base classes of the new class.
+        :param class_dict: The class dictionary.
+        :param card_type: The type of the card to use in the deck.
+        :return: The new deck class.
+        """
+        pass
+
+
 class GenericDeck(ABC, Generic[_CardT]):
     """
     A deck of cards.
@@ -206,11 +241,25 @@ class GenericDeck(ABC, Generic[_CardT]):
         """
         pass
 
+    @overload
+    def draw(self, n: Literal[1] = 1) -> _CardT:
+        """
+        Draws one or more cards from the top of the deck.
+        :param n: The number of cards to draw. Default is 1.
+        :return: The drawn card(s).
+        :raise ValueError: If `n` is greater than the number of cards in the
+            deck.
+        """
+        pass
+
+    @overload
     def draw(self, n: int = 1) -> List[_CardT]:
         """
-        Draw `n` cards from the top of the deck.
-        :param n: The number of cards to draw. Defaults to `1`.
-        :return: A list of drawn cards.
+        Draws one or more cards from the top of the deck.
+        :param n: The number of cards to draw. Default is 1.
+        :return: The drawn card(s).
+        :raise ValueError: If `n` is greater than the number of cards in the
+            deck.
         """
         pass
 
@@ -255,23 +304,6 @@ class GenericDeck(ABC, Generic[_CardT]):
         """
         pass
 
-    def __copy__(self) -> GenericDeck[_CardT]:
-        """
-        Creates a shallow copy of the deck.
-        :return: A new deck instance with the same cards.
-        """
-        pass
-
-    @overload
-    def __getitem__(self, index: int) -> _CardT: ...
-
-    @overload
-    def __getitem__(self, s: slice) -> List[_CardT]: ...
-
-    def __len__(self) -> int: ...
-
-    def __iter__(self) -> Iterator[_CardT]: ...
-
     @overload
     def __eq__(self, other: GenericDeck[_CardT]) -> bool: ...
 
@@ -284,40 +316,21 @@ class GenericDeck(ABC, Generic[_CardT]):
     @overload
     def __ne__(self, other: object) -> bool: ...
 
+    def __copy__(self) -> GenericDeck[_CardT]: ...
 
-class CardMeta(ABCMeta):
-    """A metaclass for automatically creating custom card classes."""
+    @overload
+    def __getitem__(self, index: int) -> _CardT: ...
 
-    def __new__(cls, name: str, bases: tuple[Any, ...],
-                class_dict: dict[str, Any], rank_type: Type[_RankT],
-                suit_type: Type[_SuitT]) -> CardMeta:
-        """
-        Creates a new card class with the given rank and suit types.
-        :param name: The name of the class.
-        :param bases: The base classes of the new class.
-        :param class_dict: The class dictionary.
-        :param rank_type: The type of the card rank.
-        :param suit_type: The type of the card suit.
-        :return: The new card class.
-        """
-        pass
+    @overload
+    def __getitem__(self, s: slice) -> List[_CardT]: ...
 
+    def __len__(self) -> int: ...
 
-class DeckMeta(ABCMeta):
-    """A metaclass for automatically creating custom deck classes."""
+    def __iter__(self) -> Iterator[_CardT]: ...
 
-    def __new__(cls, name: str, bases: tuple[Any, ...],
-                class_dict: dict[str, Any],
-                card_type: Type[_CardT]) -> DeckMeta:
-        """
-        Creates a new deck class with the given card type.
-        :param name: The name of the class.
-        :param bases: The base classes of the new class.
-        :param class_dict: The class dictionary.
-        :param card_type: The type of the card to use in the deck.
-        :return: The new deck class.
-        """
-        pass
+    def __contains__(self, item: _CardT) -> bool: ...
+
+    def __bool__(self) -> bool: ...
 
 
 class GenericPlayer(ABC, Generic[_CardT]):
@@ -339,26 +352,26 @@ class GenericPlayer(ABC, Generic[_CardT]):
         self.hand: List[_CardT] = ...
         self.score: int = ...
 
-    def add_card(self, *cards: _CardT) -> GenericPlayer[_CardT]:
+    def add_cards(self, *cards: _CardT) -> GenericPlayer[_CardT]:
         """
-        Add a card to the player's hand.
+        Add one or more cards to the player's hand.
         :param cards: The card(s) to add.
         :return: The player object.
         """
         pass
 
-    def remove_card(self, *cards: _CardT) -> GenericPlayer[_CardT]:
+    def remove_cards(self, *cards: _CardT) -> GenericPlayer[_CardT]:
         """
-        Remove a card from the player's hand.
+        Remove one or more cards from the player's hand.
         :param cards: The card(s) to remove.
         :return: The player object.
         """
         pass
 
-    def play_card(self, *cards: _CardT) -> List[_CardT]:
+    def play_cards(self, *cards: _CardT) -> List[_CardT]:
         """
-        Play a card from the player's hand. The card will be removed from the
-            hand.
+        Play one or more cards from the player's hand. If no cards are provided,
+            the player will play all cards in their hand.
         :param cards: The card(s) to play.
         :return: The card(s) that was/were played.
         """
@@ -487,7 +500,7 @@ class GenericGame(ABC, Generic[_CardT]):
         self.current_player_index: int = ...
 
     def deal_initial_cards(self, *players: GenericPlayer[_CardT]) -> \
-    GenericGame[_CardT]:
+            GenericGame[_CardT]:
         """
         Deal initial cards to specified players until they have at least
         hand_size cards. If no players are specified, deals to all players.
@@ -517,7 +530,7 @@ class GenericGame(ABC, Generic[_CardT]):
         pass
 
     def deal(self, num_cards: int = 1, *players: GenericPlayer[_CardT]) -> \
-    GenericGame[_CardT]:
+            GenericGame[_CardT]:
         """
         Deal cards to a player in the game.
         :param num_cards: The number of cards to deal. Default is 1.

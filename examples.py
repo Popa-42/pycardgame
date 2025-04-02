@@ -22,10 +22,10 @@ from app.pycardgame import (
     GenericDeck,
     GenericGame,
     GenericPlayer,
-    PokerCard,
-    PokerDeck,
-    PokerGame,
-    PokerPlayer,
+    UnoCard,
+    UnoDeck,
+    UnoGame,
+    UnoPlayer,
 )
 
 # Example 1: Using Generic Card Game Classes
@@ -62,8 +62,8 @@ class CustomPlayer(GenericPlayer[CustomCard]):
 
 # Create a custom game class
 class CustomGame(GenericGame[CustomCard]):
-    def __init__(self, deck=None, discard_pile=None, trump=None, hand_size=4,
-                 starting_player_index=0, *players):
+    def __init__(self, *players, deck=None, discard_pile=None, trump=None, hand_size=4,
+                 starting_player_index=0):
         super().__init__(CustomCard, CustomDeck, deck, discard_pile, trump,
                          hand_size, starting_player_index, *players)
 
@@ -90,7 +90,8 @@ player1 = CustomPlayer("Alice")
 player2 = CustomPlayer("Bob")
 
 # Create a game
-game = CustomGame(deck.shuffle(), None, "Red", 3, 0, player1, player2)
+game = CustomGame(player1, player2, deck=deck.shuffle(), trump="Red",
+                  hand_size=3)
 print(f"\nGame created: {game}")
 
 # Deal cards and demonstrate gameplay
@@ -99,63 +100,44 @@ print("\nAfter dealing first round:")
 for player in game.get_players():
     print(f"{player.name}'s hand: {[str(card) for card in player.get_hand()]}")
 
-# Example 2: Using Poker Card Game Classes
-# ----------------------------------------
+# Example 2: Using UNO Game Classes
+# ---------------------------------
 
-print("\n\nExample 2: Poker Card Game")
-print("-" * 26)
+print("\n\nExample 2: UNO")
+print("-" * 14)
 
-# Create a poker deck
-poker_deck = PokerDeck()
-print(f"\nCreated {poker_deck}. Contents:")
-[print(f"- {card}") for card in poker_deck]
+# Create UNO game with players
+player1 = UnoPlayer("Alice")
+player2 = UnoPlayer("Bob")
+player3 = UnoPlayer("Charlie")
 
-# Create poker players
-poker_player1 = PokerPlayer("Charlie")
-poker_player2 = PokerPlayer("David")
+# Create a game instance
+game = UnoGame(player1, player2, player3)
+game.start_game()
+print("\nGame started with players:")
+for player in game.get_players():
+    print(f"- {player.name} with {len(player.get_hand())} cards")
+print(f"Top card on discard pile: {game.discard_pile.get_top_card()}")
+print(f"Current player: {game.get_current_player().name}")
 
-# Create a poker game
-poker_game = PokerGame(0, poker_player1, poker_player2)
-print(f"\nCreated poker game: {poker_game}")
+# Example gameplay
+print("\nGameplay:")
+print(f"{game.get_current_player().name} has the following cards:")
+for card in sorted(game.get_current_player().get_hand()):
+    print(f"- {card}")
 
-# Deal cards and demonstrate gameplay
-poker_game.deal_initial_cards()
-print("\nAfter dealing first round:")
-for player in poker_game.get_players():
-    print(f"{player.name}'s hand: {[str(card) for card in player.get_hand()]}")
+# Check if the player can play a card
+for card in game.get_current_player():
+    if game.check_valid_play(card, game.discard_pile.get_top_card()):
+        print(f"{game.get_current_player().name} can play {card}")
+        break
+else:
+    print(f"{game.get_current_player().name} cannot play any cards")
+    # Draw a card from the deck
+    drawn_card = game.draw_card(game.get_current_player())
+    if drawn_card:
+        print(f"{game.get_current_player().name} drew a card: {drawn_card}")
+    else:
+        print("No cards left in the deck to draw.")
 
-# Demonstrate card comparison
-ace_hearts = PokerCard("Ace", "Hearts")
-king_spades = PokerCard("King", "Spades")
-
-print("\nCard comparison:")
-print(f"{ace_hearts > king_spades = } (Spades > Hearts)")
-print(f"{ace_hearts != king_spades = }")
-
-# Demonstrate deck operations
-print("\nDeck operations:")
-poker_deck.shuffle()
-print(f"After shuffling: {poker_deck}")
-
-drawn_cards = poker_deck.draw(3)
-print(f"Drawn cards: {[str(card) for card in drawn_cards]}")
-print(f"Remaining cards: {len(poker_deck)}")
-
-# Demonstrate game operations
-print("\nGame operations:")
-current_player = poker_game.get_current_player()
-print(f"Current player: {current_player}")
-
-# Play a card
-if current_player.get_hand():
-    print(f"{current_player.name}'s hand before playing: "
-          f"{[str(card) for card in current_player.get_hand()]}")
-    played_card = current_player.get_hand()[0]
-    poker_game.play(current_player, played_card)
-    print(f"Played card: {played_card}")
-    print(f"Discard pile: {poker_game.discard_pile}")
-    print(f"{current_player.name}'s hand after playing: "
-          f"{[str(card) for card in current_player.get_hand()]}")
-    poker_game.deal_initial_cards(current_player)
-    print(f"After dealing to {current_player.name}: "
-          f"{[str(card) for card in current_player.get_hand()]}")
+game.next_player()

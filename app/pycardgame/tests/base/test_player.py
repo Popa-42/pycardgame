@@ -46,18 +46,18 @@ def test_player_init():
 def test_player_add_card():
     player = DummyPlayer("Alice")
     card = DummyCard("2", "Green")
-    player.add_card(card)
+    player.add_cards(card)
     assert player.hand == [card]
-    player.add_card(card, card)
+    player.add_cards(card, card)
     assert player.hand == [card, card, card]
 
 
 def test_player_remove_card():
     card = DummyCard("2", "Green")
     player = DummyPlayer("Alice", [card, card, card])
-    player.remove_card(card)
+    player.remove_cards(card)
     assert player.hand == [card, card]
-    player.remove_card(card, card)
+    player.remove_cards(card, card)
     assert player.hand == []
 
 
@@ -65,9 +65,9 @@ def test_player_play_card():
     card1 = DummyCard("2", "Green")
     card2 = DummyCard("3", "Blue")
     player = DummyPlayer("Alice", [card1, card2])
-    assert player.play_card() == [card2]
+    assert player.play_cards() == [card2]
     assert player.hand == [card1]
-    assert player.play_card(card1) == [card1]
+    assert player.play_cards(card1) == [card1]
     assert player.hand == []
 
 
