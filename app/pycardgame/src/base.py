@@ -422,6 +422,13 @@ class GenericGame(ABC, Generic[_CardT]):
                 card.set_trump(False)
         return self
 
+    def change_trump(self, suit):
+        if suit not in self._card_type.SUITS:
+            raise ValueError(f"Invalid suit for trump: {suit}")
+        self.set_trump(suit)
+        self.apply_trump()
+        return self
+
     def get_current_player(self):
         return self.players[self.current_player_index]
 

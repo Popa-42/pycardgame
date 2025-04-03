@@ -59,7 +59,7 @@ def main():
     move(game)  # Bob plays Green 7
     move(game)  # Charlie plays Wild and changes color to Red
     print(f"-> Changed color to {game.get_top_card().get_suit()}")
-    move(game)  #
+    move(game)
 
     for player in game.players:
         print(f"{player.name} has {len(player.hand)} cards")

@@ -94,6 +94,12 @@ class UnoDeck(
 class UnoPlayer(GenericPlayer[UnoCard]):
     def __init__(self, name, hand=None, score=0):
         super().__init__(name, hand, score)
+        self.uno = False  # Indicates if the player has called "UNO"
+
+    def call_uno(self):
+        if len(self.hand) == 1:
+            self.uno = True
+        return self.uno
 
     def __str__(self):
         return f"Player {self.name} with {len(self.hand)} cards"

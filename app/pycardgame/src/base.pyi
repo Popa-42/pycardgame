@@ -591,6 +591,16 @@ class GenericGame(ABC, Generic[_CardT]):
         """
         pass
 
+    def change_trump(self, suit: Optional[_SuitT]) -> GenericGame[_CardT]:
+        """
+        Change the trump suit for the game.
+        :param suit: The new trump suit to set. Must be a valid suit or None to
+            unset the trump suit.
+        :return: The game object.
+        :raises ValueError: If suit is not None and not one of the vakud suits.
+        """
+        pass
+
     def get_current_player(self) -> GenericPlayer[_CardT]:
         """
         Get the current player.

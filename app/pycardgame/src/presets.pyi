@@ -92,6 +92,14 @@ class UnoPlayer(GenericPlayer[UnoCard]):
         :param score: The initial score for the player.
         """
         pass
+        self.uno: bool = False  # Indicates if the player has called "UNO"
+
+    def call_uno(self) -> bool:
+        """
+        Call "UNO" when the player has one card left.
+        :return: True if the player has called "UNO" correctly, False otherwise.
+        """
+        pass
 
 
 _UnoDeck = TypeVar("_UnoDeck", bound=GenericDeck[UnoCard])
@@ -114,7 +122,7 @@ class UnoGame(GenericGame[UnoCard]):
         :param discard_pile: The discard pile for the game.
         :param hand_size: The number of cards each player starts with.
         """
-        self.direction: int = ...
+        self.direction: int = 1
 
     @staticmethod
     def check_valid_play(card1: UnoCard, card2: UnoCard) -> bool:
