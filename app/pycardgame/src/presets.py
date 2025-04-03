@@ -28,7 +28,7 @@ from .. import (
 )
 
 T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
-"Reverse", "Draw Two", "Wild", "Wild Draw Four"]
+                     "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
 T_UnoSuits = Literal["Red", "Green", "Blue", "Yellow", "Wild"]
 
 
@@ -58,6 +58,14 @@ class UnoCard(
         # Initialise the card with rank and suit as integers
         super().__init__(rank_index, suit_index, False)
 
+    def is_wild(self):
+        return self.get_suit() == "Wild"
+
+    def __str__(self):
+        if self.is_wild():
+            return f"{self.get_rank()}"
+        return f"{self.get_suit()} {self.get_rank()}"
+
 
 class UnoDeck(
     GenericDeck[UnoCard],
@@ -77,7 +85,7 @@ class UnoDeck(
         ] * 4
 
     def __str__(self):
-        return f"UNO Deck with {len(self.cards)} cards"
+        return f"UNO Deck with {len(self.cards)} cards."
 
     def __repr__(self):
         return f"{self.__class__.__name__}(cards={self.cards!r})"
@@ -94,20 +102,33 @@ class UnoPlayer(GenericPlayer[UnoCard]):
 class UnoGame(GenericGame[UnoCard]):
     def __init__(self, *players, deck=None, discard_pile=None, hand_size=7):
         super().__init__(UnoCard, UnoDeck, deck, discard_pile, None,
-                         hand_size, 0, *players)
+                         hand_size, 0, False, *players)
         self.deck = deck or UnoDeck().shuffle()
         self.discard_pile = discard_pile or UnoDeck([])
         self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
 
     @staticmethod
     def check_valid_play(card1, card2):
-        if card1.rank == "Wild" or card2.rank == "Wild":
+        if card1.get_suit() == "Wild" or card2.get_suit() == "Wild":
             return True
         return card1.rank == card2.rank or card1.suit == card2.suit
 
-    def play_card(self, player, card):
+    def discard_card(self, *cards):
+        self.discard_pile.add(*cards, to_top=True)
+        return self
+
+    def get_top_card(self):
+        return self.discard_pile.get_top_card()
+
+    def get_next_player(self):
+        return self.players[
+            (self.current_player_index + self.direction) % len(self.players)]
+
+    def play_card(self, player, card, new_suit=None):
         if self.check_valid_play(card, self.discard_pile.get_top_card()):
-            self.discard_pile.add(card)
+            if card.get_rank() == "Wild":
+                card.set_suit(new_suit)
+            self.discard_card(card)
             player.remove_cards(card)
             return True
         return False
@@ -131,14 +152,27 @@ class UnoGame(GenericGame[UnoCard]):
         print(f"Game started with {len(self.players)} players.")
         return self
 
-    def next_player(self):
-        if self.discard_pile.get_top_card().rank == "Skip":
-            self.current_player_index = (self.current_player_index +
-                                         self.direction) % len(self.players)
-
-        elif self.discard_pile.get_top_card().rank == "Reverse":
+    def apply_effects(self, player, card):
+        if card.get_rank() == "Draw Two":
+            self.draw_card(player, 2)
+        elif card.get_rank() == "Skip":
+            self.next_player()
+        elif card.get_rank() == "Reverse":
             self.reverse_direction()
+        elif card.get_rank() == "Wild Draw Four":
+            self.draw_card(player, 4)
+            self.next_player()
 
+    def end_turn(self):
+        top_card = self.get_top_card()
+        if top_card.get_rank() in ["Skip", "Reverse"]:
+            self.apply_effects(self.get_current_player(), top_card)
+        elif top_card.get_rank() == "Draw Two":
+            self.apply_effects(self.get_next_player(), top_card)
+        elif top_card.get_rank() == "Wild Draw Four":
+            self.apply_effects(self.get_next_player(), top_card)
+
+    def next_player(self):
         self.current_player_index = (self.current_player_index +
                                      self.direction) % len(self.players)
         return self
@@ -155,7 +189,8 @@ class UnoGame(GenericGame[UnoCard]):
             print(f"{winner.name} wins the game!")
 
     def __str__(self):
-        return f"UNO Game with {len(self.players)} players"
+        return (f"UNO Game with {len(self.players)} players. "
+                f"Current top card: {self.get_top_card()}")
 
     def __repr__(self):
         return (f"{self.__class__.__name__}(deck={self.deck!r}, "

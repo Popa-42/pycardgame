@@ -18,10 +18,10 @@ from __future__ import annotations
 
 import random
 from abc import ABC, ABCMeta
-from typing import Generic, TypeVar, get_args, Type
+from typing import Generic, get_args, Type, TypeVar
 
-_RankT = TypeVar("_RankT", bound=str)
-_SuitT = TypeVar("_SuitT", bound=str)
+_RankT = TypeVar("_RankT")
+_SuitT = TypeVar("_SuitT")
 
 
 class GenericCard(ABC, Generic[_RankT, _SuitT]):
@@ -169,7 +169,9 @@ class GenericDeck(ABC, Generic[_CardT]):
             raise ValueError("Invalid sort key: must be 'rank' or 'suit'")
         return self
 
-    def shuffle(self):
+    def shuffle(self, seed=None):
+        if seed:
+            random.seed(seed)
         random.shuffle(self.cards)
         return self
 
@@ -179,8 +181,13 @@ class GenericDeck(ABC, Generic[_CardT]):
         return self.cards.pop(0) if n == 1 else [self.cards.pop(0) for _ in (
             range(n))]
 
-    def add(self, *cards):
-        self.cards.extend(cards)
+    def add(self, *cards, to_top=False):
+        if not all(isinstance(card, self._card_type) for card in cards):
+            raise TypeError("Invalid card type: must be a Card object")
+        if to_top:
+            self.cards = list(cards) + self.cards
+        else:
+            self.cards.extend(cards)
         return self
 
     def remove(self, *cards):
@@ -337,14 +344,18 @@ class GenericGame(ABC, Generic[_CardT]):
                  "hand_size", "players", "current_player_index")
 
     def __init__(self, card_type, deck_type, deck=None, discard_pile=None,
-                 trump=None, hand_size=4, starting_player_index=0, *players):
+                 trump=None, hand_size=4, starting_player_index=0,
+                 do_not_shuffle=False, *players):
         self._card_type = card_type
         self._deck_type = deck_type
 
         if trump is not None and trump not in self._card_type.SUITS:
             raise ValueError(f"Invalid suit for trump: {trump}")
 
-        self.deck = deck or self._deck_type().shuffle()
+        self.deck = deck or self._deck_type()
+        if not do_not_shuffle:
+            self.deck.shuffle()
+
         self.discard_pile = discard_pile or self._deck_type(cards=[])
 
         self.trump = None

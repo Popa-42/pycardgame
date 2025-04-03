@@ -1,7 +1,7 @@
-import pytest
-
 from ... import UnoCard, UnoDeck, UnoGame, UnoPlayer
 
+
+# TODO: Update existing tests and add new ones for the UNO game classes
 
 def test_uno_card():
     card = UnoCard("5", "Red")
@@ -35,7 +35,7 @@ def test_uno_game():
     deck = UnoDeck()
     player1 = UnoPlayer("Alice")
     player2 = UnoPlayer("Bob")
-    game = UnoGame(deck, None, 7, player1, player2)
+    game = UnoGame(player1, player2, deck=deck)
 
     assert game.deck is deck
     assert game.discard_pile.cards == []

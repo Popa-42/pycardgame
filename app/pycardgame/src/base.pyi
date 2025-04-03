@@ -30,8 +30,8 @@ from typing import (
     Union,
 )
 
-_RankT = TypeVar("_RankT", bound=str)
-_SuitT = TypeVar("_SuitT", bound=str)
+_RankT = TypeVar("_RankT")
+_SuitT = TypeVar("_SuitT")
 
 
 class CardMeta(ABCMeta):
@@ -234,7 +234,8 @@ class GenericDeck(ABC, Generic[_CardT]):
         """
         pass
 
-    def shuffle(self) -> GenericDeck[_CardT]:
+    def shuffle(self, seed: Optional[Union[int, float, str, bytes,
+    bytearray]] = None) -> GenericDeck[_CardT]:
         """
         Randomly shuffles the cards in the deck.
         :return: The deck instance.
@@ -263,10 +264,14 @@ class GenericDeck(ABC, Generic[_CardT]):
         """
         pass
 
-    def add(self, *cards: _CardT) -> GenericDeck[_CardT]:
+    def add(self,
+            *cards: _CardT,
+            to_top: bool = False) -> GenericDeck[_CardT]:
         """
-        Adds one or more cards to the bottom of the deck.
+        Adds one or more cards to the deck.
         :param cards: The cards to be added to the deck.
+        :param to_top: If `True`, the cards are added to the top of the deck;
+            otherwise, they are added to the bottom.
         :return: The deck instance.
         """
         pass
@@ -471,6 +476,7 @@ class GenericGame(ABC, Generic[_CardT]):
                  trump: Optional[_SuitT] = None,
                  hand_size: int = 4,
                  starting_player_index: int = 0,
+                 do_not_shuffle: bool = False,
                  *players: GenericPlayer[_CardT]) -> None:
         """
         Constructor for the GenericGame class.
@@ -485,6 +491,7 @@ class GenericGame(ABC, Generic[_CardT]):
         :param hand_size: The size of each player's hand. Default is 4.
         :param starting_player_index: The index of the starting player. Defaults
             to 0.
+        :param do_not_shuffle: If True, the deck will not be shuffled.
         :param players: The players in the game.
         :raises ValueError: If trump is not None and not in card_type.SUITS.
         """

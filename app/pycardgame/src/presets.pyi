@@ -30,6 +30,7 @@ from .base import (
 T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
                      "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
 T_UnoSuits = Literal["Red", "Green", "Blue", "Yellow", "Wild"]
+T_UnoSuitsWild = Literal["Red", "Green", "Blue", "Yellow"]
 
 
 class UnoCard(
@@ -47,9 +48,16 @@ class UnoCard(
     def __init__(self, rank: Union[T_UnoRanks, int], suit: Union[T_UnoSuits, int
     ]) -> None:
         """
-        Initialize the UNO card with a rank and suit.
+        Initialise the UNO card with a rank and suit.
         :param rank: The rank of the card.
         :param suit: The suit of the card.
+        """
+        pass
+
+    def is_wild(self) -> bool:
+        """
+        Check if the card is a Wild card.
+        :return: True if the card is a Wild card, False otherwise.
         """
         pass
 
@@ -59,12 +67,15 @@ class UnoDeck(
     metaclass=DeckMeta,
     card_type=UnoCard
 ):
-    """A class representing a UNO deck."""
+    """
+    A class representing a UNO deck of cards.
+    :param cards: Optional list of cards to initialise the deck with.
+    """
 
     def __init__(self, cards: List[UnoCard] = None) -> None:
         """
-        Initialize the UNO deck with a standard set of cards.
-        :param cards: Optional list of cards to initialize the deck with.
+        Initialise the UNO deck with a standard set of cards.
+        :param cards: Optional list of cards to initialise the deck with.
         """
         pass
 
@@ -75,7 +86,7 @@ class UnoPlayer(GenericPlayer[UnoCard]):
     def __init__(self, name: str, hand: Optional[List[UnoCard]] = None,
                  score: int = 0) -> None:
         """
-        Initialize the UNO player with a name, hand of cards, and score.
+        Initialise the UNO player with a name, hand of cards, and score.
         :param name: The name of the player.
         :param hand: The initial hand of cards for the player.
         :param score: The initial score for the player.
@@ -96,7 +107,7 @@ class UnoGame(GenericGame[UnoCard]):
                  discard_pile: Optional[_UnoDeck] = None,
                  hand_size: int = 7) -> None:
         """
-        Initialize the UNO game with a deck, discard pile, hand size, and
+        Initialise the UNO game with a deck, discard pile, hand size, and
         players.
         :param players: The players participating in the game.
         :param deck: The deck of cards for the game.
@@ -115,16 +126,41 @@ class UnoGame(GenericGame[UnoCard]):
         """
         pass
 
-    def play_card(self, player: _UnoPlayer, card: UnoCard) -> bool:
+    def discard_card(self, *cards: UnoCard) -> UnoGame:
+        """
+        Add one or more cards to the discard pile.
+        :param cards: The card(s) to discard.
+        :return: The current game instance with updated discard pile.
+        """
+        pass
+
+    def get_top_card(self) -> Optional[UnoCard]:
+        """
+        Get the top card from the discard pile.
+        :return: The top card from the discard pile or None if empty.
+        """
+        pass
+
+    def get_next_player(self) -> _UnoPlayer:
+        """
+        Get the next player in the game based on the current direction.
+        :return: The next player.
+        """
+        pass
+
+    def play_card(self, player: _UnoPlayer, card: UnoCard,
+                  new_suit: T_UnoSuitsWild = None) -> bool:
         """
         Play a card from the player's hand to the discard pile.
         :param player: The player playing the card.
         :param card: The card to play.
+        :param new_suit: The new suit if the card is a Wild card.
         :return: True if the card was played successfully, False otherwise.
         """
         pass
 
-    def draw_card(self, player: _UnoPlayer, n: int = 1) -> Optional[UnoCard]:
+    def draw_card(self, player: _UnoPlayer, n: int = 1) -> Optional[
+        List[UnoCard]]:
         """
         Draw a card from the deck and add it to the player's hand.
         :param player: The player drawing the card.
@@ -144,6 +180,14 @@ class UnoGame(GenericGame[UnoCard]):
         """
         Start the game by dealing initial cards and setting up the discard pile.
         :return: The game instance.
+        """
+        pass
+
+    def apply_effects(self, player: _UnoPlayer, card: UnoCard) -> None:
+        """
+        Apply the effects of the played card (e.g., Draw Two, Skip, Reverse).
+        :param player: The player who played the card.
+        :param card: The card that was played.
         """
         pass
 
