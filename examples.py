@@ -46,7 +46,7 @@ class CustomCard(
     # Customise the string representation of the card
     def __str__(self):
         return (f"{self.get_suit()} {self.get_rank()}"
-                f"{' (trump)' if self.get_trump() else ''}")
+                f"{' (trump)' if self.is_trump() else ''}")
 
 
 # Create a custom deck class
@@ -134,7 +134,7 @@ for card in game.get_current_player():
 else:
     print(f"{game.get_current_player().name} cannot play any cards")
     # Draw a card from the deck
-    drawn_card = game.draw_card(game.get_current_player())
+    drawn_card = game.draw_cards(game.get_current_player())
     if drawn_card:
         print(f"{game.get_current_player().name} drew a card: {drawn_card}")
     else:

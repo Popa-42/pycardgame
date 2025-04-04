@@ -58,13 +58,87 @@ class UnoCard(
         # Initialise the card with rank and suit as integers
         super().__init__(rank_index, suit_index, False)
 
+        self.wild = False
+
     def is_wild(self):
-        return self.get_suit() == "Wild"
+        return self.wild
+
+    def effect(self, game, player, *args):
+        pass
 
     def __str__(self):
         if self.is_wild():
             return f"{self.get_rank()}"
         return f"{self.get_suit()} {self.get_rank()}"
+
+
+class NumberCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
+                 suit_type=T_UnoSuits):
+    def __init__(self, rank, suit):
+        super().__init__(rank, suit)
+        self.wild = False
+
+    def effect(self, game, player, *args):
+        pass
+
+
+class DrawTwoCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
+                  suit_type=T_UnoSuits):
+    def __init__(self, suit):
+        super().__init__("Draw Two", suit)
+        self.wild = False
+
+    def effect(self, game, player, *args):
+        game.draw_cards(game.get_next_player(), 2)
+
+
+class SkipCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
+               suit_type=T_UnoSuits):
+    def __init__(self, suit):
+        super().__init__("Skip", suit)
+        self.wild = False
+
+    def effect(self, game, player, *args):
+        game.next_player()
+
+
+class ReverseCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
+                  suit_type=T_UnoSuits):
+    def __init__(self, suit):
+        super().__init__("Reverse", suit)
+        self.wild = False
+
+    def effect(self, game, player, *args):
+        game.reverse_direction()
+
+
+class WildCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
+               suit_type=T_UnoSuits):
+    def __init__(self):
+        super().__init__("Wild", "Wild")
+        self.wild = True
+
+    def effect(self, game, player, *args):
+        if args and args[0]:
+            self.change_suit(args[0])
+        else:
+            raise ValueError("A new suit must be provided for Wild card.")
+        game.discard_cards(self)
+
+
+class WildDrawFourCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
+                       suit_type=T_UnoSuits):
+    def __init__(self):
+        super().__init__("Wild Draw Four", "Wild")
+        self.wild = True
+
+    def effect(self, game, player, *args):
+        if args and args[0]:
+            self.change_suit(args[0])
+        else:
+            raise ValueError("A new suit must be provided for Wild Draw Four card.")
+        game.draw_cards(game.get_next_player(), 4)
+        game.next_player()
 
 
 class UnoDeck(
@@ -74,15 +148,28 @@ class UnoDeck(
 ):
     def __init__(self, cards=None):
         super().__init__()
+
+        colors: list[T_UnoSuits] = ["Red", "Green", "Blue", "Yellow"]
+        numbers: list[T_UnoRanks] = ["0"] + [str(i) for i in range(1, 10)] * 2  # type: ignore[assignment]
+
+        # Create the deck with the specialized card types
         self.cards = cards if cards is not None else [
-            UnoCard(rank, suit)  # type: ignore  # TODO: Resolve typing issues
-            for suit in ["Red", "Green", "Blue", "Yellow"]
-            for rank in ["0"] + [str(i) for i in range(1, 10)] * 2 +
-                        ["Skip", "Reverse", "Draw Two"] * 2
+            # Create Number Cards (0-9)
+            NumberCard(rank, suit) for suit in colors for rank in numbers
         ] + [
-            UnoCard("Wild", "Wild"),
-            UnoCard("Wild Draw Four", "Wild")
-        ] * 4
+            # Create DrawTwo Cards
+            DrawTwoCard(suit) for suit in colors
+        ] + [
+            # Create Skip Cards
+            SkipCard(suit) for suit in colors
+        ] + [
+            # Create Reverse Cards
+            ReverseCard(suit) for suit in colors
+        ] + [
+            # Add Wild Cards and Wild Draw Four Cards
+            WildCard(),
+            WildDrawFourCard()
+        ] * 4  # Wild cards are repeated 4 times
 
     def __str__(self):
         return f"UNO Deck with {len(self.cards)} cards."
@@ -101,8 +188,9 @@ class UnoPlayer(GenericPlayer[UnoCard]):
             self.uno = True
         return self.uno
 
-    def __str__(self):
-        return f"Player {self.name} with {len(self.hand)} cards"
+    def reset_uno(self):
+        self.uno = False
+        return self
 
 
 class UnoGame(GenericGame[UnoCard]):
@@ -119,7 +207,7 @@ class UnoGame(GenericGame[UnoCard]):
             return True
         return card1.rank == card2.rank or card1.suit == card2.suit
 
-    def discard_card(self, *cards):
+    def discard_cards(self, *cards):
         self.discard_pile.add(*cards, to_top=True)
         return self
 
@@ -130,16 +218,19 @@ class UnoGame(GenericGame[UnoCard]):
         return self.players[
             (self.current_player_index + self.direction) % len(self.players)]
 
-    def play_card(self, player, card, new_suit=None):
+    def play_card(self, card, player=None, *args):
         if self.check_valid_play(card, self.discard_pile.get_top_card()):
-            if card.get_rank() == "Wild":
-                card.set_suit(new_suit)
-            self.discard_card(card)
+            self.discard_cards(card)
+            if not player:
+                player = self.get_current_player()
             player.remove_cards(card)
+
+            card.effect(self, player, *args)
+
             return True
         return False
 
-    def draw_card(self, player, n=1):
+    def draw_cards(self, player, n=1):
         if len(self.deck) >= n:
             drawn = self.deck.draw(n)
             if not isinstance(drawn, list):
@@ -158,29 +249,11 @@ class UnoGame(GenericGame[UnoCard]):
         print(f"Game started with {len(self.players)} players.")
         return self
 
-    def apply_effects(self, player, card):
-        if card.get_rank() == "Draw Two":
-            self.draw_card(player, 2)
-        elif card.get_rank() == "Skip":
-            self.next_player()
-        elif card.get_rank() == "Reverse":
-            self.reverse_direction()
-        elif card.get_rank() == "Wild Draw Four":
-            self.draw_card(player, 4)
-            self.next_player()
-
-    def end_turn(self):
-        top_card = self.get_top_card()
-        if top_card.get_rank() in ["Skip", "Reverse"]:
-            self.apply_effects(self.get_current_player(), top_card)
-        elif top_card.get_rank() == "Draw Two":
-            self.apply_effects(self.get_next_player(), top_card)
-        elif top_card.get_rank() == "Wild Draw Four":
-            self.apply_effects(self.get_next_player(), top_card)
-
     def next_player(self):
-        self.current_player_index = (self.current_player_index +
-                                     self.direction) % len(self.players)
+        self.get_current_player()
+        new_index = (self.current_player_index + self.direction) % len(
+            self.players)
+        self.set_current_player(new_index)
         return self
 
     def determine_winner(self):

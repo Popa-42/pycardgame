@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import random
-from abc import ABC, ABCMeta
+from abc import ABC, ABCMeta, abstractmethod
 from typing import Generic, get_args, Type, TypeVar
 
 _RankT = TypeVar("_RankT")
@@ -35,9 +35,9 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         self.suit = None
 
         if rank is not None:
-            self.set_rank(rank)
+            self.change_rank(rank)
         if suit is not None:
-            self.set_suit(suit)
+            self.change_suit(suit)
 
         self.trump = trump
 
@@ -54,12 +54,16 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
                 raise ValueError(f"Invalid {value_name} index: {value}")
         return value
 
+    @abstractmethod
+    def effect(self, game, player):
+        pass
+
     def get_rank(self, as_index=False):
         if self.rank is None:
             return None
         return self.rank if as_index else self.__class__.RANKS[self.rank]
 
-    def set_rank(self, rank):
+    def change_rank(self, rank):
         self.rank = self._set_value(rank, self.__class__.RANKS, "rank")
         return self
 
@@ -68,11 +72,11 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
             return None
         return self.suit if as_index else self.__class__.SUITS[self.suit]
 
-    def set_suit(self, suit):
+    def change_suit(self, suit):
         self.suit = self._set_value(suit, self.__class__.SUITS, "suit")
         return self
 
-    def get_trump(self):
+    def is_trump(self):
         return self.trump
 
     def set_trump(self, trump):
@@ -302,7 +306,8 @@ class GenericPlayer(ABC, Generic[_CardT]):
         return self.hand[key]
 
     def __str__(self):
-        return f"Player {self.name} ({len(self.hand)} card(s))"
+        return f"Player {self.name} ({len(self.hand)} card(s)):\n" + "\n".join(
+            f" - {card}" for card in self.hand)
 
     def __repr__(self):
         return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r},"
@@ -373,6 +378,11 @@ class GenericGame(ABC, Generic[_CardT]):
                 raise ValueError("Invalid starting player index")
         self.current_player_index = start_idx
 
+    @staticmethod
+    @abstractmethod
+    def check_valid_play(card1, card2):
+        pass
+
     def deal_initial_cards(self, *players):
         players_to_deal = players or self.players
         for player in players_to_deal:
@@ -400,9 +410,10 @@ class GenericGame(ABC, Generic[_CardT]):
         self.deck.shuffle()
         return self
 
-    def play(self, player=None, *cards):
+    def play_card(self, card, player=None):
         player = player or self.get_current_player()
-        self.discard_pile.add(*player.play_cards(*cards))
+        self.discard_pile.add(*player.play_cards(card))
+        card.effect(self, player)
         return self
 
     def get_trump(self):
@@ -433,7 +444,12 @@ class GenericGame(ABC, Generic[_CardT]):
         return self.players[self.current_player_index]
 
     def set_current_player(self, player):
-        self.current_player_index = self.players.index(player)
+        if isinstance(player, int):
+            if player < 0 or player >= len(self.players):
+                raise ValueError("Invalid player index")
+            self.current_player_index = player
+        else:
+            self.current_player_index = self.players.index(player)
         return self
 
     def get_players(self):

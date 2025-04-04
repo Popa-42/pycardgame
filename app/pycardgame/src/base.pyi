@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from abc import ABC, ABCMeta
+from abc import ABC, ABCMeta, abstractmethod
 from typing import (
     Any,
     Generic,
@@ -49,7 +49,6 @@ class CardMeta(ABCMeta):
         :param suit_type: The type of the card suit.
         :return: The new card class.
         """
-        pass
 
 
 class GenericCard(ABC, Generic[_RankT, _SuitT]):
@@ -84,6 +83,16 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
                    values_list: List[Union[_RankT, _SuitT]],
                    value_name: str) -> Optional[int]: ...
 
+    @abstractmethod
+    def effect(self, game: GenericGame[_CardT],
+               player: GenericPlayer[_CardT]) -> None:
+        """
+        The effect of the card when played. This method should be implemented
+        in each specific card class.
+        :param game: The game instance where the card is played.
+        :param player: The player who played the card.
+        """
+
     def get_rank(self, as_index: bool = False) -> Optional[Union[_RankT, int]]:
         """
         Returns the card’s rank.
@@ -91,9 +100,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
             otherwise, as a string.
         :return: The rank of the card.
         """
-        pass
 
-    def set_rank(self, rank: Optional[Union[_RankT, int]]) -> GenericCard[
+    def change_rank(self, rank: Optional[Union[_RankT, int]]) -> GenericCard[
         _RankT, _SuitT]:
         """
         Sets the card’s rank. Accepts a rank name or an integer index.
@@ -102,7 +110,6 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         :raise ValueError: If the given string is not found in `rank_names` or
             the index is out of range.
         """
-        pass
 
     def get_suit(self, as_index: bool = False) -> Optional[Union[_SuitT, int]]:
         """
@@ -111,9 +118,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
             otherwise, as a string.
         :return: The suit of the card.
         """
-        pass
 
-    def set_suit(self, suit: Optional[Union[_SuitT, int]]) -> GenericCard[
+    def change_suit(self, suit: Optional[Union[_SuitT, int]]) -> GenericCard[
         _RankT, _SuitT]:
         """
         Sets the card’s suit. Accepts a suit name or an integer index.
@@ -122,9 +128,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         :raise ValueError: If the given string is not found in `suit_names` or
             the index is out of range.
         """
-        pass
 
-    def get_trump(self) -> bool:
+    def is_trump(self) -> bool:
         """
         Returns whether the card is marked as a trump card.
         :return: `True` if the card is a trump card; otherwise, `False`.
@@ -137,14 +142,12 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         :param trump: Whether the card is a trump card.
         :return: The card with the trump status set.
         """
-        pass
 
     def __copy__(self) -> GenericCard[_RankT, _SuitT]:
         """
         Creates a shallow copy of the card.
         :return: A new card instance with the same rank, suit, and trump status.
         """
-        pass
 
     def __lt__(self, other: GenericCard[_RankT, _SuitT]) -> bool: ...
 
@@ -184,7 +187,6 @@ class DeckMeta(ABCMeta):
         :param card_type: The type of the card to use in the deck.
         :return: The new deck class.
         """
-        pass
 
 
 class GenericDeck(ABC, Generic[_CardT]):
@@ -209,7 +211,6 @@ class GenericDeck(ABC, Generic[_CardT]):
             from the `Card` class, then sorts the deck.
         :return: The deck instance.
         """
-        pass
 
     def count(self, card: Union[_CardT, _RankT, _SuitT]) -> int:
         """
@@ -223,7 +224,6 @@ class GenericDeck(ABC, Generic[_CardT]):
             or suit.
         :raise TypeError: If the given input is not a valid type.
         """
-        pass
 
     def sort(self, by: Literal["suit", "rank"] = "suit") -> GenericDeck[_CardT]:
         """
@@ -232,7 +232,6 @@ class GenericDeck(ABC, Generic[_CardT]):
         :return: The sorted deck.
         :raise ValueError: If the `by` parameter is not a valid attribute.
         """
-        pass
 
     def shuffle(self, seed: Optional[Union[int, float, str, bytes,
     bytearray]] = None) -> GenericDeck[_CardT]:
@@ -240,7 +239,6 @@ class GenericDeck(ABC, Generic[_CardT]):
         Randomly shuffles the cards in the deck.
         :return: The deck instance.
         """
-        pass
 
     @overload
     def draw(self, n: Literal[1] = 1) -> _CardT:
@@ -251,7 +249,6 @@ class GenericDeck(ABC, Generic[_CardT]):
         :raise ValueError: If `n` is greater than the number of cards in the
             deck.
         """
-        pass
 
     @overload
     def draw(self, n: int = 1) -> List[_CardT]:
@@ -262,7 +259,6 @@ class GenericDeck(ABC, Generic[_CardT]):
         :raise ValueError: If `n` is greater than the number of cards in the
             deck.
         """
-        pass
 
     def add(self,
             *cards: _CardT,
@@ -274,7 +270,6 @@ class GenericDeck(ABC, Generic[_CardT]):
             otherwise, they are added to the bottom.
         :return: The deck instance.
         """
-        pass
 
     def remove(self, *cards: _CardT) -> GenericDeck[_CardT]:
         """
@@ -283,7 +278,6 @@ class GenericDeck(ABC, Generic[_CardT]):
         :return: The deck instance.
         :raise ValueError: If any card is not found in the deck.
         """
-        pass
 
     def get_index(self, card: _CardT) -> List[int]:
         """
@@ -292,14 +286,12 @@ class GenericDeck(ABC, Generic[_CardT]):
         :return: A list of indices where the card is found. If the card
             is not found, an empty list is returned.
         """
-        pass
 
     def get_cards(self) -> List[_CardT]:
         """
         Retrieves the entire list of cards in the deck.
         :return: A list of all cards in the deck.
         """
-        pass
 
     def get_top_card(self) -> Optional[_CardT]:
         """
@@ -307,7 +299,6 @@ class GenericDeck(ABC, Generic[_CardT]):
         :return: The top card of the deck if the deck is not empty; otherwise,
             `None`.
         """
-        pass
 
     @overload
     def __eq__(self, other: GenericDeck[_CardT]) -> bool: ...
@@ -363,7 +354,6 @@ class GenericPlayer(ABC, Generic[_CardT]):
         :param cards: The card(s) to add.
         :return: The player object.
         """
-        pass
 
     def remove_cards(self, *cards: _CardT) -> GenericPlayer[_CardT]:
         """
@@ -371,7 +361,6 @@ class GenericPlayer(ABC, Generic[_CardT]):
         :param cards: The card(s) to remove.
         :return: The player object.
         """
-        pass
 
     def play_cards(self, *cards: _CardT) -> List[_CardT]:
         """
@@ -380,21 +369,18 @@ class GenericPlayer(ABC, Generic[_CardT]):
         :param cards: The card(s) to play.
         :return: The card(s) that was/were played.
         """
-        pass
 
     def get_hand(self) -> List[_CardT]:
         """
         Get the player's hand of cards.
         :return: The player's hand.
         """
-        pass
 
     def get_score(self) -> int:
         """
         Get the player's score.
         :return: The player's score.
         """
-        pass
 
     def set_score(self, score: int) -> GenericPlayer[_CardT]:
         """
@@ -402,14 +388,12 @@ class GenericPlayer(ABC, Generic[_CardT]):
         :param score: The score to set.
         :return: The player object.
         """
-        pass
 
     def get_name(self) -> str:
         """
         Get the player's name.
         :return: The player's name.
         """
-        pass
 
     def set_name(self, name: str) -> GenericPlayer[_CardT]:
         """
@@ -417,7 +401,6 @@ class GenericPlayer(ABC, Generic[_CardT]):
         :param name: The name to set.
         :return: The player object.
         """
-        pass
 
     @overload
     def __getitem__(self, index: int) -> _CardT: ...
@@ -506,8 +489,18 @@ class GenericGame(ABC, Generic[_CardT]):
         self.players: List[GenericPlayer[_CardT]] = ...
         self.current_player_index: int = ...
 
-    def deal_initial_cards(self, *players: GenericPlayer[_CardT]) -> \
-            GenericGame[_CardT]:
+    @staticmethod
+    @abstractmethod
+    def check_valid_play(card1: _CardT, card2: _CardT) -> bool:
+        """
+        Check if a card can be played on top of another card.
+        :param card1: The card to be played.
+        :param card2: The card on top of the pile.
+        :return: True if the play is valid, False otherwise.
+        """
+
+    def deal_initial_cards(self, *players: GenericPlayer[_CardT]) -> (
+            GenericGame)[_CardT]:
         """
         Deal initial cards to specified players until they have at least
         hand_size cards. If no players are specified, deals to all players.
@@ -516,7 +509,6 @@ class GenericGame(ABC, Generic[_CardT]):
             players will be dealt to.
         :return: The game object.
         """
-        pass
 
     def add_players(self, *players: GenericPlayer[_CardT]) -> GenericGame[
         _CardT]:
@@ -525,7 +517,6 @@ class GenericGame(ABC, Generic[_CardT]):
         :param players: The players to add.
         :return: The game object.
         """
-        pass
 
     def remove_players(self, *players: GenericPlayer[_CardT]) -> GenericGame[
         _CardT]:
@@ -534,7 +525,6 @@ class GenericGame(ABC, Generic[_CardT]):
         :param players: The players to remove.
         :return: The game object.
         """
-        pass
 
     def deal(self, num_cards: int = 1, *players: GenericPlayer[_CardT]) -> \
             GenericGame[_CardT]:
@@ -545,26 +535,24 @@ class GenericGame(ABC, Generic[_CardT]):
             players will be dealt to.
         :return: The game object.
         """
-        pass
 
     def shuffle(self) -> GenericGame[_CardT]:
         """
         Shuffle the deck of cards.
         :return: The game object.
         """
-        pass
 
-    def play(self, player: Optional[GenericPlayer[_CardT]] = None,
-             *cards: _CardT) -> GenericGame[_CardT]:
+    def play_card(self, card: _CardT,
+                  player: Optional[GenericPlayer[_CardT]] = None
+                  ) -> GenericGame[_CardT]:
         """
-        Play one or more cards from a player's hand. The cards will be added to
-        the discard pile.
+        Play a card from a player's hand. The card will be added to the
+        discard pile.
+        :param card: The card to play.
         :param player: The player to play the card from. If not provided, the
             current player will play the card.
-        :param cards: The card(s) to play.
         :return: The game object.
         """
-        pass
 
     def get_trump(self) -> Optional[Any]:
         """
@@ -572,7 +560,6 @@ class GenericGame(ABC, Generic[_CardT]):
         :return: The trump suit, which will be one of the suits defined in
             self._card_type.SUITS, or None if no trump suit is set.
         """
-        pass
 
     def set_trump(self, suit: Optional[_SuitT]) -> GenericGame[_CardT]:
         """
@@ -582,14 +569,12 @@ class GenericGame(ABC, Generic[_CardT]):
         :return: The game object.
         :raises ValueError: If suit is not None and not in self._card_type.SUITS.
         """
-        pass
 
     def apply_trump(self) -> GenericGame[_CardT]:
         """
         Apply the trump suit to all cards in the deck.
         :return: The game object.
         """
-        pass
 
     def change_trump(self, suit: Optional[_SuitT]) -> GenericGame[_CardT]:
         """
@@ -599,37 +584,33 @@ class GenericGame(ABC, Generic[_CardT]):
         :return: The game object.
         :raises ValueError: If suit is not None and not one of the vakud suits.
         """
-        pass
 
     def get_current_player(self) -> GenericPlayer[_CardT]:
         """
         Get the current player.
         :return: The current player.
         """
-        pass
 
-    def set_current_player(self, player: GenericPlayer[_CardT]) -> GenericGame[
-        _CardT]:
+    def set_current_player(self, player: Union[GenericPlayer[_CardT], int]) -> (
+            GenericGame)[_CardT]:
         """
         Set the current player.
-        :param player: The player to set as current.
+        :param player: The player to set as current. Can be a player object or an
+            index.
         :return: The game object.
         """
-        pass
 
     def get_players(self) -> List[GenericPlayer[_CardT]]:
         """
         Get all players in the game.
         :return: The list of players.
         """
-        pass
 
     def get_deck(self) -> GenericDeck[_CardT]:
         """
         Get the deck of cards.
         :return: The deck of cards.
         """
-        pass
 
     def set_deck(self, deck: GenericDeck[_CardT]) -> GenericGame[_CardT]:
         """
@@ -637,4 +618,3 @@ class GenericGame(ABC, Generic[_CardT]):
         :param deck: The deck to set.
         :return: The game object.
         """
-        pass
