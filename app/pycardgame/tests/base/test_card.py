@@ -30,7 +30,7 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    pass
+    def effect(self, game, player): ...
 
 
 def test_card_init():
@@ -62,18 +62,18 @@ def test_card_get_rank():
 
 def test_card_set_rank():
     card = DummyCard(0, 0)
-    card.set_rank("2")
+    card.change_rank("2")
     assert card.rank == 1
-    card.set_rank(2)
+    card.change_rank(2)
     assert card.rank == 2
-    card.set_rank(None)
+    card.change_rank(None)
     assert card.rank is None
 
     with pytest.raises(ValueError):
-        card.set_rank("InvalidRank")  # type: ignore
+        card.change_rank("InvalidRank")  # type: ignore
 
     with pytest.raises(ValueError):
-        card.set_rank(10)
+        card.change_rank(10)
 
 
 def test_card_get_suit():
@@ -88,23 +88,23 @@ def test_card_get_suit():
 
 def test_card_set_suit():
     card = DummyCard(0, 0)
-    card.set_suit("Green")
+    card.change_suit("Green")
     assert card.suit == 1
-    card.set_suit(2)
+    card.change_suit(2)
     assert card.suit == 2
-    card.set_suit(None)
+    card.change_suit(None)
     assert card.suit is None
 
     with pytest.raises(ValueError):
-        card.set_suit("InvalidSuit")  # type: ignore
+        card.change_suit("InvalidSuit")  # type: ignore
 
     with pytest.raises(ValueError):
-        card.set_suit(10)
+        card.change_suit(10)
 
 
 def test_card_get_trump():
     card = DummyCard(0, 0, True)
-    assert card.get_trump() is True
+    assert card.is_trump() is True
 
 
 def test_card_set_trump():

@@ -26,21 +26,38 @@ from .src.base import (
     GenericCard,
     GenericDeck,
     GenericGame,
-    GenericPlayer
+    GenericPlayer,
 )
-from .src.presets import UnoCard, UnoDeck, UnoGame, UnoPlayer
+from .src.presets import (
+    DrawTwoCard,
+    NumberCard,
+    ReverseCard,
+    SkipCard,
+    UnoCard,
+    UnoDeck,
+    UnoGame,
+    UnoPlayer,
+    WildCard,
+    WildDrawFourCard,
+)
 
 __all__ = [
     "CardMeta",
     "DeckMeta",
+    "DrawTwoCard",
+    "NumberCard",
     "GenericCard",
     "GenericDeck",
     "GenericGame",
     "GenericPlayer",
+    "ReverseCard",
+    "SkipCard",
     "UnoCard",
     "UnoDeck",
     "UnoPlayer",
     "UnoGame",
+    "WildCard",
+    "WildDrawFourCard",
 ]
 
 print("""

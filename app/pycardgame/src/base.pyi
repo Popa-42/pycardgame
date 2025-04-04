@@ -58,6 +58,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
     :param suit: The suit of the card.
     :param trump: Whether the card is a trump card.
     """
+    __slots__ = ("rank", "suit", "trump")
+
     RANKS: List[_RankT] = ...
     SUITS: List[_SuitT] = ...
 
@@ -335,6 +337,7 @@ class GenericPlayer(ABC, Generic[_CardT]):
     :param name: The name of the player.
     :param hand: The player's hand of cards.
     """
+    __slots__ = ("name", "hand", "score")
 
     def __init__(self, name: str, hand: Optional[List[_CardT]] = None,
                  score: int = 0) -> None:

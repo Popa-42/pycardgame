@@ -38,6 +38,7 @@ class UnoCard(
     rank_type=T_UnoRanks,
     suit_type=T_UnoSuits
 ):
+    __slots__ = ("wild",)
     def __init__(self, rank, suit):
         # TODO: Resolve typing issues with _RankT and _SuitT in GenericCard,
         #       and remove the need for this workaround.
@@ -63,8 +64,7 @@ class UnoCard(
     def is_wild(self):
         return self.wild
 
-    def effect(self, game, player, *args):
-        pass
+    def effect(self, game, player, *args): ...
 
     def __str__(self):
         if self.is_wild():
@@ -179,6 +179,8 @@ class UnoDeck(
 
 
 class UnoPlayer(GenericPlayer[UnoCard]):
+    __slots__ = ("uno",)
+
     def __init__(self, name, hand=None, score=0):
         super().__init__(name, hand, score)
         self.uno = False  # Indicates if the player has called "UNO"
@@ -223,7 +225,7 @@ class UnoGame(GenericGame[UnoCard]):
             self.discard_cards(card)
             if not player:
                 player = self.get_current_player()
-            player.remove_cards(card)
+            player.play_cards(card)
 
             card.effect(self, player, *args)
 

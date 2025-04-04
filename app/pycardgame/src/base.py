@@ -55,8 +55,7 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         return value
 
     @abstractmethod
-    def effect(self, game, player):
-        pass
+    def effect(self, game, player): pass
 
     def get_rank(self, as_index=False):
         if self.rank is None:
@@ -195,6 +194,8 @@ class GenericDeck(ABC, Generic[_CardT]):
         return self
 
     def remove(self, *cards):
+        if not all(isinstance(card, self._card_type) for card in cards):
+            raise TypeError("Invalid card type: must be a Card object")
         for card in cards:
             self.cards.remove(card)
         return self
@@ -345,9 +346,6 @@ class GenericPlayer(ABC, Generic[_CardT]):
 
 
 class GenericGame(ABC, Generic[_CardT]):
-    __slots__ = ("_card_type", "_deck_type", "deck", "discard_pile", "trump",
-                 "hand_size", "players", "current_player_index")
-
     def __init__(self, card_type, deck_type, deck=None, discard_pile=None,
                  trump=None, hand_size=4, starting_player_index=0,
                  do_not_shuffle=False, *players):
@@ -373,15 +371,15 @@ class GenericGame(ABC, Generic[_CardT]):
         self.players = list(players)
 
         start_idx = starting_player_index
-        if start_idx < 0 or start_idx >= len(self.players):
-            if start_idx != 0:  # 0 is a valid index
-                raise ValueError("Invalid starting player index")
+        if start_idx != 0:  # 0 is a valid index
+            if start_idx < 0 or start_idx >= len(self.players):
+                raise ValueError(f"Invalid starting player index: {start_idx} "
+                                 f"> {len(self.players)} {self.players}")
         self.current_player_index = start_idx
 
     @staticmethod
     @abstractmethod
-    def check_valid_play(card1, card2):
-        pass
+    def check_valid_play(card1, card2): ...
 
     def deal_initial_cards(self, *players):
         players_to_deal = players or self.players
@@ -448,8 +446,10 @@ class GenericGame(ABC, Generic[_CardT]):
             if player < 0 or player >= len(self.players):
                 raise ValueError("Invalid player index")
             self.current_player_index = player
-        else:
+        elif isinstance(player, GenericPlayer):
             self.current_player_index = self.players.index(player)
+        else:
+            raise TypeError("Invalid player type: must be an integer or a Player object")
         return self
 
     def get_players(self):

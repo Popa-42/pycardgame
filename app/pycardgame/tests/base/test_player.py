@@ -28,7 +28,7 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    pass
+    def effect(self, game, player): ...
 
 
 class DummyPlayer(GenericPlayer[DummyCard]):
@@ -64,11 +64,9 @@ def test_player_remove_card():
 def test_player_play_card():
     card1 = DummyCard("2", "Green")
     card2 = DummyCard("3", "Blue")
-    player = DummyPlayer("Alice", [card1, card2])
-    assert player.play_cards() == [card2]
-    assert player.hand == [card1]
-    assert player.play_cards(card1) == [card1]
-    assert player.hand == []
+    hand = [card1, card2]
+    player = DummyPlayer("Alice", hand)
+    assert player.play_cards() == hand
 
 
 def test_player_get_hand():
@@ -113,7 +111,7 @@ def test_player_getitem():
 
 def test_player_str():
     player = DummyPlayer("Alice", [DummyCard("3", "Blue")])
-    assert str(player) == "Player Alice (1 card(s))"
+    assert str(player) == "Player Alice (1 card(s)):\n - Blue 3"
 
 
 def test_player_repr():

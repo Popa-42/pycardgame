@@ -44,6 +44,7 @@ class UnoCard(
     :param rank: The rank of the card.
     :param suit: The suit of the card.
     """
+    __slots__ = ("wild",)
 
     def __init__(self, rank: Union[T_UnoRanks, int], suit: Union[T_UnoSuits, int
     ]) -> None:
@@ -144,6 +145,7 @@ class UnoDeck(
 
 class UnoPlayer(GenericPlayer[UnoCard]):
     """A class representing a UNO player."""
+    __slots__ = ("uno",)
 
     def __init__(self, name: str, hand: Optional[List[UnoCard]] = None,
                  score: int = 0) -> None:
@@ -225,7 +227,8 @@ class UnoGame(GenericGame[UnoCard]):
                   *args: Any) -> bool:
         """
         Play a card from the player's hand to the discard pile.
-        :param player: The player playing the card.
+        :param player: The player playing the card. If None, the current player
+            is used.
         :param card: The card to play.
         :param args: Additional arguments for the card effect.
         :return: True if the card was played successfully, False otherwise.

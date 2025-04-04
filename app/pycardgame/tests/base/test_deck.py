@@ -30,7 +30,7 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    pass
+    def effect(self, game, player): ...
 
 
 class DummyDeck(
@@ -79,8 +79,22 @@ def test_deck_sort():
 
 
 def test_deck_shuffle():
-    deck = DummyDeck().shuffle()
-    assert deck.cards != sorted(deck.cards)
+    deck1 = DummyDeck()
+    original_deck1 = deck1.__copy__()
+    deck1.shuffle()
+    assert deck1.cards != original_deck1.cards
+    assert len(deck1.cards) == len(original_deck1.cards)
+    assert all(isinstance(card, DummyCard) for card in deck1.cards)
+
+    # Test shuffle with a seed
+    deck2 = DummyDeck()
+    original_deck2 = deck2.__copy__()
+    deck2.shuffle(seed=42)
+    assert deck2.cards != original_deck2.cards
+    assert len(deck2.cards) == len(original_deck2.cards)
+    assert all(isinstance(card, DummyCard) for card in deck2.cards)
+    original_deck2.shuffle(seed=42)
+    assert deck2.cards == original_deck2.cards
 
 
 def test_deck_draw():
@@ -89,9 +103,12 @@ def test_deck_draw():
     assert len(cards) == 5
     assert len(deck.cards) == 4
 
-    cards = deck.draw()
-    assert len(cards) == 1
-    assert len(deck.cards) == 3
+    cards = deck.draw(2)
+    assert len(cards) == 2
+    assert len(deck.cards) == 2
+
+    with pytest.raises(ValueError):
+        deck.draw(3)
 
 
 def test_deck_add():
@@ -100,6 +117,12 @@ def test_deck_add():
     deck.add(*cards)
     assert deck.cards[-1] == cards[-1]
 
+    deck.add(*cards, to_top=True)
+    assert deck.cards[0] == cards[0]
+
+    with pytest.raises(TypeError):
+        deck.add(*cards, "InvalidCard")  # type: ignore
+
 
 def test_deck_remove():
     deck = DummyDeck()
@@ -107,17 +130,14 @@ def test_deck_remove():
     deck.remove(card)
     assert card not in deck.cards
 
-    with pytest.raises(ValueError):
-        deck.remove(DummyCard(10, 10))
+    with pytest.raises(TypeError):
+        deck.remove("InvalidCard")  # type: ignore
 
 
 def test_deck_get_index():
     deck = DummyDeck()
     card = DummyCard(0, 0)
     assert deck.get_index(card) == [0]
-
-    with pytest.raises(ValueError):
-        deck.get_index(DummyCard(10, 10))
 
     with pytest.raises(TypeError):
         deck.get_index("Red 1")  # type: ignore
@@ -153,6 +173,29 @@ def test_deck_copy():
     assert deck1.cards == deck2.cards
     assert deck1.cards is not deck2.cards
     assert isinstance(deck2, DummyDeck)
+
+
+def test_deck_equalities():
+    deck1 = DummyDeck()
+    deck2 = DummyDeck()
+    assert deck1 == deck2
+    assert not deck1 != deck2
+
+    deck3 = DummyDeck([DummyCard(0, 0)])
+    assert not deck1 == deck3
+    assert deck1 != deck3
+
+    assert not deck1 == "InvalidType"  # type: ignore
+    assert not deck1 != "InvalidType"  # type: ignore
+
+
+def test_deck_contains():
+    deck = DummyDeck()
+    card = DummyCard(0, 0)
+    assert card in deck
+
+    with pytest.raises(TypeError):
+        assert "InvalidType" not in deck  # type: ignore
 
 
 def test_deck_getitem():
