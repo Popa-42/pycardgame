@@ -62,9 +62,9 @@ class CustomPlayer(GenericPlayer[CustomCard]):
 
 # Create a custom game class
 class CustomGame(GenericGame[CustomCard]):
-    def __init__(self, *players, deck=None, discard_pile=None, trump=None, hand_size=4,
+    def __init__(self, *players, draw_pile=None, discard_pile=None, trump=None, hand_size=4,
                  starting_player_index=0):
-        super().__init__(CustomCard, CustomDeck, deck, discard_pile, trump,
+        super().__init__(CustomCard, CustomDeck, draw_pile, discard_pile, trump,
                          hand_size, starting_player_index, *players)
 
 
@@ -90,7 +90,7 @@ player1 = CustomPlayer("Alice")
 player2 = CustomPlayer("Bob")
 
 # Create a game
-game = CustomGame(player1, player2, deck=deck.shuffle(), trump="Red",
+game = CustomGame(player1, player2, draw_pile=deck.shuffle(), trump="Red",
                   hand_size=3)
 print(f"\nGame created: {game}")
 

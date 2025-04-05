@@ -55,7 +55,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         return value
 
     @abstractmethod
-    def effect(self, game, player): pass
+    def effect(self, game, player):
+        pass
 
     def get_rank(self, as_index=False):
         if self.rank is None:
@@ -346,7 +347,7 @@ class GenericPlayer(ABC, Generic[_CardT]):
 
 
 class GenericGame(ABC, Generic[_CardT]):
-    def __init__(self, card_type, deck_type, deck=None, discard_pile=None,
+    def __init__(self, card_type, deck_type, draw_pile=None, discard_pile=None,
                  trump=None, hand_size=4, starting_player_index=0,
                  do_not_shuffle=False, *players):
         self._card_type = card_type
@@ -355,9 +356,9 @@ class GenericGame(ABC, Generic[_CardT]):
         if trump is not None and trump not in self._card_type.SUITS:
             raise ValueError(f"Invalid suit for trump: {trump}")
 
-        self.deck = deck or self._deck_type()
+        self.draw_pile = draw_pile or self._deck_type()
         if not do_not_shuffle:
-            self.deck.shuffle()
+            self.draw_pile.shuffle()
 
         self.discard_pile = discard_pile or self._deck_type(cards=[])
 
@@ -379,14 +380,15 @@ class GenericGame(ABC, Generic[_CardT]):
 
     @staticmethod
     @abstractmethod
-    def check_valid_play(card1, card2): ...
+    def check_valid_play(card1, card2):
+        ...
 
     def deal_initial_cards(self, *players):
         players_to_deal = players or self.players
         for player in players_to_deal:
             cards_needed = max(0, self.hand_size - len(player.hand))
             if cards_needed > 0:
-                player.add_cards(*self.deck.draw(cards_needed))
+                player.add_cards(*self.draw_pile.draw(cards_needed))
         return self
 
     def add_players(self, *players):
@@ -401,11 +403,11 @@ class GenericGame(ABC, Generic[_CardT]):
     def deal(self, num_cards=1, *players):
         players = players or self.players
         for player in players:
-            player.add_cards(*self.deck.draw(num_cards))
+            player.add_cards(*self.draw_pile.draw(num_cards))
         return self
 
     def shuffle(self):
-        self.deck.shuffle()
+        self.draw_pile.shuffle()
         return self
 
     def play_card(self, card, player=None):
@@ -424,7 +426,7 @@ class GenericGame(ABC, Generic[_CardT]):
         return self
 
     def apply_trump(self):
-        for card in self.deck:
+        for card in self.draw_pile:
             if card.get_suit() == self.trump:
                 card.set_trump(True)
             else:
@@ -449,17 +451,18 @@ class GenericGame(ABC, Generic[_CardT]):
         elif isinstance(player, GenericPlayer):
             self.current_player_index = self.players.index(player)
         else:
-            raise TypeError("Invalid player type: must be an integer or a Player object")
+            raise TypeError(
+                "Invalid player type: must be an integer or a Player object")
         return self
 
     def get_players(self):
         return self.players
 
-    def get_deck(self):
-        return self.deck
+    def get_draw_pile(self):
+        return self.draw_pile
 
-    def set_deck(self, deck):
-        self.deck = deck
+    def set_draw_pile(self, deck):
+        self.draw_pile = deck
         return self
 
     def __str__(self):
@@ -469,7 +472,7 @@ class GenericGame(ABC, Generic[_CardT]):
         return (f"{self.__class__.__name__}("
                 f"card_type={self._card_type!r}, "
                 f"deck_type={self._deck_type!r}, "
-                f"deck={self.deck!r}, "
+                f"draw_pile={self.draw_pile!r}, "
                 f"discard_pile={self.discard_pile!r}, "
                 f"trump={self.trump!r}, "
                 f"hand_size={self.hand_size!r}, "

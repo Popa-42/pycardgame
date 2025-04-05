@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Literal, Optional, TypeVar, Union
+from typing import Any, List, Literal, Never, Optional, TypeVar, Union
 
 from .base import (
     CardMeta,
@@ -147,13 +147,12 @@ class UnoPlayer(GenericPlayer[UnoCard]):
     """A class representing a UNO player."""
     __slots__ = ("uno",)
 
-    def __init__(self, name: str, hand: Optional[List[UnoCard]] = None,
-                 score: int = 0) -> None:
+    def __init__(self, name: str, hand: Optional[List[UnoCard]] = None) -> None:
         """
         Initialise the UNO player with a name, hand of cards, and score.
         :param name: The name of the player.
         :param hand: The initial hand of cards for the player.
-        :param score: The initial score for the player.
+        :param uno: Indicates if the player has called "UNO".
         """
         self.uno: bool = False  # Indicates if the player has called "UNO"
 
@@ -179,18 +178,18 @@ class UnoGame(GenericGame[UnoCard]):
 
     def __init__(self,
                  *players: _UnoPlayer,
-                 deck: Optional[_UnoDeck] = None,
+                 draw_pile: Optional[_UnoDeck] = None,
                  discard_pile: Optional[_UnoDeck] = None,
                  hand_size: int = 7) -> None:
         """
         Initialise the UNO game with a deck, discard pile, hand size, and
         players.
         :param players: The players participating in the game.
-        :param deck: The deck of cards for the game.
+        :param draw_pile: The draw pile for the game.
         :param discard_pile: The discard pile for the game.
         :param hand_size: The number of cards each player starts with.
         """
-        self.direction: int = 1
+        self.direction: Literal[1, -1] = 1
 
     @staticmethod
     def check_valid_play(card1: UnoCard, card2: UnoCard) -> bool:

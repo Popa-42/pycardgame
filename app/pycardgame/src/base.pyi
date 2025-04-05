@@ -443,8 +443,8 @@ class GenericGame(ABC, Generic[_CardT]):
     The base class for a card game.
     :param card_type: The type of card to use.
     :param deck_type: The type of deck to use.
-    :param deck: The predefined deck of cards. If not provided, a new deck will
-        be created.
+    :param draw_pile: The predefined deck of cards. If not provided, a new deck
+        will be created.
     :param discard_pile: A discard pile for the game. If not provided, a new
         empty discard pile will be created.
     :param trump: The trump suit for the game, if any. Must be one of the suits
@@ -457,7 +457,7 @@ class GenericGame(ABC, Generic[_CardT]):
     def __init__(self,
                  card_type: Type[_CardT],
                  deck_type: Type[GenericDeck[_CardT]],
-                 deck: Optional[GenericDeck[_CardT]] = None,
+                 draw_pile: Optional[GenericDeck[_CardT]] = None,
                  discard_pile: Optional[GenericDeck[_CardT]] = None,
                  trump: Optional[_SuitT] = None,
                  hand_size: int = 4,
@@ -468,12 +468,12 @@ class GenericGame(ABC, Generic[_CardT]):
         Constructor for the GenericGame class.
         :param card_type: The type of card to use.
         :param deck_type: The type of deck to use.
-        :param deck: The predefined deck of cards. If not provided, a new deck
-            will be created.
+        :param draw_pile: The predefined deck of cards. If not provided, a new
+            deck will be created.
         :param discard_pile: A discard pile for the game. If not provided, a
             new empty discard pile will be created.
-        :param trump: The trump suit for the game, if any. Must be one of the suits
-            defined in card_type.SUITS.
+        :param trump: The trump suit for the game, if any. Must be one of the
+            suits defined in card_type.SUITS.
         :param hand_size: The size of each player's hand. Default is 4.
         :param starting_player_index: The index of the starting player. Defaults
             to 0.
@@ -484,7 +484,7 @@ class GenericGame(ABC, Generic[_CardT]):
         self._card_type: Type[_CardT] = ...
         self._deck_type: Type[GenericDeck[_CardT]] = ...
 
-        self.deck: GenericDeck[_CardT] = ...
+        self.draw_pile: GenericDeck[_CardT] = ...
         self.discard_pile: GenericDeck[_CardT] = ...
 
         self.trump: Optional[str] = ...
@@ -570,7 +570,8 @@ class GenericGame(ABC, Generic[_CardT]):
         :param suit: The trump suit to set. Must be one of the suits defined in
             self._card_type.SUITS, or None to unset the trump suit.
         :return: The game object.
-        :raises ValueError: If suit is not None and not in self._card_type.SUITS.
+        :raises ValueError: If suit is not None and not in
+            self._card_type.SUITS.
         """
 
     def apply_trump(self) -> GenericGame[_CardT]:
@@ -598,8 +599,8 @@ class GenericGame(ABC, Generic[_CardT]):
             GenericGame)[_CardT]:
         """
         Set the current player.
-        :param player: The player to set as current. Can be a player object or an
-            index.
+        :param player: The player to set as current. Can be a player object or
+            an index.
         :return: The game object.
         """
 
@@ -609,15 +610,16 @@ class GenericGame(ABC, Generic[_CardT]):
         :return: The list of players.
         """
 
-    def get_deck(self) -> GenericDeck[_CardT]:
+    def get_draw_pile(self) -> GenericDeck[_CardT]:
         """
         Get the deck of cards.
         :return: The deck of cards.
         """
 
-    def set_deck(self, deck: GenericDeck[_CardT]) -> GenericGame[_CardT]:
+    def set_draw_pile(self, draw_pile: GenericDeck[_CardT]) -> \
+            GenericGame[_CardT]:
         """
         Set the deck of cards.
-        :param deck: The deck to set.
+        :param draw_pile: The deck to set.
         :return: The game object.
         """

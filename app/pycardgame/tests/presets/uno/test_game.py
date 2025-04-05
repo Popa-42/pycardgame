@@ -1,4 +1,5 @@
-from .... import NumberCard, UnoPlayer
+from .... import NumberCard, UnoDeck, UnoGame, UnoPlayer, WildCard
+from ....src.presets import UnoCard
 
 
 def test_uno_player_init():
@@ -9,17 +10,16 @@ def test_uno_player_init():
 
 
 def test_uno_player_call_uno():
-    player = UnoPlayer("Player 1")
-    player.call_uno()
+    player = UnoPlayer("Player 1", [NumberCard("5", "Red")])
     assert player.uno is False
-
-    player.hand = [NumberCard("5", "Red")]
     player.call_uno()
     assert player.uno is True
 
 
 def test_uno_player_reset_uno():
-    player = UnoPlayer("Player 1", None, True)
+    player = UnoPlayer("Player 1")
+    player.uno = True
+    assert player.uno is True
     player.reset_uno()
     assert player.uno is False
 
@@ -31,5 +31,143 @@ def test_uno_player_str():
 
 def test_uno_player_repr():
     player = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    print(player.score)
     assert repr(player) == ("UnoPlayer('Player 1', "
                             "hand=[NumberCard(rank=5, suit=0)], uno=False)")
+
+
+def test_uno_game_init():
+    player1 = UnoPlayer("Player 1")
+    player2 = UnoPlayer("Player 2")
+    game = UnoGame(player1, player2)
+    assert len(game.players) == 2
+    assert isinstance(game.draw_pile, UnoDeck)
+    assert isinstance(game.discard_pile, UnoDeck)
+    assert game.hand_size == 7
+    assert game.direction == 1
+
+
+def test_uno_game_check_valid_play():
+    card1 = NumberCard("5", "Red")
+    card2 = NumberCard("5", "Blue")
+    card3 = NumberCard("7", "Blue")
+
+    assert UnoGame.check_valid_play(card1, card2) is True
+    assert UnoGame.check_valid_play(card1, card3) is False
+    assert UnoGame.check_valid_play(card2, card3) is True
+
+    wild = WildCard()
+    cards = [card1, card2, card3, wild]
+    assert (UnoGame.check_valid_play(card, wild) is True for card in cards)
+
+
+def test_uno_game_discard_cards():
+    player = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    game = UnoGame(player)
+    game.discard_cards(NumberCard("5", "Red"))
+    assert len(game.discard_pile) == 1
+    assert game.discard_pile.get_top_card() == NumberCard("5", "Red")
+
+
+def test_uno_game_get_top_card():
+    player = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    game = UnoGame(player)
+    game.discard_cards(NumberCard("5", "Red"))
+    assert game.get_top_card() == NumberCard("5", "Red")
+
+
+def test_uno_game_get_next_player():
+    player1 = UnoPlayer("Player 1")
+    player2 = UnoPlayer("Player 2")
+    player3 = UnoPlayer("Player 3")
+    game = UnoGame(player1, player2, player3)
+
+    assert game.get_next_player() == player2
+    game.direction = -1
+    assert game.get_next_player() == player3
+
+
+def test_uno_game_play_card():
+    player1 = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
+    game = UnoGame(player1, player2)
+    game.discard_cards(NumberCard("1", "Red"))
+
+    assert game.play_card(NumberCard("5", "Red")) is True
+    assert len(player1) == 0
+    assert len(game.discard_pile) == 2
+    assert game.get_top_card() == NumberCard("5", "Red")
+    assert game.play_card(NumberCard("7", "Blue"), player2) is False
+
+
+def test_uno_game_draw_cards():
+    player = UnoPlayer("Player 1")
+    game = UnoGame(player)
+
+    drawn_cards = game.draw_cards(player, 2)
+    assert len(drawn_cards) == 2
+    assert len(player) == 2
+    assert len(game.draw_pile) == 106
+
+    drawn_card = game.draw_cards(player)
+    assert len(drawn_card) == 1
+    assert len(player) == 3
+    assert len(game.draw_pile) == 105
+
+    assert game.draw_cards(player, 999) is None
+
+
+def test_uno_game_reverse_direction():
+    player1 = UnoPlayer("Player 1")
+    player2 = UnoPlayer("Player 2")
+    game = UnoGame(player1, player2)
+
+    assert game.direction == 1
+    game.reverse_direction()
+    assert game.direction == -1
+    game.reverse_direction()
+    assert game.direction == 1
+
+
+def test_uno_game_start_game():
+    player1 = UnoPlayer("Player 1")
+    player2 = UnoPlayer("Player 2")
+    game = UnoGame(player1, player2)
+
+    game.start_game()
+    assert len(player1) == 7
+    assert len(player2) == 7
+    assert len(game.draw_pile) == 108 - 14 - 1
+    assert len(game.discard_pile) == 1
+    assert isinstance(game.discard_pile.get_top_card(), UnoCard)
+
+
+def test_uno_game_next_player():
+    player1 = UnoPlayer("Player 1")
+    player2 = UnoPlayer("Player 2")
+    player3 = UnoPlayer("Player 3")
+    game = UnoGame(player1, player2, player3)
+
+    assert game.current_player_index == 0
+    game.next_player()
+    assert game.current_player_index == 1
+    game.next_player()
+    assert game.current_player_index == 2
+    game.next_player()
+    assert game.current_player_index == 0
+
+
+def test_uno_game_determine_winner():
+    player1 = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
+    game = UnoGame(player1, player2)
+
+    assert game.determine_winner() is None
+
+    player1.play_cards(NumberCard("5", "Red"))
+    assert game.determine_winner() == player1
+
+
+def test_uno_game_end_game():
+    # TODO: Implement game end logic
+    ...

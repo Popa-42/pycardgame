@@ -53,9 +53,9 @@ class DummyPlayer(GenericPlayer[DummyCard]):
 
 
 class DummyGame(GenericGame[DummyCard]):
-    def __init__(self, *players, deck=None, discard_pile=None, trump=None,
+    def __init__(self, *players, draw_pile=None, discard_pile=None, trump=None,
                  hand_size=4, starting_player_index=0, do_not_shuffle=False):
-        super().__init__(DummyCard, DummyDeck, deck, discard_pile, trump,
+        super().__init__(DummyCard, DummyDeck, draw_pile, discard_pile, trump,
                          hand_size, starting_player_index, do_not_shuffle,
                          *players)
 
@@ -69,9 +69,9 @@ def test_game_init():
     empty_deck = DummyDeck(cards=[])
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
 
-    game = DummyGame(*players, deck=deck, discard_pile=empty_deck,
+    game = DummyGame(*players, draw_pile=deck, discard_pile=empty_deck,
                      trump="Green", hand_size=2, starting_player_index=1)
-    assert game.deck == deck
+    assert game.draw_pile == deck
     assert game.discard_pile == empty_deck
     assert game.trump == "Green"
     assert game.hand_size == 2
@@ -103,7 +103,7 @@ def test_game_deal_initial_cards():
     game = DummyGame(*players, hand_size=2)
     game.deal_initial_cards()
     assert all(len(player.hand) == 2 for player in players)
-    assert len(game.deck) < len(deck)
+    assert len(game.draw_pile) < len(deck)
 
 
 def test_game_add_players():
@@ -131,11 +131,11 @@ def test_game_deal():
 
 def test_game_shuffle():
     deck = DummyDeck()
-    game = DummyGame(deck=deck)
+    game = DummyGame(draw_pile=deck)
     game.shuffle()
-    assert list(game.deck) != sorted(game.deck)
-    assert len(game.deck) == len(deck)
-    assert all(card in deck for card in game.deck)
+    assert list(game.draw_pile) != sorted(game.draw_pile)
+    assert len(game.draw_pile) == len(deck)
+    assert all(card in deck for card in game.draw_pile)
 
 
 def test_game_play():
@@ -170,9 +170,9 @@ def test_game_set_trump():
 def test_game_apply_trump():
     game = DummyGame(trump="Red")
     game.apply_trump()
-    assert all(card.trump for card in game.deck
+    assert all(card.trump for card in game.draw_pile
                if card.get_suit() == "Red")
-    assert not any(card.trump for card in game.deck
+    assert not any(card.trump for card in game.draw_pile
                    if card.get_suit() != "Red")
     assert all(card.trump for player in game.players for card in player.hand
                if card.get_suit() == "Red")
@@ -184,9 +184,9 @@ def test_game_change_trump():
     game = DummyGame(trump="Red")
     game.change_trump("Green")
     assert game.trump == "Green"
-    assert all(card.trump for card in game.deck
+    assert all(card.trump for card in game.draw_pile
                if card.get_suit() == "Green")
-    assert not any(card.trump for card in game.deck
+    assert not any(card.trump for card in game.draw_pile
                    if card.get_suit() != "Green")
     assert all(card.trump for player in game.players for card in player.hand
                if card.get_suit() == "Green")
@@ -227,16 +227,16 @@ def test_game_get_players():
 
 def test_game_get_deck():
     deck = DummyDeck()
-    game = DummyGame(deck=deck)
-    assert game.get_deck() == deck
+    game = DummyGame(draw_pile=deck)
+    assert game.get_draw_pile() == deck
 
 
 def test_game_set_deck():
     deck = DummyDeck()
-    game = DummyGame(deck=DummyDeck([]))
-    assert game.deck != deck
-    game.set_deck(deck)
-    assert game.deck == deck
+    game = DummyGame(draw_pile=DummyDeck([]))
+    assert game.draw_pile != deck
+    game.set_draw_pile(deck)
+    assert game.draw_pile == deck
 
 
 def test_game_str():
@@ -249,13 +249,13 @@ def test_game_repr():
     deck = DummyDeck()
     discard_pile = DummyDeck([])
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
-    game = DummyGame(*players, deck=deck, discard_pile=discard_pile,
+    game = DummyGame(*players, draw_pile=deck, discard_pile=discard_pile,
                      trump="Green", hand_size=2, starting_player_index=1)
     game_repr = repr(game)
 
     assert game_repr.startswith("DummyGame(card_type=<class ")
     assert "deck_type=<class " in game_repr
-    assert "deck=DummyDeck(card_type=<class " in game_repr
+    assert "draw_pile=DummyDeck(card_type=<class " in game_repr
     assert "cards=[DummyCard(" in game_repr
     assert "DummyCard(rank=0, suit=0)" in game_repr
     assert "discard_pile=DummyDeck(card_type=<class " in game_repr

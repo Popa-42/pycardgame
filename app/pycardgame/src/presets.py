@@ -184,9 +184,9 @@ class UnoDeck(
 class UnoPlayer(GenericPlayer[UnoCard]):
     __slots__ = ("uno",)
 
-    def __init__(self, name, hand=None, uno=False):
+    def __init__(self, name, hand=None):
         super().__init__(name, hand, 0)
-        self.uno = uno
+        self.uno = False
 
     def call_uno(self):
         if len(self.hand) == 1:
@@ -203,11 +203,10 @@ class UnoPlayer(GenericPlayer[UnoCard]):
 
 
 class UnoGame(GenericGame[UnoCard]):
-    def __init__(self, *players, deck=None, discard_pile=None, hand_size=7):
-        super().__init__(UnoCard, UnoDeck, deck, discard_pile, None,
+    def __init__(self, *players, draw_pile=None, discard_pile=None,
+                 hand_size=7):
+        super().__init__(UnoCard, UnoDeck, draw_pile, discard_pile, None,
                          hand_size, 0, False, *players)
-        self.deck = deck or UnoDeck().shuffle()
-        self.discard_pile = discard_pile or UnoDeck([])
         self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
 
     @staticmethod
@@ -240,8 +239,8 @@ class UnoGame(GenericGame[UnoCard]):
         return False
 
     def draw_cards(self, player, n=1):
-        if len(self.deck) >= n:
-            drawn = self.deck.draw(n)
+        if len(self.draw_pile) >= n:
+            drawn = self.draw_pile.draw(n)
             if not isinstance(drawn, list):
                 drawn = [drawn]
             player.add_cards(*drawn)
@@ -254,8 +253,7 @@ class UnoGame(GenericGame[UnoCard]):
 
     def start_game(self):
         self.deal_initial_cards()
-        self.discard_pile.add(self.deck.draw())
-        print(f"Game started with {len(self.players)} players.")
+        self.discard_pile.add(self.draw_pile.draw())
         return self
 
     def next_player(self):
@@ -272,15 +270,18 @@ class UnoGame(GenericGame[UnoCard]):
         return None
 
     def end_game(self):
+        # TODO: Implement end game logic
         winner = self.determine_winner()
         if winner:
             print(f"{winner.name} wins the game!")
+        else:
+            print("Game ended without a winner.")
 
     def __str__(self):
         return (f"UNO Game with {len(self.players)} players. "
                 f"Current top card: {self.get_top_card()}")
 
     def __repr__(self):
-        return (f"{self.__class__.__name__}(deck={self.deck!r}, "
+        return (f"{self.__class__.__name__}(draw_pile={self.draw_pile!r}, "
                 f"discard_pile={self.discard_pile!r}, "
                 f"{self.players!r})")

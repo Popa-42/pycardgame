@@ -70,7 +70,7 @@ def test_draw_two_card_effect():
     player1 = UnoPlayer("Player 1", [DrawTwoCard("Red")])
     player2 = UnoPlayer("Player 2")
     deck = UnoDeck()
-    game = UnoGame(player1, player2, deck=deck)
+    game = UnoGame(player1, player2, draw_pile=deck)
     game.discard_cards(UnoCard("5", "Red"))
     game.play_card(DrawTwoCard("Red"))
     assert len(player1) == 0
@@ -90,7 +90,7 @@ def test_skip_card_effect():
     player1 = UnoPlayer("Player 1", [SkipCard("Red")])
     player2 = UnoPlayer("Player 2")
     deck = UnoDeck()
-    game = UnoGame(player1, player2, deck=deck)
+    game = UnoGame(player1, player2, draw_pile=deck)
     game.discard_cards(UnoCard("5", "Red"))
     game.play_card(SkipCard("Red"))
     assert game.current_player_index == 1
@@ -109,7 +109,7 @@ def test_reverse_card_effect():
     player1 = UnoPlayer("Player 1", [ReverseCard("Red")])
     player2 = UnoPlayer("Player 2")
     deck = UnoDeck()
-    game = UnoGame(player1, player2, deck=deck)
+    game = UnoGame(player1, player2, draw_pile=deck)
     game.discard_cards(UnoCard("5", "Red"))
     game.play_card(ReverseCard("Red"))
     assert game.direction == -1
@@ -128,7 +128,7 @@ def test_wild_card_effect():
     player1 = UnoPlayer("Player 1", [WildCard()] * 2)
     player2 = UnoPlayer("Player 2")
     deck = UnoDeck()
-    game = UnoGame(player1, player2, deck=deck)
+    game = UnoGame(player1, player2, draw_pile=deck)
     game.discard_cards(UnoCard("5", "Red"))
     game.play_card(WildCard(), player1, "Blue")
     assert game.discard_pile.cards[0].suit == 2
@@ -150,7 +150,7 @@ def test_wild_draw_four_card_effect():
     player1 = UnoPlayer("Player 1", [WildDrawFourCard()] * 2)
     player2 = UnoPlayer("Player 2")
     deck = UnoDeck()
-    game = UnoGame(player1, player2, deck=deck)
+    game = UnoGame(player1, player2, draw_pile=deck)
     game.discard_cards(UnoCard("5", "Red"))
     game.play_card(WildDrawFourCard(), player1, "Blue")
     assert game.discard_pile.cards[0].suit == 2
