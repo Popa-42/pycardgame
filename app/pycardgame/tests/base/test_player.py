@@ -28,7 +28,8 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    def effect(self, game, player): ...
+    def effect(self, game, player):  # pragma: no cover
+        pass
 
 
 class DummyPlayer(GenericPlayer[DummyCard]):
@@ -129,7 +130,9 @@ def test_player_equalities():
     assert player1 != DummyPlayer("Bob", [DummyCard("2", "Green")])
     assert player1 != DummyPlayer("Alice", [DummyCard("3", "Blue")])
     assert player1 != DummyPlayer("Alice", [DummyCard("2", "Green")], 10)
+
     assert not player1 == "InvalidType"  # type: ignore
+    assert player1 != "InvalidType"  # type: ignore
 
 
 def test_player_comparisons():

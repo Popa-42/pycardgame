@@ -87,12 +87,14 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
 
     @abstractmethod
     def effect(self, game: GenericGame[_CardT],
-               player: GenericPlayer[_CardT]) -> None:
+               player: GenericPlayer[_CardT],
+               *args: Any) -> None:
         """
         The effect of the card when played. This method should be implemented
         in each specific card class.
         :param game: The game instance where the card is played.
         :param player: The player who played the card.
+        :param args: Additional arguments for the effect.
         """
 
     def get_rank(self, as_index: bool = False) -> Optional[Union[_RankT, int]]:

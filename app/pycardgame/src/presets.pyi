@@ -32,6 +32,8 @@ T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
 T_UnoSuits = Literal["Red", "Green", "Blue", "Yellow", "Wild"]
 T_UnoSuitsWild = Literal["Red", "Green", "Blue", "Yellow"]
 
+_UnoDeck = TypeVar("_UnoDeck", bound=GenericDeck[UnoCard])
+_UnoPlayer = TypeVar("_UnoPlayer", bound=GenericPlayer[UnoCard])
 
 class UnoCard(
     GenericCard[T_UnoRanks, T_UnoSuits],
@@ -61,7 +63,10 @@ class UnoCard(
         :return: True if the card is a Wild card, False otherwise.
         """
 
-    def effect(self, game: UnoGame, player: _UnoPlayer, *args: Any) -> None:
+    def effect(self,
+               game: UnoGame,  # type: ignore[override]
+               player: _UnoPlayer,
+               *args: Any) -> None:
         """
         Apply the effect of the card in the game.
         :param game: The game instance.
@@ -136,7 +141,7 @@ class UnoDeck(
     :param cards: Optional list of cards to initialise the deck with.
     """
 
-    def __init__(self, cards: List[UnoCard] = None) -> None:
+    def __init__(self, cards: Optional[List[UnoCard]] = None) -> None:
         """
         Initialise the UNO deck with a standard set of cards.
         :param cards: Optional list of cards to initialise the deck with.
@@ -152,7 +157,6 @@ class UnoPlayer(GenericPlayer[UnoCard]):
         Initialise the UNO player with a name, hand of cards, and score.
         :param name: The name of the player.
         :param hand: The initial hand of cards for the player.
-        :param uno: Indicates if the player has called "UNO".
         """
         self.uno: bool = False  # Indicates if the player has called "UNO"
 
@@ -162,15 +166,11 @@ class UnoPlayer(GenericPlayer[UnoCard]):
         :return: True if the player has called "UNO" correctly, False otherwise.
         """
 
-    def reset_uno(self) -> _UnoPlayer:
+    def reset_uno(self) -> UnoPlayer:
         """
         Resets the "UNO" state to false
         :return: The player instance
         """
-
-
-_UnoDeck = TypeVar("_UnoDeck", bound=GenericDeck[UnoCard])
-_UnoPlayer = TypeVar("_UnoPlayer", bound=GenericPlayer[UnoCard])
 
 
 class UnoGame(GenericGame[UnoCard]):
@@ -214,15 +214,17 @@ class UnoGame(GenericGame[UnoCard]):
         """
 
     # TODO: Resolve typing issue
-    def get_current_player(self) -> _UnoPlayer: ...
+    def get_current_player(self) -> UnoPlayer: ...
 
-    def get_next_player(self) -> _UnoPlayer:
+    def get_next_player(self) -> UnoPlayer:
         """
         Get the next player in the game based on the current direction.
         :return: The next player.
         """
 
-    def play_card(self, card: UnoCard, player: _UnoPlayer = None,
+    def play_card(self,  # type: ignore[override]
+                  card: UnoCard,
+                  player: _UnoPlayer | None = None,
                   *args: Any) -> bool:
         """
         Play a card from the player's hand to the discard pile.

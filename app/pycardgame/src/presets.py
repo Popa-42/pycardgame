@@ -65,7 +65,8 @@ class UnoCard(
     def is_wild(self):
         return self.wild
 
-    def effect(self, game, player, *args): ...
+    def effect(self, game, player, *args):  # pragma: no cover
+        pass
 
     def __str__(self):
         if self.is_wild():

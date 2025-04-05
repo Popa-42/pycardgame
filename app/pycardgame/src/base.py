@@ -55,7 +55,7 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         return value
 
     @abstractmethod
-    def effect(self, game, player):
+    def effect(self, game, player, *args):  # pragma: no cover
         pass
 
     def get_rank(self, as_index=False):
@@ -115,6 +115,11 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         return (self.suit == other.suit and self.rank == other.rank and
                 self.trump == other.trump)
 
+    def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return not self.__eq__(other)
+
     def __gt__(self, other):
         return not self.__lt__(other) and not self.__eq__(other)
 
@@ -123,9 +128,6 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
 
     def __ge__(self, other):
         return not self.__lt__(other)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
 
 _CardT = TypeVar("_CardT", bound=GenericCard)
@@ -228,6 +230,8 @@ class GenericDeck(ABC, Generic[_CardT]):
         return self.cards == other.cards
 
     def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return not self.__eq__(other)
 
     def __copy__(self):
@@ -322,6 +326,8 @@ class GenericPlayer(ABC, Generic[_CardT]):
                 self.name == other.name)
 
     def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return not self.__eq__(other)
 
     def __lt__(self, other):
@@ -380,8 +386,8 @@ class GenericGame(ABC, Generic[_CardT]):
 
     @staticmethod
     @abstractmethod
-    def check_valid_play(card1, card2):
-        ...
+    def check_valid_play(card1, card2):  # pragma: no cover
+        pass
 
     def deal_initial_cards(self, *players):
         players_to_deal = players or self.players
