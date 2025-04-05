@@ -9,7 +9,7 @@ addopts = [
 
 [project]
 name = "pycardgame"
-version = "0.1.7"
+version = "0.1.8"
 authors = [
     { name="Popa", email="contact@just-popa.de" }
 ]
