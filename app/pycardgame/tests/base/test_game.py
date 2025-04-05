@@ -53,8 +53,8 @@ class DummyPlayer(GenericPlayer[DummyCard]):
 
 
 class DummyGame(GenericGame[DummyCard]):
-    def __init__(self, *players, deck=None, discard_pile=None, trump=None, hand_size=4,
-                 starting_player_index=0, do_not_shuffle=False):
+    def __init__(self, *players, deck=None, discard_pile=None, trump=None,
+                 hand_size=4, starting_player_index=0, do_not_shuffle=False):
         super().__init__(DummyCard, DummyDeck, deck, discard_pile, trump,
                          hand_size, starting_player_index, do_not_shuffle,
                          *players)
@@ -95,6 +95,7 @@ def test_game_check_valid_play():
     assert DummyGame.check_valid_play(card1, card2) is True
     assert DummyGame.check_valid_play(card1, card3) is True
     assert DummyGame.check_valid_play(card2, card3) is False
+
 
 def test_game_deal_initial_cards():
     players = [DummyPlayer("Alice"), DummyPlayer("Bob")]

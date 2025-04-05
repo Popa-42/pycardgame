@@ -39,6 +39,7 @@ class UnoCard(
     suit_type=T_UnoSuits
 ):
     __slots__ = ("wild",)
+
     def __init__(self, rank, suit):
         # TODO: Resolve typing issues with _RankT and _SuitT in GenericCard,
         #       and remove the need for this workaround.
@@ -136,7 +137,8 @@ class WildDrawFourCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
         if args and args[0]:
             self.change_suit(args[0])
         else:
-            raise ValueError("A new suit must be provided for Wild Draw Four card.")
+            raise ValueError(
+                "A new suit must be provided for Wild Draw Four card.")
         game.draw_cards(game.get_next_player(), 4)
         game.next_player()
 
@@ -150,7 +152,8 @@ class UnoDeck(
         super().__init__()
 
         colors: list[T_UnoSuits] = ["Red", "Green", "Blue", "Yellow"]
-        numbers: list[T_UnoRanks] = ["0"] + [str(i) for i in range(1, 10)] * 2  # type: ignore[assignment]
+        numbers: list[T_UnoRanks] = ["0"] + [str(i) for i in  # type: ignore
+                                             range(1, 10)] * 2
 
         # Create the deck with the specialized card types
         self.cards = cards if cards is not None else [
@@ -159,13 +162,13 @@ class UnoDeck(
         ] + [
             # Create DrawTwo Cards
             DrawTwoCard(suit) for suit in colors
-        ] + [
+        ] * 2 + [
             # Create Skip Cards
             SkipCard(suit) for suit in colors
-        ] + [
+        ] * 2 + [
             # Create Reverse Cards
             ReverseCard(suit) for suit in colors
-        ] + [
+        ] * 2 + [
             # Add Wild Cards and Wild Draw Four Cards
             WildCard(),
             WildDrawFourCard()
@@ -181,9 +184,9 @@ class UnoDeck(
 class UnoPlayer(GenericPlayer[UnoCard]):
     __slots__ = ("uno",)
 
-    def __init__(self, name, hand=None, score=0):
-        super().__init__(name, hand, score)
-        self.uno = False  # Indicates if the player has called "UNO"
+    def __init__(self, name, hand=None, uno=False):
+        super().__init__(name, hand, 0)
+        self.uno = uno
 
     def call_uno(self):
         if len(self.hand) == 1:
@@ -193,6 +196,10 @@ class UnoPlayer(GenericPlayer[UnoCard]):
     def reset_uno(self):
         self.uno = False
         return self
+
+    def __repr__(self):
+        return (f"{self.__class__.__name__}({self.name!r}, "
+                f"hand={self.hand!r}, uno={self.uno!r})")
 
 
 class UnoGame(GenericGame[UnoCard]):
