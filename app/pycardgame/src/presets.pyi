@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Literal, Never, Optional, TypeVar, Union
+from typing import Any, List, Literal, Optional, TypeVar, Union
 
 from .base import (
     CardMeta,
