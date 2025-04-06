@@ -58,14 +58,21 @@ def test_uno_game_check_valid_play():
     card1 = NumberCard("5", "Red")
     card2 = NumberCard("5", "Blue")
     card3 = NumberCard("7", "Blue")
+    game = UnoGame()
 
-    assert UnoGame.check_valid_play(card1, card2) is True
-    assert UnoGame.check_valid_play(card1, card3) is False
-    assert UnoGame.check_valid_play(card2, card3) is True
+    assert game.check_valid_play(card1) is False
+    assert game.check_valid_play(None, card1) is False  # type: ignore
+
+    assert game.check_valid_play(card1, card2) is True
+    assert game.check_valid_play(card1, card3) is False
+    assert game.check_valid_play(card2, card3) is True
 
     wild = WildCard()
     cards = [card1, card2, card3, wild]
-    assert (UnoGame.check_valid_play(card, wild) is True for card in cards)
+    assert (game.check_valid_play(card, wild) is True for card in cards)
+
+    game.draw_count = 2
+    assert game.check_valid_play(card1, card2) is False
 
 
 def test_uno_game_discard_cards():
