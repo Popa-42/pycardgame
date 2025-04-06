@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Sequence
 
 from .. import (
     CardMeta,
@@ -122,8 +122,9 @@ class WildCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
         self.wild = True
 
     def effect(self, game, player, *args):
-        if args and args[0]:
+        if args and args[0] is not None:
             self.change_suit(args[0])
+            self.wild = False
         else:
             raise ValueError("A new suit must be provided for Wild card.")
         game.discard_cards(self)
@@ -136,8 +137,9 @@ class WildDrawFourCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
         self.wild = True
 
     def effect(self, game, player, *args):
-        if args and args[0]:
+        if args and args[0] is not None:
             self.change_suit(args[0])
+            self.wild = False
         else:
             raise ValueError(
                 "A new suit must be provided for Wild Draw Four card.")
@@ -171,10 +173,12 @@ class UnoDeck(
             # Create Reverse Cards
             ReverseCard(suit) for suit in colors
         ] * 2 + [
-            # Add Wild Cards and Wild Draw Four Cards
-            WildCard(),
-            WildDrawFourCard()
-        ] * 4  # Wild cards are repeated 4 times
+            # Add Wild Cards
+            WildCard() for _ in range(4)
+        ] + [
+            # Add Wild Draw Four Cards
+            WildDrawFourCard() for _ in range(4)
+        ]
 
         self.cards = cards if cards is not None else card_list
 
@@ -215,9 +219,18 @@ class UnoGame(GenericGame[UnoCard]):
         self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
         self.draw_count = 0  # Track accumulated draw count
 
-    @staticmethod
-    def check_valid_play(card1, card2):
-        if card1.get_suit() == "Wild" or card2.get_suit() == "Wild":
+    def check_valid_play(self, card1, card2=None):
+        if card2 is None:
+            card2 = self.get_top_card()
+
+        if card1 is None or card2 is None:
+            return False
+
+        # Only Draw Two cards can be stacked on top of each other
+        if self.draw_count > 0 and card1.get_rank() != "Draw Two":
+            return False
+
+        if card1.is_wild():
             return True
         return card1.rank == card2.rank or card1.suit == card2.suit
 
@@ -281,7 +294,6 @@ class UnoGame(GenericGame[UnoCard]):
         if self.draw_count > 0:
             drawn_cards = self.draw_cards(player, self.draw_count)
             self.draw_count = 0
-            self.next_player()
         else:
             drawn_cards = self.draw_cards(player, 1)
 

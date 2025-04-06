@@ -25,6 +25,7 @@ from typing import (
     Literal,
     Optional,
     overload,
+    Sequence,
     Type,
     TypeVar,
     Union,
@@ -202,13 +203,13 @@ class GenericDeck(ABC, Generic[_CardT]):
     """
     _card_type: Type[_CardT]
 
-    def __init__(self, cards: Optional[List[_CardT]] = None) -> None:
+    def __init__(self, cards: Optional[Sequence[_CardT]] = None) -> None:
         """
         Creates a new deck instance.
         :param cards: A custom list of `Card` objects. If omitted, a full deck
             is created using the `reset()` method.
         """
-        self.cards: List[_CardT] = ...
+        self.cards: Sequence[_CardT] = ...
 
     def reset(self) -> GenericDeck[_CardT]:
         """

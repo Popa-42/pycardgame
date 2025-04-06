@@ -1,3 +1,5 @@
+from copy import copy
+
 from ....src.base import GenericCard
 from ....src.presets import (
     DrawTwoCard,
@@ -29,7 +31,7 @@ def test_uno_deck_init():
 
 def test_uno_deck_shuffle():
     deck = UnoDeck()
-    original_order = deck.cards.copy()
+    original_order = copy(deck.cards)
     deck.shuffle()
     assert deck.cards != original_order
     assert len(deck.cards) == 108

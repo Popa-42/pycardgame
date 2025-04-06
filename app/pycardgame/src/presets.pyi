@@ -191,8 +191,8 @@ class UnoGame(GenericGame[UnoCard]):
         self.direction: Literal[1, -1] = 1
         self.draw_count: int = 0
 
-    @staticmethod
-    def check_valid_play(card1: UnoCard, card2: UnoCard) -> bool:
+    def check_valid_play(self, card1: UnoCard,
+                         card2: Optional[UnoCard] = None) -> bool:
         """
         Check if a card can be played on top of another card.
         :param card1: The card being played.
