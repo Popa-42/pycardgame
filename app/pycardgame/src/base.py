@@ -141,7 +141,7 @@ class GenericDeck(ABC, Generic[_CardT]):
         if cards is None:
             self.cards = self.reset().get_cards()
         else:
-            self.cards = cards
+            self.cards = list(cards)
 
     def reset(self):
         self.cards = [self._card_type(rank, suit)

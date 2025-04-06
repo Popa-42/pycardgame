@@ -209,7 +209,7 @@ class GenericDeck(ABC, Generic[_CardT]):
         :param cards: A custom list of `Card` objects. If omitted, a full deck
             is created using the `reset()` method.
         """
-        self.cards: Sequence[_CardT] = ...
+        self.cards: List[_CardT] = ...
 
     def reset(self) -> GenericDeck[_CardT]:
         """

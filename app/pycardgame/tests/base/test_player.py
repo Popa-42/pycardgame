@@ -28,7 +28,7 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    def effect(self, game, player):  # pragma: no cover
+    def effect(self, game, player, *args):  # pragma: no cover
         pass
 
 
