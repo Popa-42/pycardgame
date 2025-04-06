@@ -1,6 +1,6 @@
 import pytest
 
-from .... import (
+from ....src.presets import (
     DrawTwoCard,
     NumberCard,
     ReverseCard,

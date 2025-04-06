@@ -18,7 +18,7 @@ from typing import Literal
 
 import pytest
 
-from ... import (
+from ...src.base import (
     CardMeta,
     DeckMeta,
     GenericCard,

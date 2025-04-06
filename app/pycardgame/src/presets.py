@@ -303,12 +303,12 @@ class UnoGame(GenericGame[UnoCard]):
             print("Game ended without a winner.")
 
     def __str__(self):
+        direction = 'Clockwise' if self.direction == 1 else 'Counter-clockwise'
         return ("UNO Game\n"
                 f"Current Player: {self.get_current_player().name}\n"
                 f"Draw Pile: {len(self.draw_pile)} card(s)\n"
                 f"Discard Pile: {len(self.discard_pile)} card(s)\n"
-                f"Direction: {'Clockwise' if self.direction == 1 else
-                              'Counter-clockwise'}\n"
+                f"Direction: {direction}\n"
                 f"Top Card: {self.get_top_card()}\n"
                 "Players:\n" + "\n".join(
                     [f" - {player.name}: {len(player)} card(s)" for player in

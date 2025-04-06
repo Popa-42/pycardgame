@@ -18,7 +18,7 @@ from typing import Literal
 
 import pytest
 
-from ... import CardMeta, GenericCard
+from ...src.base import CardMeta, GenericCard
 
 T_Ranks = Literal["1", "2", "3"]
 T_Suits = Literal["Red", "Green", "Blue"]

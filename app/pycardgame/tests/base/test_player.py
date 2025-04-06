@@ -16,7 +16,7 @@
 
 from typing import Literal
 
-from ... import GenericCard, GenericPlayer, CardMeta
+from ...src.base import GenericCard, GenericPlayer, CardMeta
 
 T_Ranks = Literal["1", "2", "3"]
 T_Suits = Literal["Red", "Green", "Blue"]

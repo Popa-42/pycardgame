@@ -1,6 +1,6 @@
-from .... import (
+from ....src.base import GenericCard
+from ....src.presets import (
     DrawTwoCard,
-    GenericCard,
     NumberCard,
     ReverseCard,
     SkipCard,
