@@ -1,8 +1,8 @@
 """
 PyCardGame — A base library for creating card games in Python.
 
-Usage
------
+Overview
+--------
 
 This library provides a base for creating card games in Python. It includes
 generic classes for cards, decks, games, and players, as well as a preset
