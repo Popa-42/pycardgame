@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Literal, cast
+from typing import Literal
 
 from .. import (
     CardMeta,
@@ -158,7 +158,7 @@ class UnoDeck(
                                              range(1, 10)] * 2
 
         # Create the deck with the specialized card types
-        card_list: list[UnoCard] = cast(list[UnoCard], [
+        card_list = [
             # Create Number Cards (0-9)
             NumberCard(rank, suit) for suit in colors for rank in numbers
         ] + [
@@ -174,7 +174,7 @@ class UnoDeck(
             # Add Wild Cards and Wild Draw Four Cards
             WildCard(),
             WildDrawFourCard()
-        ] * 4)  # Wild cards are repeated 4 times
+        ] * 4  # Wild cards are repeated 4 times
 
         self.cards = cards if cards is not None else card_list
 
@@ -303,7 +303,7 @@ class UnoGame(GenericGame[UnoCard]):
             print("Game ended without a winner.")
 
     def __str__(self):
-        direction = 'Clockwise' if self.direction == 1 else 'Counter-clockwise'
+        direction = "Clockwise" if self.direction == 1 else "Counter-clockwise"
         return ("UNO Game\n"
                 f"Current Player: {self.get_current_player().name}\n"
                 f"Draw Pile: {len(self.draw_pile)} card(s)\n"
