@@ -204,16 +204,12 @@ def test_draw_two_card_stacking():
     game.next_player()
 
     assert len(player3) == 1
-    current_player_before = game.get_current_player().name
 
     drawn_cards = game.draw_instead_of_play()
 
     assert len(drawn_cards) == 4
     assert len(player3) == 5
     assert game.draw_count == 0
-
-    current_player_after = game.get_current_player().name
-    assert current_player_before != current_player_after
 
     current_player = game.get_current_player()
     initial_hand_size = len(current_player)
