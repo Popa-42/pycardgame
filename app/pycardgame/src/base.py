@@ -384,9 +384,8 @@ class GenericGame(ABC, Generic[_CardT]):
                                  f"> {len(self.players)} {self.players}")
         self.current_player_index = start_idx
 
-    @staticmethod
     @abstractmethod
-    def check_valid_play(card1, card2):  # pragma: no cover
+    def check_valid_play(self, card1, card2):  # pragma: no cover
         pass
 
     def deal_initial_cards(self, *players):

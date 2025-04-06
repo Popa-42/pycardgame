@@ -497,9 +497,8 @@ class GenericGame(ABC, Generic[_CardT]):
         self.players: List[GenericPlayer[_CardT]] = ...
         self.current_player_index: int = ...
 
-    @staticmethod
     @abstractmethod
-    def check_valid_play(card1: _CardT, card2: _CardT) -> bool:
+    def check_valid_play(self, card1: _CardT, card2: _CardT) -> bool:
         """
         Check if a card can be played on top of another card.
         :param card1: The card to be played.
