@@ -24,9 +24,9 @@ def test_uno_deck_init():
     assert all(isinstance(card, DrawTwoCard) for card in deck.cards[76:84])
     assert all(isinstance(card, SkipCard) for card in deck.cards[84:92])
     assert all(isinstance(card, ReverseCard) for card in deck.cards[92:100])
-    assert all(isinstance(card, WildCard) for card in deck.cards[100:108:2])
+    assert all(isinstance(card, WildCard) for card in deck.cards[100:104])
     assert all(
-        isinstance(card, WildDrawFourCard) for card in deck.cards[101:108:2])
+        isinstance(card, WildDrawFourCard) for card in deck.cards[104:108])
 
 
 def test_uno_deck_shuffle():
