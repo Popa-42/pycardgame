@@ -32,6 +32,9 @@ from typing import (
 
 _RankT = TypeVar("_RankT")
 _SuitT = TypeVar("_SuitT")
+_CardT = TypeVar("_CardT", bound="GenericCard")
+_GameT_co = TypeVar("_GameT_co", bound="GenericGame", covariant=True)
+_PlayerT_co = TypeVar("_PlayerT_co", bound="GenericPlayer", covariant=True)
 
 
 class CardMeta(ABCMeta):
@@ -86,13 +89,14 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
                    value_name: str) -> Optional[int]: ...
 
     @abstractmethod
-    def effect(self, game: GenericGame[_CardT],
-               player: GenericPlayer[_CardT],
+    def effect(self,
+               game: Any,  # Use Any to avoid type conflicts in subclasses
+               player: Any,  # Use Any to avoid type conflicts in subclasses
                *args: Any) -> None:
         """
         The effect of the card when played. This method should be implemented
         in each specific card class.
-        :param game: The game instance where the card is played.
+        :param game: The game instance.
         :param player: The player who played the card.
         :param args: Additional arguments for the effect.
         """
@@ -174,9 +178,6 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
     def __ne__(self, other: object) -> bool: ...
 
 
-_CardT = TypeVar("_CardT", bound=GenericCard)  # type: ignore
-
-
 class DeckMeta(ABCMeta):
     """A metaclass for automatically creating custom deck classes."""
 
@@ -237,8 +238,9 @@ class GenericDeck(ABC, Generic[_CardT]):
         :raise ValueError: If the `by` parameter is not a valid attribute.
         """
 
-    def shuffle(self, seed: Optional[Union[int, float, str, bytes,
-    bytearray]] = None) -> GenericDeck[_CardT]:
+    def shuffle(self, seed: Optional[
+        Union[int, float, str, bytes, bytearray]] = None) -> GenericDeck[
+        _CardT]:
         """
         Randomly shuffles the cards in the deck.
         :return: The deck instance.
@@ -549,14 +551,14 @@ class GenericGame(ABC, Generic[_CardT]):
 
     def play_card(self, card: _CardT,
                   player: Optional[GenericPlayer[_CardT]] = None
-                  ) -> GenericGame[_CardT]:
+                  ) -> bool:
         """
         Play a card from a player's hand. The card will be added to the
         discard pile.
         :param card: The card to play.
         :param player: The player to play the card from. If not provided, the
             current player will play the card.
-        :return: The game object.
+        :return: True if the card was played successfully, False otherwise.
         """
 
     def get_trump(self) -> Optional[Any]:

@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, cast
 
 from .. import (
     CardMeta,
@@ -40,7 +40,7 @@ class UnoCard(
 ):
     __slots__ = ("wild",)
 
-    def __init__(self, rank, suit):
+    def __init__(self, rank: T_UnoRanks | int, suit: T_UnoSuits | int):
         # TODO: Resolve typing issues with _RankT and _SuitT in GenericCard,
         #       and remove the need for this workaround.
         if isinstance(rank, str):
@@ -91,7 +91,8 @@ class DrawTwoCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
         self.wild = False
 
     def effect(self, game, player, *args):
-        game.draw_cards(game.get_next_player(), 2)
+        if isinstance(game, UnoGame):
+            game.draw_count += 2  # Add 2 to the draw count
 
 
 class SkipCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
@@ -149,7 +150,7 @@ class UnoDeck(
     metaclass=DeckMeta,
     card_type=UnoCard
 ):
-    def __init__(self, cards=None):
+    def __init__(self, cards: list[UnoCard] | None = None):
         super().__init__()
 
         colors: list[T_UnoSuits] = ["Red", "Green", "Blue", "Yellow"]
@@ -157,7 +158,7 @@ class UnoDeck(
                                              range(1, 10)] * 2
 
         # Create the deck with the specialized card types
-        self.cards = cards if cards is not None else [
+        card_list: list[UnoCard] = cast(list[UnoCard], [
             # Create Number Cards (0-9)
             NumberCard(rank, suit) for suit in colors for rank in numbers
         ] + [
@@ -173,7 +174,9 @@ class UnoDeck(
             # Add Wild Cards and Wild Draw Four Cards
             WildCard(),
             WildDrawFourCard()
-        ] * 4  # Wild cards are repeated 4 times
+        ] * 4)  # Wild cards are repeated 4 times
+
+        self.cards = cards if cards is not None else card_list
 
     def __str__(self):
         return f"UNO Deck with {len(self.cards)} cards."
@@ -207,8 +210,10 @@ class UnoGame(GenericGame[UnoCard]):
     def __init__(self, *players, draw_pile=None, discard_pile=None,
                  hand_size=7):
         super().__init__(UnoCard, UnoDeck, draw_pile, discard_pile, None,
-                         hand_size, 0, False, *players)
+                         hand_size, 0, True, *players)
+        self.draw_pile = draw_pile if draw_pile else UnoDeck().shuffle()
         self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
+        self.draw_count = 0  # Track accumulated draw count
 
     @staticmethod
     def check_valid_play(card1, card2):
@@ -228,10 +233,16 @@ class UnoGame(GenericGame[UnoCard]):
             (self.current_player_index + self.direction) % len(self.players)]
 
     def play_card(self, card, player=None, *args):
-        if self.check_valid_play(card, self.discard_pile.get_top_card()):
-            self.discard_cards(card)
+        top_card = self.discard_pile.get_top_card()
+
+        if top_card is None:
+            return False
+
+        if self.check_valid_play(card, top_card):
             if not player:
                 player = self.get_current_player()
+
+            self.discard_cards(card)
             player.play_cards(card)
 
             card.effect(self, player, *args)
@@ -264,14 +275,27 @@ class UnoGame(GenericGame[UnoCard]):
         self.set_current_player(new_index)
         return self
 
+    def draw_instead_of_play(self, player=None):
+        player = player or self.get_current_player()
+
+        if self.draw_count > 0:
+            drawn_cards = self.draw_cards(player, self.draw_count)
+            self.draw_count = 0
+            self.next_player()
+        else:
+            drawn_cards = self.draw_cards(player, 1)
+
+        if drawn_cards is None:
+            return []
+        return drawn_cards
+
     def determine_winner(self):
         for player in self.players:
             if len(player) == 0:
                 return player
         return None
 
-    def end_game(self):
-        # TODO: Implement end game logic
+    def end_game(self):  # pragma: no cover  # TODO: Implement end game logic
         winner = self.determine_winner()
         if winner:
             print(f"{winner.name} wins the game!")
@@ -279,10 +303,22 @@ class UnoGame(GenericGame[UnoCard]):
             print("Game ended without a winner.")
 
     def __str__(self):
-        return (f"UNO Game with {len(self.players)} players. "
-                f"Current top card: {self.get_top_card()}")
+        return ("UNO Game\n"
+                f"Current Player: {self.get_current_player().name}\n"
+                f"Draw Pile: {len(self.draw_pile)} card(s)\n"
+                f"Discard Pile: {len(self.discard_pile)} card(s)\n"
+                f"Direction: {'Clockwise' if self.direction == 1 else
+                              'Counter-clockwise'}\n"
+                f"Top Card: {self.get_top_card()}\n"
+                "Players:\n" + "\n".join(
+                    [f" - {player.name}: {len(player)} card(s)" for player in
+                     self.players]))
 
     def __repr__(self):
-        return (f"{self.__class__.__name__}(draw_pile={self.draw_pile!r}, "
+        return (f"{self.__class__.__name__}("
+                f"players={self.players!r}, "
+                f"draw_pile={self.draw_pile!r}, "
                 f"discard_pile={self.discard_pile!r}, "
-                f"{self.players!r})")
+                f"hand_size={self.hand_size!r}, "
+                f"current_player_index={self.current_player_index!r}, "
+                f"direction={self.direction!r})")

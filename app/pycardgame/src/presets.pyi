@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Literal, Optional, TypeVar, Union
+from typing import Any, Literal, Optional, Sequence, Union
 
 from .base import (
     CardMeta,
@@ -32,8 +32,6 @@ T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
 T_UnoSuits = Literal["Red", "Green", "Blue", "Yellow", "Wild"]
 T_UnoSuitsWild = Literal["Red", "Green", "Blue", "Yellow"]
 
-_UnoDeck = TypeVar("_UnoDeck", bound=GenericDeck[UnoCard])
-_UnoPlayer = TypeVar("_UnoPlayer", bound=GenericPlayer[UnoCard])
 
 class UnoCard(
     GenericCard[T_UnoRanks, T_UnoSuits],
@@ -64,8 +62,8 @@ class UnoCard(
         """
 
     def effect(self,
-               game: UnoGame,  # type: ignore[override]
-               player: _UnoPlayer,
+               game: UnoGame,
+               player: UnoPlayer,
                *args: Any) -> None:
         """
         Apply the effect of the card in the game.
@@ -141,7 +139,7 @@ class UnoDeck(
     :param cards: Optional list of cards to initialise the deck with.
     """
 
-    def __init__(self, cards: Optional[List[UnoCard]] = None) -> None:
+    def __init__(self, cards: Optional[Sequence[UnoCard]] = None) -> None:
         """
         Initialise the UNO deck with a standard set of cards.
         :param cards: Optional list of cards to initialise the deck with.
@@ -152,7 +150,8 @@ class UnoPlayer(GenericPlayer[UnoCard]):
     """A class representing a UNO player."""
     __slots__ = ("uno",)
 
-    def __init__(self, name: str, hand: Optional[List[UnoCard]] = None) -> None:
+    def __init__(self, name: str, hand: Optional[Sequence[UnoCard]] = None) -> \
+            None:
         """
         Initialise the UNO player with a name, hand of cards, and score.
         :param name: The name of the player.
@@ -177,9 +176,9 @@ class UnoGame(GenericGame[UnoCard]):
     """A class representing a UNO game."""
 
     def __init__(self,
-                 *players: _UnoPlayer,
-                 draw_pile: Optional[_UnoDeck] = None,
-                 discard_pile: Optional[_UnoDeck] = None,
+                 *players: GenericPlayer[UnoCard],
+                 draw_pile: Optional[GenericDeck[UnoCard]] = None,
+                 discard_pile: Optional[GenericDeck[UnoCard]] = None,
                  hand_size: int = 7) -> None:
         """
         Initialise the UNO game with a deck, discard pile, hand size, and
@@ -190,6 +189,7 @@ class UnoGame(GenericGame[UnoCard]):
         :param hand_size: The number of cards each player starts with.
         """
         self.direction: Literal[1, -1] = 1
+        self.draw_count: int = 0
 
     @staticmethod
     def check_valid_play(card1: UnoCard, card2: UnoCard) -> bool:
@@ -222,9 +222,9 @@ class UnoGame(GenericGame[UnoCard]):
         :return: The next player.
         """
 
-    def play_card(self,  # type: ignore[override]
+    def play_card(self,
                   card: UnoCard,
-                  player: _UnoPlayer | None = None,
+                  player: GenericPlayer[UnoCard] | None = None,
                   *args: Any) -> bool:
         """
         Play a card from the player's hand to the discard pile.
@@ -235,8 +235,8 @@ class UnoGame(GenericGame[UnoCard]):
         :return: True if the card was played successfully, False otherwise.
         """
 
-    def draw_cards(self, player: _UnoPlayer, n: int = 1) -> Optional[
-        List[UnoCard]]:
+    def draw_cards(self, player: GenericPlayer[UnoCard], n: int = 1) -> \
+            Optional[Sequence[UnoCard]]:
         """
         Draw a card from the deck and add it to the player's hand.
         :param player: The player drawing the card.
@@ -262,7 +262,19 @@ class UnoGame(GenericGame[UnoCard]):
         :return: The game instance with the updated current player.
         """
 
-    def determine_winner(self) -> Optional[_UnoPlayer]:
+    def draw_instead_of_play(self,
+                             player: Optional[GenericPlayer[UnoCard]] = None
+                             ) -> Sequence[UnoCard]:
+        """
+        Called when a player chooses to draw instead of playing a card.
+        If there's an accumulated draw count from Draw Two cards, handle that.
+        Otherwise, just draw one card and continue play.
+        :param player: The player who is drawing a card.
+        :return: The drawn cards (list) or an empty list if the draw pile is
+            empty.
+        """
+
+    def determine_winner(self) -> Optional[GenericPlayer[UnoCard]]:
         """
         Determine the winner of the game based on the players' scores.
         :return: The winning player or None if no winner is determined.

@@ -1,5 +1,12 @@
-from .... import NumberCard, UnoDeck, UnoGame, UnoPlayer, WildCard
-from ....src.presets import UnoCard
+from .... import (
+    DrawTwoCard,
+    NumberCard,
+    UnoCard,
+    UnoDeck,
+    UnoGame,
+    UnoPlayer,
+    WildCard,
+)
 
 
 def test_uno_player_init():
@@ -91,6 +98,9 @@ def test_uno_game_play_card():
     player1 = UnoPlayer("Player 1", [NumberCard("5", "Red")])
     player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
     game = UnoGame(player1, player2)
+
+    assert game.play_card(NumberCard("5", "Red")) is False
+
     game.discard_cards(NumberCard("1", "Red"))
 
     assert game.play_card(NumberCard("5", "Red")) is True
@@ -100,16 +110,40 @@ def test_uno_game_play_card():
     assert game.play_card(NumberCard("7", "Blue"), player2) is False
 
 
+def test_uno_game_draw_instead_of_play():
+    player1 = UnoPlayer("Player 1", [DrawTwoCard("Red")])
+    player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
+    game = UnoGame(player1, player2)
+
+    game.draw_pile = UnoDeck([])
+    assert game.draw_instead_of_play(player2) == []
+    game.draw_pile = UnoDeck()
+
+    game.discard_cards(NumberCard("5", "Red"))
+    game.play_card(DrawTwoCard("Red"), player1)
+    assert len(player1) == 0
+    assert len(player2) == 1
+    assert game.draw_count == 2
+
+    game.next_player()
+    drawn = game.draw_instead_of_play()
+    assert len(drawn) == 2
+    assert len(player2) == 3
+    assert game.draw_count == 0
+
+
 def test_uno_game_draw_cards():
     player = UnoPlayer("Player 1")
     game = UnoGame(player)
 
     drawn_cards = game.draw_cards(player, 2)
+    assert drawn_cards is not None
     assert len(drawn_cards) == 2
     assert len(player) == 2
     assert len(game.draw_pile) == 106
 
     drawn_card = game.draw_cards(player)
+    assert drawn_card is not None
     assert len(drawn_card) == 1
     assert len(player) == 3
     assert len(game.draw_pile) == 105
@@ -171,3 +205,32 @@ def test_uno_game_determine_winner():
 def test_uno_game_end_game():
     # TODO: Implement game end logic
     ...
+
+
+def test_uno_game_str():
+    player1 = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
+    game = UnoGame(player1, player2)
+    game.discard_cards(NumberCard("1", "Red"))
+
+    assert str(game) == ("UNO Game\n"
+                         "Current Player: Player 1\n"
+                         "Draw Pile: 108 card(s)\n"
+                         "Discard Pile: 1 card(s)\n"
+                         "Direction: Clockwise\n"
+                         "Top Card: Red 1\n"
+                         "Players:\n"
+                         " - Player 1: 1 card(s)\n"
+                         " - Player 2: 1 card(s)")
+
+
+def test_uno_game_repr():
+    player1 = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
+    deck = UnoDeck()
+    game = UnoGame(player1, player2, draw_pile=deck)
+
+    assert repr(game) == (f"UnoGame(players=[{player1!r}, {player2!r}], "
+                          f"draw_pile={UnoDeck()!r}, "
+                          f"discard_pile={UnoDeck([])!r}, "
+                          f"hand_size=7, current_player_index=0, direction=1)")

@@ -27,3 +27,6 @@ license-files = ["LICENSE"]
 [project.urls]
 Homepage = "https://github.com/Popa-42/pycardgame"
 Issues = "https://github.com/Popa-42/pycardgame/issues"
+
+[tool.mypy]
+

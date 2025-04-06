@@ -418,9 +418,11 @@ class GenericGame(ABC, Generic[_CardT]):
 
     def play_card(self, card, player=None):
         player = player or self.get_current_player()
-        self.discard_pile.add(*player.play_cards(card))
-        card.effect(self, player)
-        return self
+        if card in player.hand:
+            self.discard_pile.add(*player.play_cards(card))
+            card.effect(self, player)
+            return True
+        return False
 
     def get_trump(self):
         return self.trump

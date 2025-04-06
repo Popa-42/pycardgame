@@ -71,10 +71,20 @@ def test_draw_two_card_effect():
     player2 = UnoPlayer("Player 2")
     deck = UnoDeck()
     game = UnoGame(player1, player2, draw_pile=deck)
+
     game.discard_cards(UnoCard("5", "Red"))
-    game.play_card(DrawTwoCard("Red"))
+    game.play_card(DrawTwoCard("Red"), player1)
+
     assert len(player1) == 0
+    assert len(player2) == 0
+    assert game.draw_count == 2
+
+    game.next_player()
+    drawn = game.draw_instead_of_play()
+
+    assert len(drawn) == 2
     assert len(player2) == 2
+    assert game.draw_count == 0
 
 
 def test_skip_card_init():
@@ -158,3 +168,57 @@ def test_wild_draw_four_card_effect():
 
     with pytest.raises(ValueError):
         game.play_card(WildDrawFourCard(), player1)
+
+
+def test_draw_two_card_stacking():
+    hand1 = [DrawTwoCard("Red"), NumberCard("5", "Yellow")]
+    hand2 = [DrawTwoCard("Yellow"), NumberCard("6", "Blue")]
+    hand3 = [NumberCard("7", "Yellow")]  # No Draw Two card
+
+    player1 = UnoPlayer("Player 1", hand1)
+    player2 = UnoPlayer("Player 2", hand2)
+    player3 = UnoPlayer("Player 3", hand3)
+
+    deck_cards = [
+        NumberCard("1", "Blue"), NumberCard("2", "Green"),
+        NumberCard("3", "Red"), NumberCard("4", "Yellow"),
+        NumberCard("5", "Blue"), NumberCard("6", "Green"),
+        NumberCard("7", "Red"), NumberCard("8", "Yellow"),
+        NumberCard("9", "Blue"), NumberCard("1", "Green")
+    ]
+    deck = UnoDeck(deck_cards)
+    game = UnoGame(player1, player2, player3, draw_pile=deck)
+
+    game.discard_cards(NumberCard("4", "Red"))
+
+    game.play_card(DrawTwoCard("Red"))
+    assert game.draw_count == 2
+    assert len(player1) == 1
+
+    game.next_player()
+
+    game.play_card(DrawTwoCard("Yellow"))
+    assert game.draw_count == 4
+    assert len(player2) == 1
+
+    game.next_player()
+
+    assert len(player3) == 1
+    current_player_before = game.get_current_player().name
+
+    drawn_cards = game.draw_instead_of_play()
+
+    assert len(drawn_cards) == 4
+    assert len(player3) == 5
+    assert game.draw_count == 0
+
+    current_player_after = game.get_current_player().name
+    assert current_player_before != current_player_after
+
+    current_player = game.get_current_player()
+    initial_hand_size = len(current_player)
+
+    drawn = game.draw_instead_of_play()
+
+    assert len(drawn) == 1
+    assert len(current_player) == initial_hand_size + 1

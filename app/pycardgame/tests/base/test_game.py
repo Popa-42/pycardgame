@@ -37,7 +37,7 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    def effect(self, game, player):  # pragma: no cover
+    def effect(self, game, player, *args):  # pragma: no cover
         pass
 
 
@@ -144,11 +144,13 @@ def test_game_play():
     game = DummyGame(*players, hand_size=2)
     game.deal(2)
     dealt_card = players[0].hand[0]
-    game.play_card(players[0].hand[0], players[0])
+    assert game.play_card(players[0].hand[0], players[0]) is True
     assert len(players[0].hand) == 1
     assert len(game.discard_pile) == 1
     assert (dealt_card in game.discard_pile and dealt_card not in
             players[0].hand)
+
+    assert game.play_card(players[0].hand[0], players[1]) is False
 
 
 def test_game_get_trump():
