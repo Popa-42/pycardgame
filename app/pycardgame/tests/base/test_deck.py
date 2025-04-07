@@ -195,8 +195,7 @@ def test_deck_contains():
     card = DummyCard(0, 0)
     assert card in deck
 
-    with pytest.raises(TypeError):
-        assert "InvalidType" not in deck  # type: ignore
+    assert "InvalidType" not in deck  # type: ignore
 
 
 def test_deck_getitem():

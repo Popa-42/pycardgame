@@ -265,7 +265,7 @@ class GenericDeck(ABC, Generic[_CardT]):
 
     def __contains__(self, item):
         if not isinstance(item, self._card_type):
-            raise TypeError("Invalid card type: must be a Card object")
+            return False
         return item in self.cards
 
     def __bool__(self):
