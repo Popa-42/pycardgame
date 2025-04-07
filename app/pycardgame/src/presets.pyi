@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal, Optional, Sequence, Union
+from typing import Any, List, Literal, Optional, Sequence, Union
 
 from .base import (
     CardMeta,
@@ -207,6 +207,12 @@ class UnoGame(GenericGame[UnoCard]):
         :return: The current game instance with updated discard pile.
         """
 
+    def reshuffle_discard_pile(self) -> UnoGame:
+        """
+        Reshuffle the discard pile into the draw pile if the draw pile is empty.
+        :return: The current game instance with reshuffled draw pile.
+        """
+
     def get_top_card(self) -> Optional[UnoCard]:
         """
         Get the top card from the discard pile.
@@ -236,12 +242,16 @@ class UnoGame(GenericGame[UnoCard]):
         """
 
     def draw_cards(self, player: GenericPlayer[UnoCard], n: int = 1) -> \
-            Optional[Sequence[UnoCard]]:
+            List[UnoCard]:
         """
         Draw a card from the deck and add it to the player's hand.
         :param player: The player drawing the card.
         :param n: The number of cards to draw (default is 1).
-        :return: The drawn card or None if the deck is empty.
+        :return: The drawn cards (list). If the draw pile is empty, it
+            reshuffles the discard pile into the draw pile and returns the drawn
+            cards.
+        :raise ValueError: If the draw pile is empty and reshuffling is not
+            possible.
         """
 
     def reverse_direction(self) -> UnoGame:

@@ -23,6 +23,7 @@ from typing import (
     Iterator,
     List,
     Literal,
+    MutableSequence,
     Optional,
     overload,
     Sequence,
@@ -64,8 +65,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
     """
     __slots__ = ("rank", "suit", "trump")
 
-    RANKS: Sequence[_RankT] = ...
-    SUITS: Sequence[_SuitT] = ...
+    RANKS: MutableSequence[_RankT] = ...
+    SUITS: MutableSequence[_SuitT] = ...
 
     def __init__(self, rank: Optional[Union[_RankT, int]],
                  suit: Optional[Union[_SuitT, int]],
@@ -86,7 +87,7 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
 
     @staticmethod
     def _set_value(value: Optional[Union[_RankT, _SuitT, int]],
-                   values_list: List[Union[_RankT, _SuitT]],
+                   values_list: Sequence[Union[_RankT, _SuitT]],
                    value_name: str) -> Optional[int]: ...
 
     @abstractmethod
@@ -209,7 +210,7 @@ class GenericDeck(ABC, Generic[_CardT]):
         :param cards: A custom list of `Card` objects. If omitted, a full deck
             is created using the `reset()` method.
         """
-        self.cards: Sequence[_CardT] = ...
+        self.cards: List[_CardT] = ...
 
     def reset(self) -> GenericDeck[_CardT]:
         """
@@ -284,6 +285,12 @@ class GenericDeck(ABC, Generic[_CardT]):
         :param cards: The cards to remove from the deck.
         :return: The deck instance.
         :raise ValueError: If any card is not found in the deck.
+        """
+
+    def clear(self) -> GenericDeck[_CardT]:
+        """
+        Clears the deck, removing all cards.
+        :return: The cleared deck instance.
         """
 
     def get_index(self, card: _CardT) -> List[int]:

@@ -138,8 +138,10 @@ class UnoDeck(
     def __init__(self, cards=None):
         super().__init__()
 
-        colors: List[T_UnoSuits] = ["Red", "Green", "Blue", "Yellow"]
-        numbers: List[T_UnoRanks] = ["0"] + [str(i) for i in range(1, 10)] * 2
+        colors: List[T_UnoSuits] = ["Red", "Green", "Blue",  # type: ignore
+                                    "Yellow"]
+        numbers: List[T_UnoRanks] = (["0"]  # type: ignore
+                                     + [str(i) for i in range(1, 10)] * 2)
 
         # Create the deck with the specialized card types
         card_list = [
@@ -147,14 +149,14 @@ class UnoDeck(
             NumberCard(rank, suit) for suit in colors for rank in numbers
         ] + [
             # Create DrawTwo Cards
-            DrawTwoCard(suit) for suit in colors
-        ] * 2 + [
+            DrawTwoCard(suit) for suit in colors for _ in range(2)
+        ] + [
             # Create Skip Cards
-            SkipCard(suit) for suit in colors
-        ] * 2 + [
+            SkipCard(suit) for suit in colors for _ in range(2)
+        ] + [
             # Create Reverse Cards
-            ReverseCard(suit) for suit in colors
-        ] * 2 + [
+            ReverseCard(suit) for suit in colors for _ in range(2)
+        ] + [
             # Add Wild Cards
             WildCard() for _ in range(4)
         ] + [
@@ -220,6 +222,12 @@ class UnoGame(GenericGame[UnoCard]):
         self.discard_pile.add(*cards, to_top=True)
         return self
 
+    def reshuffle_discard_pile(self):
+        if len(self.draw_pile) == 0:
+            self.draw_pile = self.discard_pile.shuffle()
+            self.discard_pile.clear()
+        return self
+
     def get_top_card(self):
         return self.discard_pile.get_top_card()
 
@@ -252,7 +260,9 @@ class UnoGame(GenericGame[UnoCard]):
                 drawn = [drawn]
             player.add_cards(*drawn)
             return drawn
-        return None
+        if len(self.draw_pile) == 0:
+            return self.reshuffle_discard_pile().draw_cards(player, n)
+        raise ValueError("Not enough cards in the draw pile.")
 
     def reverse_direction(self):
         self.direction *= -1
@@ -264,7 +274,8 @@ class UnoGame(GenericGame[UnoCard]):
         return self
 
     def next_player(self):
-        self.get_current_player()
+        self.reshuffle_discard_pile()
+
         new_index = (self.current_player_index + self.direction) % len(
             self.players)
         self.set_current_player(new_index)
@@ -279,8 +290,6 @@ class UnoGame(GenericGame[UnoCard]):
         else:
             drawn_cards = self.draw_cards(player, 1)
 
-        if drawn_cards is None:
-            return []
         return drawn_cards
 
     def determine_winner(self):

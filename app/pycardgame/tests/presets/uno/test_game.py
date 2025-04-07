@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import pytest
+
 from ....src.presets import (
     DrawTwoCard,
     NumberCard,
@@ -138,8 +140,6 @@ def test_uno_game_draw_instead_of_play():
     player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
     game = UnoGame(player1, player2)
 
-    game.draw_pile = UnoDeck([])
-    assert game.draw_instead_of_play(player2) == []
     game.draw_pile = UnoDeck()
 
     game.discard_cards(NumberCard("5", "Red"))
@@ -153,6 +153,10 @@ def test_uno_game_draw_instead_of_play():
     assert len(drawn) == 2
     assert len(player2) == 3
     assert game.draw_count == 0
+
+    with pytest.raises(RecursionError):
+        game.draw_pile = UnoDeck([])
+        assert game.draw_instead_of_play(player2) == []
 
 
 def test_uno_game_draw_cards():
@@ -171,7 +175,8 @@ def test_uno_game_draw_cards():
     assert len(player) == 3
     assert len(game.draw_pile) == 105
 
-    assert game.draw_cards(player, 999) is None
+    with pytest.raises(ValueError):
+        game.draw_cards(player, 999)
 
 
 def test_uno_game_reverse_direction():

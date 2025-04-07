@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import random
 from abc import ABC, ABCMeta, abstractmethod
-from typing import Generic, get_args, Type, TypeVar
+from typing import Generic, get_args, MutableSequence, Type, TypeVar
 
 _RankT = TypeVar("_RankT")
 _SuitT = TypeVar("_SuitT")
@@ -34,8 +34,8 @@ class CardMeta(ABCMeta):
 class GenericCard(ABC, Generic[_RankT, _SuitT]):
     __slots__ = ("rank", "suit", "trump")
 
-    RANKS = []
-    SUITS = []
+    RANKS: MutableSequence[_RankT] = []
+    SUITS: MutableSequence[_SuitT] = []
 
     def __init__(self, rank, suit, trump=False):
         self.rank = None
@@ -214,6 +214,10 @@ class GenericDeck(ABC, Generic[_CardT]):
             raise TypeError("Invalid card type: must be a Card object")
         for card in cards:
             self.cards.remove(card)
+        return self
+
+    def clear(self):
+        self.cards.clear()
         return self
 
     def get_index(self, card):
