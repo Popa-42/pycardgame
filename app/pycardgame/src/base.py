@@ -374,14 +374,14 @@ class GenericGame(ABC, Generic[_CardT]):
 
         self.discard_pile = discard_pile or self._deck_type(cards=[])
 
+        self.hand_size = hand_size
+
+        self.players = list(players) if players else []
+
         self.trump = None
         if trump is not None:
             self.set_trump(trump)
         self.apply_trump()
-
-        self.hand_size = hand_size
-
-        self.players = list(players)
 
         start_idx = starting_player_index
         if start_idx != 0:  # 0 is a valid index
@@ -423,6 +423,8 @@ class GenericGame(ABC, Generic[_CardT]):
 
     def draw_cards(self, player=None, n=1):
         if len(self.draw_pile) >= n:
+            if player is None:
+                player = self.get_current_player()
             drawn = self.draw_pile.draw(n)
             if not isinstance(drawn, list):
                 drawn = [drawn]
@@ -487,27 +489,10 @@ class GenericGame(ABC, Generic[_CardT]):
         return self
 
     def apply_trump(self):
-        # Apply trump status to cards in the draw pile
-        for card in self.draw_pile:
-            if card.get_suit() == self.trump:
-                card.set_trump(True)
-            else:
-                card.set_trump(False)
-
-        # Apply trump status to cards in the discard pile
-        for card in self.discard_pile:
-            if card.get_suit() == self.trump:
-                card.set_trump(True)
-            else:
-                card.set_trump(False)
-
-        # Apply trump status to cards in each player's hand
-        for player in self.players:
-            for card in player.hand:
-                if card.get_suit() == self.trump:
-                    card.set_trump(True)
-                else:
-                    card.set_trump(False)
+        for deck in ([self.draw_pile.get_cards(), self.discard_pile.get_cards()]
+                     + [player.hand for player in self.players]):
+            for card in deck:
+                card.set_trump(card.get_suit() == self.trump)
         return self
 
     def change_trump(self, suit):

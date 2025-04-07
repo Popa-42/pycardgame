@@ -143,7 +143,7 @@ def test_game_draw_cards():
     deck = DummyDeck([DummyCard(0, 0), DummyCard(1, 1)])
     discard_pile = DummyDeck([DummyCard(2, 2)])
     game = DummyGame(*players, draw_pile=deck, discard_pile=discard_pile)
-    game.draw_cards(players[0], 2)
+    game.draw_cards(n=2)
     assert len(players[0].hand) == 2
     assert len(game.draw_pile) == 0
     assert len(game.discard_pile) == 1
@@ -228,10 +228,12 @@ def test_game_set_trump():
 def test_game_apply_trump():
     game = DummyGame(trump="Red")
     game.apply_trump()
-    assert all(card.trump for card in game.draw_pile
+
+    assert all(card.is_trump() for card in game.draw_pile
                if card.get_suit() == "Red")
-    assert not any(card.trump for card in game.draw_pile
+    assert not any(card.is_trump() for card in game.draw_pile
                    if card.get_suit() != "Red")
+    
     assert all(card.trump for player in game.players for card in player.hand
                if card.get_suit() == "Red")
     assert not any(card.trump for player in game.players for card in
@@ -242,10 +244,12 @@ def test_game_change_trump():
     game = DummyGame(trump="Red")
     game.change_trump("Green")
     assert game.trump == "Green"
+
     assert all(card.trump for card in game.draw_pile
                if card.get_suit() == "Green")
     assert not any(card.trump for card in game.draw_pile
                    if card.get_suit() != "Green")
+
     assert all(card.trump for player in game.players for card in player.hand
                if card.get_suit() == "Green")
     assert not any(card.trump for player in game.players for card in
