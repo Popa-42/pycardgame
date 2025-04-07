@@ -35,6 +35,10 @@ def move(game: UnoGame, *, color=None, uno=False):
     elif len(current) == 1 and uno:
         print(f">>> {current.name} called UNO!")
 
+    if len(current) == 0:
+        print(f"========= {current.name} wins the game! =========")
+        return
+
     game.next_player()
 
 
