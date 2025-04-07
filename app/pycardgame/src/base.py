@@ -196,7 +196,7 @@ class GenericDeck(ABC, Generic[_CardT]):
 
     def draw(self, n=1):
         if n < 1 or n > len(self.cards):
-            raise ValueError("Cannot draw less or more than one card")
+            raise ValueError(f"Cannot draw {n} cards: number of cards to draw must be between 1 and {len(self.cards)}")
         return self.cards.pop(0) if n == 1 else [self.cards.pop(0) for _ in (
             range(n))]
 
