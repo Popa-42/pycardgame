@@ -154,10 +154,6 @@ def test_uno_game_draw_instead_of_play():
     assert len(player2) == 3
     assert game.draw_count == 0
 
-    with pytest.raises(RecursionError):
-        game.draw_pile = UnoDeck([])
-        assert game.draw_instead_of_play(player2) == []
-
 
 def test_uno_game_draw_cards():
     player = UnoPlayer("Player 1")

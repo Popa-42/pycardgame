@@ -503,6 +503,7 @@ class GenericGame(ABC, Generic[_CardT]):
         self.hand_size: int = ...
         self.players: List[GenericPlayer[_CardT]] = ...
         self.current_player_index: int = ...
+        self.direction: Literal[1, -1] = ...
 
     @abstractmethod
     def check_valid_play(self, card1: _CardT, card2: _CardT) -> bool:
@@ -511,6 +512,55 @@ class GenericGame(ABC, Generic[_CardT]):
         :param card1: The card to be played.
         :param card2: The card on top of the pile.
         :return: True if the play is valid, False otherwise.
+        """
+
+    @abstractmethod
+    def start_game(self) -> GenericGame[_CardT]:
+        """
+        Start the game by dealing initial cards and setting up the discard pile.
+        :return: The game instance.
+        """
+
+    @abstractmethod
+    def end_game(self) -> Any:
+        """End the game and determine the winner."""
+
+    def discard_cards(self, *cards: _CardT) -> GenericGame[_CardT]:
+        """
+        Discard one or more cards from the player's hand.
+        :param cards: The card(s) to discard.
+        :return: The game object.
+        """
+
+    def get_discard_pile(self) -> GenericDeck[_CardT]:
+        """
+        Get the discard pile.
+        :return: The discard pile.
+        """
+
+    def get_top_card(self) -> Optional[_CardT]:
+        """
+        Get the top card from the discard pile.
+        :return: The top card from the discard pile or None if empty.
+        """
+
+    def reshuffle_discard_pile(self) -> GenericGame[_CardT]:
+        """
+        Reshuffle the discard pile into the draw pile if the draw pile is empty.
+        :return: The game object.
+        """
+
+    def draw_cards(self, player: GenericPlayer[_CardT], n: int = 1) -> \
+            List[_CardT]:
+        """
+        Draw a card from the deck and add it to the player's hand.
+        :param player: The player drawing the card.
+        :param n: The number of cards to draw (default is 1).
+        :return: The drawn cards (list). If the draw pile is empty, it
+            reshuffles the discard pile into the draw pile and returns the drawn
+            cards.
+        :raise ValueError: If the draw pile is empty and reshuffling is not
+            possible.
         """
 
     def deal_initial_cards(self, *players: GenericPlayer[_CardT]) -> (
@@ -550,22 +600,23 @@ class GenericGame(ABC, Generic[_CardT]):
         :return: The game object.
         """
 
+    def play_card(self,
+                  card: _CardT,
+                  player: Optional[GenericPlayer[_CardT]] = None,
+                  *args: Any) -> bool:
+        """
+        Play a card from the player's hand to the discard pile.
+        :param player: The player playing the card. If None, the current player
+            is used.
+        :param card: The card to play.
+        :param args: Additional arguments for the card effect.
+        :return: True if the card was played successfully, False otherwise.
+        """
+
     def shuffle(self) -> GenericGame[_CardT]:
         """
         Shuffle the deck of cards.
         :return: The game object.
-        """
-
-    def play_card(self, card: _CardT,
-                  player: Optional[GenericPlayer[_CardT]] = None
-                  ) -> bool:
-        """
-        Play a card from a player's hand. The card will be added to the
-        discard pile.
-        :param card: The card to play.
-        :param player: The player to play the card from. If not provided, the
-            current player will play the card.
-        :return: True if the card was played successfully, False otherwise.
         """
 
     def get_trump(self) -> Optional[Any]:
@@ -619,6 +670,18 @@ class GenericGame(ABC, Generic[_CardT]):
         """
         Get all players in the game.
         :return: The list of players.
+        """
+
+    def next_player(self) -> GenericGame[_CardT]:
+        """
+        Move to the next player in the game.
+        :return: The game instance with the updated current player.
+        """
+
+    def reverse_direction(self) -> GenericGame[_CardT]:
+        """
+        Reverse the direction of play.
+        :return: The current game instance with updated direction.
         """
 
     def get_draw_pile(self) -> GenericDeck[_CardT]:

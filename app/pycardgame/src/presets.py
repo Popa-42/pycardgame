@@ -200,7 +200,6 @@ class UnoGame(GenericGame[UnoCard]):
         super().__init__(UnoCard, UnoDeck, draw_pile, discard_pile, None,
                          hand_size, 0, True, *players)
         self.draw_pile = draw_pile if draw_pile else UnoDeck().shuffle()
-        self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
         self.draw_count = 0  # Track accumulated draw count
         self.game_ended = False
 
@@ -219,67 +218,13 @@ class UnoGame(GenericGame[UnoCard]):
             return True
         return card1.rank == card2.rank or card1.suit == card2.suit
 
-    def discard_cards(self, *cards):
-        self.discard_pile.add(*cards, to_top=True)
-        return self
-
-    def reshuffle_discard_pile(self):
-        if len(self.draw_pile) == 0:
-            self.draw_pile = self.discard_pile.shuffle()
-            self.discard_pile.clear()
-        return self
-
-    def get_top_card(self):
-        return self.discard_pile.get_top_card()
-
     def get_next_player(self):
         return self.players[
             (self.current_player_index + self.direction) % len(self.players)]
 
-    def play_card(self, card, player=None, *args):
-        top_card = self.discard_pile.get_top_card()
-
-        if top_card is None:
-            return False
-
-        if self.check_valid_play(card, top_card):
-            if not player:
-                player = self.get_current_player()
-
-            self.discard_cards(card)
-            player.play_cards(card)
-
-            card.effect(self, player, *args)
-
-            return True
-        return False
-
-    def draw_cards(self, player, n=1):
-        if len(self.draw_pile) >= n:
-            drawn = self.draw_pile.draw(n)
-            if not isinstance(drawn, list):
-                drawn = [drawn]
-            player.add_cards(*drawn)
-            return drawn
-        if len(self.draw_pile) == 0:
-            return self.reshuffle_discard_pile().draw_cards(player, n)
-        raise ValueError("Not enough cards in the draw pile.")
-
-    def reverse_direction(self):
-        self.direction *= -1
-        return self
-
     def start_game(self):
         self.deal_initial_cards()
         self.discard_pile.add(self.draw_pile.draw())
-        return self
-
-    def next_player(self):
-        self.reshuffle_discard_pile()
-
-        new_index = (self.current_player_index + self.direction) % len(
-            self.players)
-        self.set_current_player(new_index)
         return self
 
     def draw_instead_of_play(self, player=None):

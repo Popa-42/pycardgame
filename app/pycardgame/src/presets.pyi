@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, List, Literal, Optional, Sequence, Union
+from typing import Any, Literal, Optional, Sequence, Union
 
 from .base import (
     CardMeta,
@@ -64,7 +64,7 @@ class UnoCard(
 
     def effect(self,
                game: UnoGame,
-               player: UnoPlayer,
+               player: GenericPlayer[UnoCard],
                *args: Any) -> None:
         """
         Apply the effect of the card in the game.
@@ -189,7 +189,6 @@ class UnoGame(GenericGame[UnoCard]):
         :param discard_pile: The discard pile for the game.
         :param hand_size: The number of cards each player starts with.
         """
-        self.direction: Literal[1, -1] = 1
         self.draw_count: int = 0
         self.game_ended: bool = False
 
@@ -202,75 +201,16 @@ class UnoGame(GenericGame[UnoCard]):
         :return: True if the card can be played, False otherwise.
         """
 
-    def discard_cards(self, *cards: UnoCard) -> UnoGame:
-        """
-        Add one or more cards to the discard pile.
-        :param cards: The card(s) to discard.
-        :return: The current game instance with updated discard pile.
-        """
-
-    def reshuffle_discard_pile(self) -> UnoGame:
-        """
-        Reshuffle the discard pile into the draw pile if the draw pile is empty.
-        :return: The current game instance with reshuffled draw pile.
-        """
-
-    def get_top_card(self) -> Optional[UnoCard]:
-        """
-        Get the top card from the discard pile.
-        :return: The top card from the discard pile or None if empty.
-        """
-
-    def get_current_player(self) -> UnoPlayer: ...
-
     def get_next_player(self) -> UnoPlayer:
         """
         Get the next player in the game based on the current direction.
         :return: The next player.
         """
 
-    def play_card(self,
-                  card: UnoCard,
-                  player: GenericPlayer[UnoCard] | None = None,
-                  *args: Any) -> bool:
-        """
-        Play a card from the player's hand to the discard pile.
-        :param player: The player playing the card. If None, the current player
-            is used.
-        :param card: The card to play.
-        :param args: Additional arguments for the card effect.
-        :return: True if the card was played successfully, False otherwise.
-        """
-
-    def draw_cards(self, player: GenericPlayer[UnoCard], n: int = 1) -> \
-            List[UnoCard]:
-        """
-        Draw a card from the deck and add it to the player's hand.
-        :param player: The player drawing the card.
-        :param n: The number of cards to draw (default is 1).
-        :return: The drawn cards (list). If the draw pile is empty, it
-            reshuffles the discard pile into the draw pile and returns the drawn
-            cards.
-        :raise ValueError: If the draw pile is empty and reshuffling is not
-            possible.
-        """
-
-    def reverse_direction(self) -> UnoGame:
-        """
-        Reverse the direction of play.
-        :return: The current game instance with updated direction.
-        """
-
     def start_game(self) -> UnoGame:
         """
         Start the game by dealing initial cards and setting up the discard pile.
         :return: The game instance.
-        """
-
-    def next_player(self) -> UnoGame:
-        """
-        Move to the next player in the game.
-        :return: The game instance with the updated current player.
         """
 
     def draw_instead_of_play(self,

@@ -366,7 +366,8 @@ class GenericGame(ABC, Generic[_CardT]):
         if trump is not None and trump not in self._card_type.SUITS:
             raise ValueError(f"Invalid suit for trump: {trump}")
 
-        self.draw_pile = draw_pile or self._deck_type()
+        self.draw_pile = draw_pile if draw_pile is not None \
+            else self._deck_type()
         if not do_not_shuffle:
             self.draw_pile.shuffle()
 
@@ -388,9 +389,47 @@ class GenericGame(ABC, Generic[_CardT]):
                                  f"> {len(self.players)} {self.players}")
         self.current_player_index = start_idx
 
+        self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
+
     @abstractmethod
     def check_valid_play(self, card1, card2):  # pragma: no cover
         pass
+
+    @abstractmethod
+    def start_game(self):  # pragma: no cover
+        pass
+
+    @abstractmethod
+    def end_game(self):  # pragma: no cover
+        pass
+
+    def discard_cards(self, *cards):
+        self.discard_pile.add(*cards, to_top=True)
+        return self
+
+    def get_discard_pile(self):
+        return self.discard_pile
+
+    def get_top_card(self):
+        return self.discard_pile.get_top_card()
+
+    def reshuffle_discard_pile(self):
+        if len(self.draw_pile) == 0:
+            self.draw_pile.add(*self.discard_pile.get_cards())
+            self.discard_pile.clear()
+            self.draw_pile.shuffle()
+        return self
+
+    def draw_cards(self, player=None, n=1):
+        if len(self.draw_pile) >= n:
+            drawn = self.draw_pile.draw(n)
+            if not isinstance(drawn, list):
+                drawn = [drawn]
+            player.add_cards(*drawn)
+            return drawn
+        if len(self.draw_pile) == 0:
+            return self.reshuffle_discard_pile().draw_cards(player, n)
+        raise ValueError("Not enough cards in the draw pile.")
 
     def deal_initial_cards(self, *players):
         players_to_deal = players or self.players
@@ -415,17 +454,27 @@ class GenericGame(ABC, Generic[_CardT]):
             player.add_cards(*self.draw_pile.draw(num_cards))
         return self
 
+    def play_card(self, card, player=None, *args):
+        top_card = self.discard_pile.get_top_card()
+
+        if top_card is None:
+            return False
+
+        if self.check_valid_play(card, top_card):
+            if not player:
+                player = self.get_current_player()
+
+            self.discard_cards(card)
+            player.play_cards(card)
+
+            card.effect(self, player, *args)
+
+            return True
+        return False
+
     def shuffle(self):
         self.draw_pile.shuffle()
         return self
-
-    def play_card(self, card, player=None):
-        player = player or self.get_current_player()
-        if card in player.hand:
-            self.discard_pile.add(*player.play_cards(card))
-            card.effect(self, player)
-            return True
-        return False
 
     def get_trump(self):
         return self.trump
@@ -468,6 +517,18 @@ class GenericGame(ABC, Generic[_CardT]):
 
     def get_players(self):
         return self.players
+
+    def next_player(self):
+        self.reshuffle_discard_pile()
+
+        new_index = (self.current_player_index + self.direction) % len(
+            self.players)
+        self.set_current_player(new_index)
+        return self
+
+    def reverse_direction(self):
+        self.direction *= -1
+        return self
 
     def get_draw_pile(self):
         return self.draw_pile

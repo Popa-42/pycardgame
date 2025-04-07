@@ -60,9 +60,11 @@ class DummyGame(GenericGame[DummyCard]):
                          hand_size, starting_player_index, do_not_shuffle,
                          *players)
 
-    @staticmethod
-    def check_valid_play(card1, card2):
+    def check_valid_play(self, card1, card2):
         return card1.suit == card2.suit or card1.rank == card2.rank
+
+    def start_game(self): ...
+    def end_game(self): ...
 
 
 def test_game_init():
@@ -92,10 +94,61 @@ def test_game_check_valid_play():
     card1 = DummyCard(0, 0)
     card2 = DummyCard(0, 1)
     card3 = DummyCard(1, 0)
+    game = DummyGame()
 
-    assert DummyGame.check_valid_play(card1, card2) is True
-    assert DummyGame.check_valid_play(card1, card3) is True
-    assert DummyGame.check_valid_play(card2, card3) is False
+    assert game.check_valid_play(card1, card2) is True
+    assert game.check_valid_play(card1, card3) is True
+    assert game.check_valid_play(card2, card3) is False
+
+
+def test_game_discard_cards():
+    game = DummyGame()
+    discard_card = DummyCard(0, 0)
+    game.discard_cards(discard_card)
+    assert discard_card in game.discard_pile
+
+
+def test_game_get_discard_pile():
+    deck = DummyDeck()
+    discard_pile = DummyDeck(cards=[])
+    players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
+    game = DummyGame(*players, draw_pile=deck, discard_pile=discard_pile)
+    assert game.get_discard_pile() == discard_pile
+
+
+def test_game_get_top_card():
+    players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
+    game = DummyGame(*players)
+    top_card = game.get_top_card()
+    assert top_card is None
+    game.discard_pile.add(DummyCard(0, 0))
+    top_card = game.get_top_card()
+    assert isinstance(top_card, DummyCard)
+    assert top_card in game.draw_pile
+
+
+def test_game_reshuffle_discard_pile():
+    players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
+    deck = DummyDeck([])
+    discard_pile = DummyDeck([DummyCard(0, 0), DummyCard(1, 1)])
+    game = DummyGame(*players, draw_pile=deck, discard_pile=discard_pile)
+    game.reshuffle_discard_pile()
+    assert len(game.draw_pile) > 0
+    assert len(game.discard_pile) == 0
+    assert all(card in game.draw_pile for card in discard_pile.cards)
+
+
+def test_game_draw_cards():
+    players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
+    deck = DummyDeck([DummyCard(0, 0), DummyCard(1, 1)])
+    discard_pile = DummyDeck([DummyCard(2, 2)])
+    game = DummyGame(*players, draw_pile=deck, discard_pile=discard_pile)
+    game.draw_cards(players[0], 2)
+    assert len(players[0].hand) == 2
+    assert len(game.draw_pile) == 0
+    assert len(game.discard_pile) == 1
+    game.draw_cards(players[0])
+    assert len(players[0].hand) == 3
 
 
 def test_game_deal_initial_cards():
@@ -140,17 +193,19 @@ def test_game_shuffle():
 
 
 def test_game_play():
-    players = [DummyPlayer("Alice"), DummyPlayer("Bob")]
+    player1 = DummyPlayer("Alice", [DummyCard(0, 0)])
+    player2 = DummyPlayer("Bob", [DummyCard(1, 1)])
+    players = [player1, player2]
     game = DummyGame(*players, hand_size=2)
-    game.deal(2)
-    dealt_card = players[0].hand[0]
-    assert game.play_card(players[0].hand[0], players[0]) is True
-    assert len(players[0].hand) == 1
-    assert len(game.discard_pile) == 1
+    dealt_card = player1.hand[0]
+    game.discard_cards(dealt_card)
+    assert game.play_card(dealt_card, player1) is True
+    assert len(player1.hand) == 0
+    assert len(game.discard_pile) == 2
     assert (dealt_card in game.discard_pile and dealt_card not in
-            players[0].hand)
+            player1.hand)
 
-    assert game.play_card(players[0].hand[0], players[1]) is False
+    assert game.play_card(player2.hand[0], player2) is False
 
 
 def test_game_get_trump():
