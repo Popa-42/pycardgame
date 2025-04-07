@@ -55,14 +55,14 @@ def test_deck_init():
 def test_deck_count():
     deck = DummyDeck()
     assert deck.count(DummyCard(0, 0)) == 1
-    assert deck.count("2") == 3
-    assert deck.count("Blue") == 3
+    assert deck.count("2") == 3  # type: ignore
+    assert deck.count("Blue") == 3  # type: ignore
 
     with pytest.raises(ValueError):
-        deck.count("InvalidName")
+        deck.count("InvalidName")  # type: ignore
 
     with pytest.raises(TypeError):
-        deck.count(DummyCard(0, 0).rank)
+        deck.count(["InvalidType"])  # type: ignore
 
 
 def test_deck_sort():

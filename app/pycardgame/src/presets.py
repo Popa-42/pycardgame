@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import List, Literal
 
 from .. import (
     CardMeta,
@@ -40,25 +40,8 @@ class UnoCard(
 ):
     __slots__ = ("wild",)
 
-    def __init__(self, rank: T_UnoRanks | int, suit: T_UnoSuits | int):
-        # TODO: Resolve typing issues with _RankT and _SuitT in GenericCard,
-        #       and remove the need for this workaround.
-        if isinstance(rank, str):
-            rank_index = self.RANKS.index(rank)
-        elif isinstance(rank, int) or rank is None:
-            rank_index = rank
-        else:
-            raise ValueError("Rank must be a string or an integer.")
-
-        if isinstance(suit, str):
-            suit_index = self.SUITS.index(suit)
-        elif isinstance(suit, int) or suit is None:
-            suit_index = suit
-        else:
-            raise ValueError("Suit must be a string or an integer.")
-
-        # Initialise the card with rank and suit as integers
-        super().__init__(rank_index, suit_index, False)
+    def __init__(self, rank, suit):
+        super().__init__(rank, suit, False)  # type: ignore
 
         self.wild = False
 
@@ -152,12 +135,11 @@ class UnoDeck(
     metaclass=DeckMeta,
     card_type=UnoCard
 ):
-    def __init__(self, cards: list[UnoCard] | None = None):
+    def __init__(self, cards=None):
         super().__init__()
 
-        colors: list[T_UnoSuits] = ["Red", "Green", "Blue", "Yellow"]
-        numbers: list[T_UnoRanks] = ["0"] + [str(i) for i in  # type: ignore
-                                             range(1, 10)] * 2
+        colors: List[T_UnoSuits] = ["Red", "Green", "Blue", "Yellow"]
+        numbers: List[T_UnoRanks] = ["0"] + [str(i) for i in range(1, 10)] * 2
 
         # Create the deck with the specialized card types
         card_list = [

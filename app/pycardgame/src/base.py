@@ -24,6 +24,13 @@ _RankT = TypeVar("_RankT")
 _SuitT = TypeVar("_SuitT")
 
 
+class CardMeta(ABCMeta):
+    def __new__(cls, name, bases, class_dict, rank_type, suit_type):
+        class_dict["RANKS"] = list(get_args(rank_type))
+        class_dict["SUITS"] = list(get_args(suit_type))
+        return super().__new__(cls, name, bases, class_dict)
+
+
 class GenericCard(ABC, Generic[_RankT, _SuitT]):
     __slots__ = ("rank", "suit", "trump")
 
@@ -131,6 +138,12 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
 
 
 _CardT = TypeVar("_CardT", bound=GenericCard)
+
+
+class DeckMeta(ABCMeta):
+    def __new__(cls, name, bases, class_dict, card_type):
+        class_dict["_card_type"] = card_type
+        return super().__new__(cls, name, bases, class_dict)
 
 
 class GenericDeck(ABC, Generic[_CardT]):
@@ -253,19 +266,6 @@ class GenericDeck(ABC, Generic[_CardT]):
 
     def __bool__(self):
         return bool(self.cards)
-
-
-class CardMeta(ABCMeta):
-    def __new__(cls, name, bases, class_dict, rank_type, suit_type):
-        class_dict["RANKS"] = list(get_args(rank_type))
-        class_dict["SUITS"] = list(get_args(suit_type))
-        return super().__new__(cls, name, bases, class_dict)
-
-
-class DeckMeta(ABCMeta):
-    def __new__(cls, name, bases, class_dict, card_type):
-        class_dict["_card_type"] = card_type
-        return super().__new__(cls, name, bases, class_dict)
 
 
 class GenericPlayer(ABC, Generic[_CardT]):

@@ -64,8 +64,8 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
     """
     __slots__ = ("rank", "suit", "trump")
 
-    RANKS: List[_RankT] = ...
-    SUITS: List[_SuitT] = ...
+    RANKS: Sequence[_RankT] = ...
+    SUITS: Sequence[_SuitT] = ...
 
     def __init__(self, rank: Optional[Union[_RankT, int]],
                  suit: Optional[Union[_SuitT, int]],
@@ -209,7 +209,7 @@ class GenericDeck(ABC, Generic[_CardT]):
         :param cards: A custom list of `Card` objects. If omitted, a full deck
             is created using the `reset()` method.
         """
-        self.cards: List[_CardT] = ...
+        self.cards: Sequence[_CardT] = ...
 
     def reset(self) -> GenericDeck[_CardT]:
         """
