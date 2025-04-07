@@ -487,11 +487,27 @@ class GenericGame(ABC, Generic[_CardT]):
         return self
 
     def apply_trump(self):
+        # Apply trump status to cards in the draw pile
         for card in self.draw_pile:
             if card.get_suit() == self.trump:
                 card.set_trump(True)
             else:
                 card.set_trump(False)
+
+        # Apply trump status to cards in the discard pile
+        for card in self.discard_pile:
+            if card.get_suit() == self.trump:
+                card.set_trump(True)
+            else:
+                card.set_trump(False)
+
+        # Apply trump status to cards in each player's hand
+        for player in self.players:
+            for card in player.hand:
+                if card.get_suit() == self.trump:
+                    card.set_trump(True)
+                else:
+                    card.set_trump(False)
         return self
 
     def change_trump(self, suit):
