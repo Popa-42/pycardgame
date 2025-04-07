@@ -291,7 +291,7 @@ class UnoGame(GenericGame[UnoCard]):
         :return: The winning player or None if no winner is determined.
         """
 
-    def end_game(self, export: Optional[os.PathLike] = None) -> Optional[
+    def end_game(self, export: Optional[Union[os.PathLike, str]] = None) -> Optional[
         UnoPlayer]:
         """
         End the game and determine the winner.

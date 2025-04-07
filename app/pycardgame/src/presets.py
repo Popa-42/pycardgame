@@ -52,7 +52,7 @@ class UnoCard(
         pass
 
     def __str__(self):
-        if self.is_wild():
+        if self.get_rank() in ["Wild", "Wild Draw Four"]:
             return f"{self.get_rank()}"
         return f"{self.get_suit()} {self.get_rank()}"
 
