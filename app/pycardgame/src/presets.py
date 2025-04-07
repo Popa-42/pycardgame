@@ -202,6 +202,7 @@ class UnoGame(GenericGame[UnoCard]):
         self.draw_pile = draw_pile if draw_pile else UnoDeck().shuffle()
         self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
         self.draw_count = 0  # Track accumulated draw count
+        self.game_ended = False
 
     def check_valid_play(self, card1, card2=None):
         if card2 is None:
@@ -298,12 +299,28 @@ class UnoGame(GenericGame[UnoCard]):
                 return player
         return None
 
-    def end_game(self):  # pragma: no cover  # TODO: Implement end game logic
+    def end_game(self, export=None):  # type: ignore
         winner = self.determine_winner()
-        if winner:
+        if winner is not None:
             print(f"{winner.name} wins the game!")
         else:
             print("Game ended without a winner.")
+
+        self.game_ended = True
+
+        self.draw_pile.clear()
+        self.discard_pile.clear()
+        for player in self.players:
+            player.hand.clear()
+
+        self.players.clear()
+
+        # TODO: Export game statistics to a file or database
+        # self.export_statistics(path=export)
+
+        print("Game resources have been cleared and the game is now closed.")
+
+        return winner
 
     def __str__(self):
         direction = "Clockwise" if self.direction == 1 else "Counter-clockwise"

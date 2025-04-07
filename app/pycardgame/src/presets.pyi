@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, List, Literal, Optional, Sequence, Union
 
 from .base import (
@@ -190,6 +191,7 @@ class UnoGame(GenericGame[UnoCard]):
         """
         self.direction: Literal[1, -1] = 1
         self.draw_count: int = 0
+        self.game_ended: bool = False
 
     def check_valid_play(self, card1: UnoCard,
                          card2: Optional[UnoCard] = None) -> bool:
@@ -219,7 +221,6 @@ class UnoGame(GenericGame[UnoCard]):
         :return: The top card from the discard pile or None if empty.
         """
 
-    # TODO: Resolve typing issue
     def get_current_player(self) -> UnoPlayer: ...
 
     def get_next_player(self) -> UnoPlayer:
@@ -290,5 +291,9 @@ class UnoGame(GenericGame[UnoCard]):
         :return: The winning player or None if no winner is determined.
         """
 
-    def end_game(self) -> None:
-        """End the game and announce the winner."""
+    def end_game(self, export: Optional[os.PathLike] = None) -> Optional[
+        UnoPlayer]:
+        """
+        End the game and determine the winner.
+        :param export: Optional file path to export game statistics.
+        """

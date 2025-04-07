@@ -231,8 +231,22 @@ def test_uno_game_determine_winner():
 
 
 def test_uno_game_end_game():
-    # TODO: Implement game end logic
-    ...
+    player1 = UnoPlayer("Player 1", [NumberCard("5", "Red")])
+    player2 = UnoPlayer("Player 2", [NumberCard("7", "Blue")])
+    game1 = UnoGame(player1, player2)
+
+    assert game1.game_ended is False
+    assert game1.end_game() is None
+    assert game1.game_ended is True
+    assert len(game1.draw_pile) == 0
+    assert len(game1.discard_pile) == 0
+    assert len(game1.players) == 0
+    assert len(player1) == 0
+    assert len(player2) == 0
+
+    player2.add_cards(NumberCard("5", "Red"))
+    game2 = UnoGame(player1, player2)
+    assert game2.end_game() is not None
 
 
 def test_uno_game_str():
