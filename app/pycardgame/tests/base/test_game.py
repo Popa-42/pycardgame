@@ -226,12 +226,24 @@ def test_game_set_trump():
 
 
 def test_game_apply_trump():
-    game = DummyGame(trump="Red")
+    player1 = DummyPlayer("Alice", [DummyCard(0, 0)])
+    player2 = DummyPlayer("Bob", [DummyCard(1, 1)])
+    players = [player1, player2]
+    deck = DummyDeck([DummyCard(0, 0), DummyCard(1, 1)])
+    discard_pile = DummyDeck([DummyCard(0, 2), DummyCard(1, 2)])
+    game = DummyGame(*players, trump="Red", draw_pile=deck,
+                     discard_pile=discard_pile)
+
     game.apply_trump()
 
     assert all(card.is_trump() for card in game.draw_pile
                if card.get_suit() == "Red")
     assert not any(card.is_trump() for card in game.draw_pile
+                   if card.get_suit() != "Red")
+
+    assert all(card.is_trump() for card in game.discard_pile
+               if card.get_suit() == "Red")
+    assert not any(card.is_trump() for card in game.discard_pile
                    if card.get_suit() != "Red")
     
     assert all(card.trump for player in game.players for card in player.hand
@@ -241,13 +253,25 @@ def test_game_apply_trump():
 
 
 def test_game_change_trump():
-    game = DummyGame(trump="Red")
+    player1 = DummyPlayer("Alice", [DummyCard(0, 0)])
+    player2 = DummyPlayer("Bob", [DummyCard(1, 1)])
+    players = [player1, player2]
+    deck = DummyDeck([DummyCard(0, 0), DummyCard(1, 1)])
+    discard_pile = DummyDeck([DummyCard(0, 2), DummyCard(1, 2)])
+    game = DummyGame(*players, trump="Red", draw_pile=deck,
+                     discard_pile=discard_pile)
+
     game.change_trump("Green")
     assert game.trump == "Green"
 
     assert all(card.trump for card in game.draw_pile
                if card.get_suit() == "Green")
     assert not any(card.trump for card in game.draw_pile
+                   if card.get_suit() != "Green")
+
+    assert all(card.trump for card in game.discard_pile
+               if card.get_suit() == "Green")
+    assert not any(card.trump for card in game.discard_pile
                    if card.get_suit() != "Green")
 
     assert all(card.trump for player in game.players for card in player.hand
