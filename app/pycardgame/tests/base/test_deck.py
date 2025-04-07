@@ -18,10 +18,10 @@ from typing import Literal
 
 import pytest
 
-from ... import CardMeta, DeckMeta, GenericCard, GenericDeck
+from ...src.base import CardMeta, DeckMeta, GenericCard, GenericDeck
 
-T_Ranks = Literal["7", "8", "9", "10", "J", "Q", "K", "A"]
-T_Suits = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+T_Ranks = Literal["1", "2", "3"]
+T_Suits = Literal["Red", "Green", "Blue"]
 
 
 class DummyCard(
@@ -30,10 +30,8 @@ class DummyCard(
     rank_type=T_Ranks,
     suit_type=T_Suits
 ):
-    # Update string representation (e.g. "10 of Hearts" instead of "Hearts 10")
-    def __str__(self):
-        return (f"{self.get_rank()} of {self.get_suit()}"
-                f"{' (trump)' if self.get_trump() else ''}")
+    def effect(self, game, player, *args):  # pragma: no cover
+        pass
 
 
 class DummyDeck(
@@ -41,12 +39,12 @@ class DummyDeck(
     metaclass=DeckMeta,
     card_type=DummyCard
 ):
-    ...
+    pass
 
 
 def test_deck_init():
     deck1 = DummyDeck()
-    assert len(deck1.cards) == 32
+    assert len(deck1.cards) == 9
     assert all(isinstance(card, DummyCard) for card in deck1)
 
     cards = [DummyCard(0, 0)]
@@ -57,14 +55,14 @@ def test_deck_init():
 def test_deck_count():
     deck = DummyDeck()
     assert deck.count(DummyCard(0, 0)) == 1
-    assert deck.count("7") == 4
-    assert deck.count("Diamonds") == 8
+    assert deck.count("2") == 3  # type: ignore
+    assert deck.count("Blue") == 3  # type: ignore
 
     with pytest.raises(ValueError):
-        deck.count("InvalidName")
+        deck.count("InvalidName")  # type: ignore
 
     with pytest.raises(TypeError):
-        deck.count(DummyCard(0, 0).rank)
+        deck.count(["InvalidType"])  # type: ignore
 
 
 def test_deck_sort():
@@ -82,19 +80,36 @@ def test_deck_sort():
 
 
 def test_deck_shuffle():
-    deck = DummyDeck().shuffle()
-    assert deck.cards != sorted(deck.cards)
+    deck1 = DummyDeck()
+    original_deck1 = deck1.__copy__()
+    deck1.shuffle()
+    assert deck1.cards != original_deck1.cards
+    assert len(deck1.cards) == len(original_deck1.cards)
+    assert all(isinstance(card, DummyCard) for card in deck1.cards)
+
+    # Test shuffle with a seed
+    deck2 = DummyDeck()
+    original_deck2 = deck2.__copy__()
+    deck2.shuffle(seed=42)
+    assert deck2.cards != original_deck2.cards
+    assert len(deck2.cards) == len(original_deck2.cards)
+    assert all(isinstance(card, DummyCard) for card in deck2.cards)
+    original_deck2.shuffle(seed=42)
+    assert deck2.cards == original_deck2.cards
 
 
 def test_deck_draw():
     deck = DummyDeck()
     cards = deck.draw(5)
     assert len(cards) == 5
-    assert len(deck.cards) == 27
+    assert len(deck.cards) == 4
 
-    cards = deck.draw()
-    assert len(cards) == 1
-    assert len(deck.cards) == 26
+    cards = deck.draw(2)
+    assert len(cards) == 2
+    assert len(deck.cards) == 2
+
+    with pytest.raises(ValueError):
+        deck.draw(3)
 
 
 def test_deck_add():
@@ -103,6 +118,12 @@ def test_deck_add():
     deck.add(*cards)
     assert deck.cards[-1] == cards[-1]
 
+    deck.add(*cards, to_top=True)
+    assert deck.cards[0] == cards[0]
+
+    with pytest.raises(TypeError):
+        deck.add(*cards, "InvalidCard")  # type: ignore
+
 
 def test_deck_remove():
     deck = DummyDeck()
@@ -110,8 +131,8 @@ def test_deck_remove():
     deck.remove(card)
     assert card not in deck.cards
 
-    with pytest.raises(ValueError):
-        deck.remove(DummyCard(10, 10))
+    with pytest.raises(TypeError):
+        deck.remove("InvalidCard")  # type: ignore
 
 
 def test_deck_get_index():
@@ -119,11 +140,8 @@ def test_deck_get_index():
     card = DummyCard(0, 0)
     assert deck.get_index(card) == [0]
 
-    with pytest.raises(ValueError):
-        deck.get_index(DummyCard(10, 10))
-
     with pytest.raises(TypeError):
-        deck.get_index("Ace of Diamonds")  # type: ignore
+        deck.get_index("Red 1")  # type: ignore
 
 
 def test_deck_get_cards():
@@ -138,7 +156,7 @@ def test_deck_get_top_card():
 
 def test_deck_str():
     deck = DummyDeck()
-    assert str(deck) == "Deck of 32 cards. Top card: 7 of Diamonds"
+    assert str(deck) == "Deck of 9 cards. Top card: Red 1"
 
 
 def test_deck_repr():
@@ -146,7 +164,7 @@ def test_deck_repr():
     deck_repr = repr(deck)
     assert deck_repr.startswith("DummyDeck(card_type=<class")
     assert "cards=[DummyCard(rank=0, suit=0)," in deck_repr
-    assert deck_repr.endswith("DummyCard(rank=7, suit=3)])")
+    assert deck_repr.endswith("DummyCard(rank=2, suit=2)])")
 
 
 def test_deck_copy():
@@ -156,6 +174,28 @@ def test_deck_copy():
     assert deck1.cards == deck2.cards
     assert deck1.cards is not deck2.cards
     assert isinstance(deck2, DummyDeck)
+
+
+def test_deck_equalities():
+    deck1 = DummyDeck()
+    deck2 = DummyDeck()
+    assert deck1 == deck2
+    assert not deck1 != deck2
+
+    deck3 = DummyDeck([DummyCard(0, 0)])
+    assert not deck1 == deck3
+    assert deck1 != deck3
+
+    assert not deck1 == "InvalidType"  # type: ignore
+    assert deck1 != "InvalidType"  # type: ignore
+
+
+def test_deck_contains():
+    deck = DummyDeck()
+    card = DummyCard(0, 0)
+    assert card in deck
+
+    assert "InvalidType" not in deck  # type: ignore
 
 
 def test_deck_getitem():

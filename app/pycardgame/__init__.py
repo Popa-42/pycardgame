@@ -1,5 +1,14 @@
 """
-PyCardGame — A base library for creating card games in Python
+PyCardGame — A base library for creating card games in Python.
+
+Overview
+--------
+
+This library provides a base for creating card games in Python. It includes
+generic classes for cards, decks, games, and players, as well as a preset
+UNO game with its cards and deck.
+
+It is designed to be extended and customised for specific games.
 
 License
 -------
@@ -20,22 +29,45 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from .src.base import GenericCard, GenericDeck, CardMeta, DeckMeta
-from .src.game import GenericGame, GenericPlayer
-from .src.presets import PokerCard, PokerDeck, PokerPlayer, PokerGame
-# , SkatCard, SkatDeck, UnoCard, UnoDeck
+from .src.base import (
+    CardMeta,
+    DeckMeta,
+    GenericCard,
+    GenericDeck,
+    GenericGame,
+    GenericPlayer,
+)
+
+from .src.presets import (
+    DrawTwoCard,
+    NumberCard,
+    ReverseCard,
+    SkipCard,
+    UnoCard,
+    UnoDeck,
+    UnoGame,
+    UnoPlayer,
+    WildCard,
+    WildDrawFourCard,
+)
 
 __all__ = [
     "CardMeta",
     "DeckMeta",
+    "DrawTwoCard",
     "GenericCard",
     "GenericDeck",
     "GenericGame",
     "GenericPlayer",
-    "PokerCard",
-    "PokerDeck",
-    "PokerPlayer",
-    "PokerGame",
+    "NumberCard",
+    "ReverseCard",
+    "SkipCard",
+    "UnoCard",
+    "UnoDeck",
+    "UnoGame",
+    "UnoPlayer",
+    "WildCard",
+    "WildDrawFourCard",
 ]
 
 print("""

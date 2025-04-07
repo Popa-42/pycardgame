@@ -17,27 +17,34 @@
 from __future__ import annotations
 
 import random
-from abc import ABC, ABCMeta
-from typing import Generic, TypeVar, get_args, Type
+from abc import ABC, ABCMeta, abstractmethod
+from typing import Generic, get_args, MutableSequence, Type, TypeVar
 
 _RankT = TypeVar("_RankT")
 _SuitT = TypeVar("_SuitT")
 
 
+class CardMeta(ABCMeta):
+    def __new__(cls, name, bases, class_dict, rank_type, suit_type):
+        class_dict["RANKS"] = list(get_args(rank_type))
+        class_dict["SUITS"] = list(get_args(suit_type))
+        return super().__new__(cls, name, bases, class_dict)
+
+
 class GenericCard(ABC, Generic[_RankT, _SuitT]):
     __slots__ = ("rank", "suit", "trump")
 
-    RANKS = []
-    SUITS = []
+    RANKS: MutableSequence[_RankT] = []
+    SUITS: MutableSequence[_SuitT] = []
 
     def __init__(self, rank, suit, trump=False):
         self.rank = None
         self.suit = None
 
         if rank is not None:
-            self.set_rank(rank)
+            self.change_rank(rank)
         if suit is not None:
-            self.set_suit(suit)
+            self.change_suit(suit)
 
         self.trump = trump
 
@@ -54,12 +61,16 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
                 raise ValueError(f"Invalid {value_name} index: {value}")
         return value
 
+    @abstractmethod
+    def effect(self, game, player, *args):  # pragma: no cover
+        pass
+
     def get_rank(self, as_index=False):
         if self.rank is None:
             return None
         return self.rank if as_index else self.__class__.RANKS[self.rank]
 
-    def set_rank(self, rank):
+    def change_rank(self, rank):
         self.rank = self._set_value(rank, self.__class__.RANKS, "rank")
         return self
 
@@ -68,11 +79,11 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
             return None
         return self.suit if as_index else self.__class__.SUITS[self.suit]
 
-    def set_suit(self, suit):
+    def change_suit(self, suit):
         self.suit = self._set_value(suit, self.__class__.SUITS, "suit")
         return self
 
-    def get_trump(self):
+    def is_trump(self):
         return self.trump
 
     def set_trump(self, trump):
@@ -111,6 +122,11 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         return (self.suit == other.suit and self.rank == other.rank and
                 self.trump == other.trump)
 
+    def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return not self.__eq__(other)
+
     def __gt__(self, other):
         return not self.__lt__(other) and not self.__eq__(other)
 
@@ -120,11 +136,14 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
     def __ge__(self, other):
         return not self.__lt__(other)
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
 
 _CardT = TypeVar("_CardT", bound=GenericCard)
+
+
+class DeckMeta(ABCMeta):
+    def __new__(cls, name, bases, class_dict, card_type):
+        class_dict["_card_type"] = card_type
+        return super().__new__(cls, name, bases, class_dict)
 
 
 class GenericDeck(ABC, Generic[_CardT]):
@@ -135,7 +154,7 @@ class GenericDeck(ABC, Generic[_CardT]):
         if cards is None:
             self.cards = self.reset().get_cards()
         else:
-            self.cards = cards
+            self.cards = list(cards)
 
     def reset(self):
         self.cards = [self._card_type(rank, suit)
@@ -169,20 +188,37 @@ class GenericDeck(ABC, Generic[_CardT]):
             raise ValueError("Invalid sort key: must be 'rank' or 'suit'")
         return self
 
-    def shuffle(self):
+    def shuffle(self, seed=None):
+        if seed is not None:
+            random.seed(seed)
         random.shuffle(self.cards)
         return self
 
     def draw(self, n=1):
-        return [self.cards.pop(0) for _ in range(n)]
+        if n < 1 or n > len(self.cards):
+            raise ValueError(f"Cannot draw {n} cards: number of cards to draw "
+                             f"must be between 1 and {len(self.cards)}")
+        return self.cards.pop(0) if n == 1 else [self.cards.pop(0) for _ in (
+            range(n))]
 
-    def add(self, *cards):
-        self.cards.extend(cards)
+    def add(self, *cards, to_top=False):
+        if not all(isinstance(card, self._card_type) for card in cards):
+            raise TypeError("Invalid card type: must be a Card object")
+        if to_top:
+            self.cards = list(cards) + self.cards
+        else:
+            self.cards.extend(cards)
         return self
 
     def remove(self, *cards):
+        if not all(isinstance(card, self._card_type) for card in cards):
+            raise TypeError("Invalid card type: must be a Card object")
         for card in cards:
             self.cards.remove(card)
+        return self
+
+    def clear(self):
+        self.cards.clear()
         return self
 
     def get_index(self, card):
@@ -212,6 +248,8 @@ class GenericDeck(ABC, Generic[_CardT]):
         return self.cards == other.cards
 
     def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return not self.__eq__(other)
 
     def __copy__(self):
@@ -226,15 +264,291 @@ class GenericDeck(ABC, Generic[_CardT]):
     def __iter__(self):
         return iter(self.cards)
 
+    def __contains__(self, item):
+        if not isinstance(item, self._card_type):
+            return False
+        return item in self.cards
 
-class CardMeta(ABCMeta):
-    def __new__(cls, name, bases, class_dict, rank_type, suit_type):
-        class_dict["RANKS"] = list(get_args(rank_type))
-        class_dict["SUITS"] = list(get_args(suit_type))
-        return super().__new__(cls, name, bases, class_dict)
+    def __bool__(self):
+        return bool(self.cards)
 
 
-class DeckMeta(ABCMeta):
-    def __new__(cls, name, bases, class_dict, card_type):
-        class_dict["_card_type"] = card_type
-        return super().__new__(cls, name, bases, class_dict)
+class GenericPlayer(ABC, Generic[_CardT]):
+    __slots__ = ("name", "hand", "score")
+
+    def __init__(self, name, hand=None, score=0):
+        self.name = name
+        self.hand = hand or []
+        self.score = score
+
+    def add_cards(self, *cards):
+        self.hand.extend(cards)
+
+    def remove_cards(self, *cards):
+        for card in cards:
+            self.hand.remove(card)
+        return self
+
+    def play_cards(self, *cards):
+        if not cards:
+            cards = self.hand
+        for card in cards:
+            self.hand.remove(card)
+        return list(cards)
+
+    def get_hand(self):
+        return self.hand
+
+    def get_score(self):
+        return self.score
+
+    def set_score(self, score):
+        self.score = score
+        return self
+
+    def get_name(self):
+        return self.name
+
+    def set_name(self, name):
+        self.name = name
+        return self
+
+    def __getitem__(self, key):
+        return self.hand[key]
+
+    def __str__(self):
+        return f"Player {self.name} ({len(self.hand)} card(s)):\n" + "\n".join(
+            f" - {card}" for card in self.hand)
+
+    def __repr__(self):
+        return (f"{self.__class__.__name__}({self.name!r}, hand={self.hand!r},"
+                f" score={self.score!r})")
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self.score == other.score and self.hand == other.hand and
+                self.name == other.name)
+
+    def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        return self.score < other.score
+
+    def __le__(self, other):
+        return self.score <= other.score
+
+    def __gt__(self, other):
+        return self.score > other.score
+
+    def __ge__(self, other):
+        return self.score >= other.score
+
+    def __bool__(self):
+        return bool(self.hand) and self.score >= 0
+
+    def __iter__(self):
+        return iter(self.hand)
+
+    def __len__(self):
+        return len(self.hand)
+
+
+class GenericGame(ABC, Generic[_CardT]):
+    def __init__(self, card_type, deck_type, draw_pile=None, discard_pile=None,
+                 trump=None, hand_size=4, starting_player_index=0,
+                 do_not_shuffle=False, *players):
+        self._card_type = card_type
+        self._deck_type = deck_type
+
+        if trump is not None and trump not in self._card_type.SUITS:
+            raise ValueError(f"Invalid suit for trump: {trump}")
+
+        self.draw_pile = draw_pile if draw_pile is not None \
+            else self._deck_type()
+        if not do_not_shuffle:
+            self.draw_pile.shuffle()
+
+        self.discard_pile = discard_pile or self._deck_type(cards=[])
+
+        self.hand_size = hand_size
+
+        self.players = list(players) if players else []
+
+        self.trump = None
+        if trump is not None:
+            self.set_trump(trump)
+        self.apply_trump()
+
+        start_idx = starting_player_index
+        if start_idx != 0:  # 0 is a valid index
+            if start_idx < 0 or start_idx >= len(self.players):
+                raise ValueError(f"Invalid starting player index: {start_idx} "
+                                 f"> {len(self.players)} {self.players}")
+        self.current_player_index = start_idx
+
+        self.direction = 1  # 1 for clockwise, -1 for counter-clockwise
+
+    @abstractmethod
+    def check_valid_play(self, card1, card2):  # pragma: no cover
+        pass
+
+    @abstractmethod
+    def start_game(self):  # pragma: no cover
+        pass
+
+    @abstractmethod
+    def end_game(self):  # pragma: no cover
+        pass
+
+    def discard_cards(self, *cards):
+        self.discard_pile.add(*cards, to_top=True)
+        return self
+
+    def get_discard_pile(self):
+        return self.discard_pile
+
+    def get_top_card(self):
+        return self.discard_pile.get_top_card()
+
+    def reshuffle_discard_pile(self):
+        if len(self.draw_pile) == 0:
+            self.draw_pile.add(*self.discard_pile.get_cards())
+            self.discard_pile.clear()
+            self.draw_pile.shuffle()
+        return self
+
+    def draw_cards(self, player=None, n=1):
+        if len(self.draw_pile) >= n:
+            if player is None:
+                player = self.get_current_player()
+            drawn = self.draw_pile.draw(n)
+            if not isinstance(drawn, list):
+                drawn = [drawn]
+            player.add_cards(*drawn)
+            return drawn
+        if len(self.draw_pile) == 0:
+            return self.reshuffle_discard_pile().draw_cards(player, n)
+        raise ValueError("Not enough cards in the draw pile.")
+
+    def deal_initial_cards(self, *players):
+        players_to_deal = players or self.players
+        for player in players_to_deal:
+            cards_needed = max(0, self.hand_size - len(player.hand))
+            if cards_needed > 0:
+                player.add_cards(*self.draw_pile.draw(cards_needed))
+        return self
+
+    def add_players(self, *players):
+        self.players.extend(players)
+        return self
+
+    def remove_players(self, *players):
+        for player in players:
+            self.players.remove(player)
+        return self
+
+    def deal(self, num_cards=1, *players):
+        players = players or self.players
+        for player in players:
+            player.add_cards(*self.draw_pile.draw(num_cards))
+        return self
+
+    def play_card(self, card, player=None, *args):
+        top_card = self.discard_pile.get_top_card()
+
+        if top_card is None:
+            return False
+
+        if self.check_valid_play(card, top_card):
+            if not player:
+                player = self.get_current_player()
+
+            self.discard_cards(card)
+            player.play_cards(card)
+
+            card.effect(self, player, *args)
+
+            return True
+        return False
+
+    def shuffle(self):
+        self.draw_pile.shuffle()
+        return self
+
+    def get_trump(self):
+        return self.trump
+
+    def set_trump(self, suit):
+        if suit not in self._card_type.SUITS:
+            raise ValueError(f"Invalid suit for trump: {suit}")
+        self.trump = suit
+        return self
+
+    def apply_trump(self):
+        for deck in ([self.draw_pile.get_cards(), self.discard_pile.get_cards()]
+                     + [player.hand for player in self.players]):
+            for card in deck:
+                card.set_trump(card.get_suit() == self.trump)
+        return self
+
+    def change_trump(self, suit):
+        if suit not in self._card_type.SUITS:
+            raise ValueError(f"Invalid suit for trump: {suit}")
+        self.set_trump(suit)
+        self.apply_trump()
+        return self
+
+    def get_current_player(self):
+        return self.players[self.current_player_index]
+
+    def set_current_player(self, player):
+        if isinstance(player, int):
+            if player < 0 or player >= len(self.players):
+                raise ValueError("Invalid player index")
+            self.current_player_index = player
+        elif isinstance(player, GenericPlayer):
+            self.current_player_index = self.players.index(player)
+        else:
+            raise TypeError(
+                "Invalid player type: must be an integer or a Player object")
+        return self
+
+    def get_players(self):
+        return self.players
+
+    def next_player(self):
+        self.reshuffle_discard_pile()
+
+        new_index = (self.current_player_index + self.direction) % len(
+            self.players)
+        self.set_current_player(new_index)
+        return self
+
+    def reverse_direction(self):
+        self.direction *= -1
+        return self
+
+    def get_draw_pile(self):
+        return self.draw_pile
+
+    def set_draw_pile(self, deck):
+        self.draw_pile = deck
+        return self
+
+    def __str__(self):
+        return f"Game of {len(self.players)} players"
+
+    def __repr__(self):
+        return (f"{self.__class__.__name__}("
+                f"card_type={self._card_type!r}, "
+                f"deck_type={self._deck_type!r}, "
+                f"draw_pile={self.draw_pile!r}, "
+                f"discard_pile={self.discard_pile!r}, "
+                f"trump={self.trump!r}, "
+                f"hand_size={self.hand_size!r}, "
+                f"starting_player_index={self.current_player_index!r}, "
+                f"*{self.players!r}")

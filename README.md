@@ -138,7 +138,7 @@ class CustomGame(GenericGame[CustomCard]):
     def play_round(self):
         # Some custom game logic
         current = self.get_current_player()
-        self.play(current, current.play_card(self.get_current_player().hand[0])[0])
+        self.play(current, current.play_card(current.hand[0])[0])
 
 # ...and use the newly created classes
 game = CustomGame(deck.shuffle(), None, "Red", 3, 0, player1, player2)

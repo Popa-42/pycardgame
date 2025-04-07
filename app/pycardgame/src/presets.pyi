@@ -14,112 +14,226 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Literal, List, Type
+from __future__ import annotations
 
-from .. import GenericCard, GenericDeck, GenericPlayer, GenericGame
+import os
+from typing import Any, Literal, Optional, Sequence, Union
 
-_RanksT = Literal["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
-"Queen", "King", "Ace"]
-_SuitsT = Literal["Diamonds", "Hearts", "Spades", "Clubs"]
+from .base import (
+    CardMeta,
+    DeckMeta,
+    GenericCard,
+    GenericDeck,
+    GenericGame,
+    GenericPlayer,
+)
+
+T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
+                     "Reverse", "Draw Two", "Wild", "Wild Draw Four"]
+T_UnoSuits = Literal["Red", "Green", "Blue", "Yellow", "Wild"]
+T_UnoSuitsWild = Literal["Red", "Green", "Blue", "Yellow"]
 
 
-class PokerCard(GenericCard[_RanksT, _SuitsT]):
+class UnoCard(
+    GenericCard[T_UnoRanks, T_UnoSuits],
+    metaclass=CardMeta,
+    rank_type=T_UnoRanks,
+    suit_type=T_UnoSuits
+):
     """
-    A card for a standard 52-card deck.
+    A class representing a UNO card.
     :param rank: The rank of the card.
-    :param suit: The suit of the card
+    :param suit: The suit of the card.
     """
-    RANKS: List[_RanksT] = ...
-    SUITS: List[_SuitsT] = ...
+    __slots__ = ("wild",)
 
-    def __init__(self, rank: _RanksT, suit: _SuitsT) -> None:
+    def __init__(self, rank: Union[T_UnoRanks, int], suit: Union[T_UnoSuits, int
+    ]) -> None:
         """
-        Initialize the card.
+        Initialise the UNO card with a rank and suit.
         :param rank: The rank of the card.
         :param suit: The suit of the card.
         """
-        pass
+        self.wild: bool = ...
+
+    def is_wild(self) -> bool:
+        """
+        Check if the card is a Wild card.
+        :return: True if the card is a Wild card, False otherwise.
+        """
+
+    def effect(self,
+               game: UnoGame,
+               player: GenericPlayer[UnoCard],
+               *args: Any) -> None:
+        """
+        Apply the effect of the card in the game.
+        :param game: The game instance.
+        :param player: The player who played the card.
+        :param args: Additional arguments for the effect.
+        """
 
 
-class PokerDeck(GenericDeck[PokerCard]):
+class NumberCard(UnoCard):
+    """A class representing a numbered UNO card."""
+
+    def __init__(self, rank: Union[T_UnoRanks, int], suit: Union[T_UnoSuits, int
+    ]) -> None:
+        """
+        Initialise the numbered UNO card with a rank and suit.
+        :param rank: The rank of the card.
+        :param suit: The suit of the card.
+        """
+
+
+class DrawTwoCard(UnoCard):
+    """A class representing a Draw Two UNO card."""
+
+    def __init__(self, suit: Union[T_UnoSuits, int]) -> None:
+        """
+        Initialise the Draw Two UNO card with a suit.
+        :param suit: The suit of the card.
+        """
+
+
+class SkipCard(UnoCard):
+    """A class representing a Skip UNO card."""
+
+    def __init__(self, suit: Union[T_UnoSuits, int]) -> None:
+        """
+        Initialise the Skip UNO card with a suit.
+        :param suit: The suit of the card.
+        """
+
+
+class ReverseCard(UnoCard):
+    """A class representing a Reverse UNO card."""
+
+    def __init__(self, suit: Union[T_UnoSuits, int]) -> None:
+        """
+        Initialise the Reverse UNO card with a suit.
+        :param suit: The suit of the card.
+        """
+
+
+class WildCard(UnoCard):
+    """A class representing a Wild UNO card."""
+
+    def __init__(self) -> None:
+        """Initialise the Wild UNO card."""
+
+
+class WildDrawFourCard(UnoCard):
+    """A class representing a Wild Draw Four UNO card."""
+
+    def __init__(self) -> None:
+        """Initialise the Wild Draw Four UNO card."""
+
+
+class UnoDeck(
+    GenericDeck[UnoCard],
+    metaclass=DeckMeta,
+    card_type=UnoCard
+):
     """
-    A deck of cards for a standard 52-card deck.
-    :param cards: The cards in the deck.
-    :param card_type: The type of card to use.
+    A class representing a UNO deck of cards.
+    :param cards: Optional list of cards to initialise the deck with.
     """
 
-    def __init__(self, cards: List[PokerCard] = None,  # type: ignore
-                 card_type: Type[PokerCard] = PokerCard) -> None:
+    def __init__(self, cards: Optional[Sequence[UnoCard]] = None) -> None:
         """
-        Initialize the deck.
-        :param cards: The cards in the deck.
-        :param card_type: The type of card to use.
+        Initialise the UNO deck with a standard set of cards.
+        :param cards: Optional list of cards to initialise the deck with.
         """
-        pass
 
 
-class PokerPlayer(GenericPlayer[PokerCard]):
-    """
-    A player for a standard game of poker.
-    :param name: The player's name.
-    :param bankroll: The player's bankroll. Default is 1000.
-    """
+class UnoPlayer(GenericPlayer[UnoCard]):
+    """A class representing a UNO player."""
+    __slots__ = ("uno",)
 
-    def __init__(self, name: str, bankroll: float = 1000) -> None:
+    def __init__(self, name: str, hand: Optional[Sequence[UnoCard]] = None) -> \
+            None:
         """
-        Initialize the player.
-        :param name: The player's name.
-        :param bankroll: The player's bankroll. Default is 1000.
+        Initialise the UNO player with a name, hand of cards, and score.
+        :param name: The name of the player.
+        :param hand: The initial hand of cards for the player.
         """
-        self.bankroll: float = ...
+        self.uno: bool = False  # Indicates if the player has called "UNO"
 
-    def bet(self, amount: float) -> PokerPlayer:
+    def call_uno(self) -> bool:
         """
-        Place a bet.
-        :param amount: The amount to bet.
-        :return: The player who placed the bet, with the bet amount deducted
-            from their bankroll.
+        Call "UNO" when the player has one card left.
+        :return: True if the player has called "UNO" correctly, False otherwise.
         """
-        pass
 
-    def win(self, amount: float) -> PokerPlayer:
+    def reset_uno(self) -> UnoPlayer:
         """
-        Win a bet.
-        :param amount: The amount won.
-        :return: The player who won the bet, with the amount added to their
-            bankroll.
+        Resets the "UNO" state to false
+        :return: The player instance
         """
-        pass
 
 
-class PokerGame(GenericGame[PokerCard]):
-    """
-    The base class for a game of poker.
-    :param starting_player_index: The index of the starting player.
-    :param players: The players in the game.
-    """
+class UnoGame(GenericGame[UnoCard]):
+    """A class representing a UNO game."""
 
-    def __init__(self, starting_player_index: int = 0,
-                 *players: PokerPlayer) -> None:
+    def __init__(self,
+                 *players: GenericPlayer[UnoCard],
+                 draw_pile: Optional[GenericDeck[UnoCard]] = None,
+                 discard_pile: Optional[GenericDeck[UnoCard]] = None,
+                 hand_size: int = 7) -> None:
         """
-        Initialize the game.
-        :param starting_player_index: The index of the starting player.
-        :param players: The players in the game.
+        Initialise the UNO game with a deck, discard pile, hand size, and
+        players.
+        :param players: The players participating in the game.
+        :param draw_pile: The draw pile for the game.
+        :param discard_pile: The discard pile for the game.
+        :param hand_size: The number of cards each player starts with.
         """
-        self.trash_pile: List[PokerCard] = ...
-        self.trash_pile_limit: int = ...
-        self.trash_pile_index: int = ...
-        self.pot: float = ...
-        self.current_bet: float = ...
+        self.draw_count: int = 0
+        self.game_ended: bool = False
 
-    def start_round(self) -> None:
-        """Start a new round."""
-        pass
+    def check_valid_play(self, card1: UnoCard,
+                         card2: Optional[UnoCard] = None) -> bool:
+        """
+        Check if a card can be played on top of another card.
+        :param card1: The card being played.
+        :param card2: The card on top of the discard pile.
+        :return: True if the card can be played, False otherwise.
+        """
 
-    def betting_round(self) -> None:
-        """Conduct a betting round."""
-        pass
+    def get_next_player(self) -> UnoPlayer:
+        """
+        Get the next player in the game based on the current direction.
+        :return: The next player.
+        """
 
-    def showdown(self) -> None:
-        """Conduct a showdown."""
-        pass
+    def start_game(self) -> UnoGame:
+        """
+        Start the game by dealing initial cards and setting up the discard pile.
+        :return: The game instance.
+        """
+
+    def draw_instead_of_play(self,
+                             player: Optional[GenericPlayer[UnoCard]] = None
+                             ) -> Sequence[UnoCard]:
+        """
+        Called when a player chooses to draw instead of playing a card.
+        If there's an accumulated draw count from Draw Two cards, handle that.
+        Otherwise, just draw one card and continue play.
+        :param player: The player who is drawing a card.
+        :return: The drawn cards (list) or an empty list if the draw pile is
+            empty.
+        """
+
+    def determine_winner(self) -> Optional[GenericPlayer[UnoCard]]:
+        """
+        Determine the winner of the game based on the players' scores.
+        :return: The winning player or None if no winner is determined.
+        """
+
+    def end_game(self, export: Optional[Union[os.PathLike, str]] = None) -> Optional[
+        UnoPlayer]:
+        """
+        End the game and determine the winner.
+        :param export: Optional file path to export game statistics.
+        """
