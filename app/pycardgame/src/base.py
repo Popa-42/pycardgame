@@ -189,7 +189,7 @@ class GenericDeck(ABC, Generic[_CardT]):
         return self
 
     def shuffle(self, seed=None):
-        if seed:
+        if seed is not None:
             random.seed(seed)
         random.shuffle(self.cards)
         return self
