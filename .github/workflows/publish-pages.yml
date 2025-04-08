@@ -1,5 +1,5 @@
-# Simple workflow for deploying the latest pytest coverage report to GitHub Pages
-name: Deploy pytest coverage report to Pages
+# Simple workflow for deploying the latest documentation to GitHub Pages
+name: Deploy documentation to Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -37,21 +37,26 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install -U pip
           python -m pip install pytest coverage
       - name: Run tests and generate coverage report
         run: |
           # Run tests with coverage
           coverage run -m pytest
           # Generate HTML coverage report
-          coverage html --skip-empty --precision=1
+          coverage html --skip-empty --precision=1 --directory=docs/source/_static/coverage_report
+      - name: Build documentation
+        run: |
+          python -m pip install sphinx furo
+          # Build the documentation using Sphinx
+          sphinx-build -b html docs/source docs/build/html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload the HTML coverage report directory
-          path: './htmlcov'
+          path: './docs/build/html'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
