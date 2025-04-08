@@ -16,7 +16,7 @@
 
 from copy import copy
 
-from ....src.base import GenericCard
+from ....src.base import Card
 from ....src.presets import (
     DrawTwoCard,
     NumberCard,
@@ -33,7 +33,7 @@ def test_uno_deck_init():
     deck = UnoDeck()
 
     assert len(deck.cards) == 108
-    assert all(isinstance(card, GenericCard) for card in deck.cards)
+    assert all(isinstance(card, Card) for card in deck.cards)
     assert all(isinstance(card, UnoCard) for card in deck.cards)
 
     assert all(isinstance(card, NumberCard) for card in deck.cards[0:76])

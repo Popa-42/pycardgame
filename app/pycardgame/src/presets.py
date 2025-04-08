@@ -21,10 +21,10 @@ from typing import List, Literal
 from .. import (
     CardMeta,
     DeckMeta,
-    GenericCard,
-    GenericDeck,
-    GenericGame,
-    GenericPlayer,
+    Card,
+    Deck,
+    Game,
+    Player,
 )
 
 T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
@@ -33,7 +33,7 @@ T_UnoSuits = Literal["Red", "Green", "Blue", "Yellow", "Wild"]
 
 
 class UnoCard(
-    GenericCard[T_UnoRanks, T_UnoSuits],
+    Card[T_UnoRanks, T_UnoSuits],
     metaclass=CardMeta,
     rank_type=T_UnoRanks,
     suit_type=T_UnoSuits
@@ -131,7 +131,7 @@ class WildDrawFourCard(UnoCard, metaclass=CardMeta, rank_type=T_UnoRanks,
 
 
 class UnoDeck(
-    GenericDeck[UnoCard],
+    Deck[UnoCard],
     metaclass=DeckMeta,
     card_type=UnoCard
 ):
@@ -173,7 +173,7 @@ class UnoDeck(
         return f"{self.__class__.__name__}(cards={self.cards!r})"
 
 
-class UnoPlayer(GenericPlayer[UnoCard]):
+class UnoPlayer(Player[UnoCard]):
     __slots__ = ("uno",)
 
     def __init__(self, name, hand=None):
@@ -194,7 +194,7 @@ class UnoPlayer(GenericPlayer[UnoCard]):
                 f"hand={self.hand!r}, uno={self.uno!r})")
 
 
-class UnoGame(GenericGame[UnoCard]):
+class UnoGame(Game[UnoCard]):
     def __init__(self, *players, draw_pile=None, discard_pile=None,
                  hand_size=7):
         super().__init__(UnoCard, UnoDeck, draw_pile, discard_pile, None,

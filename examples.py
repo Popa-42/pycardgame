@@ -19,10 +19,10 @@ from typing import Literal, Optional
 from app.pycardgame import (
     CardMeta,
     DeckMeta,
-    GenericCard,
-    GenericDeck,
-    GenericGame,
-    GenericPlayer,
+    Card,
+    Deck,
+    Game,
+    Player,
     UnoGame,
     UnoPlayer,
 )
@@ -39,7 +39,7 @@ Suit = Literal["Red", "Yellow", "Green", "Blue"]
 
 # Create a custom card class
 class CustomCard(
-    GenericCard[Rank, Suit],
+    Card[Rank, Suit],
     metaclass=CardMeta,
     rank_type=Rank,
     suit_type=Suit
@@ -51,7 +51,7 @@ class CustomCard(
 
 # Create a custom deck class
 class CustomDeck(
-    GenericDeck[CustomCard],
+    Deck[CustomCard],
     metaclass=DeckMeta,
     card_type=CustomCard
 ):
@@ -59,12 +59,12 @@ class CustomDeck(
 
 
 # Create a custom player class
-class CustomPlayer(GenericPlayer[CustomCard]):
+class CustomPlayer(Player[CustomCard]):
     pass
 
 
 # Create a custom game class
-class CustomGame(GenericGame[CustomCard]):
+class CustomGame(Game[CustomCard]):
     def __init__(self, *players, draw_pile=None, discard_pile=None, trump=None,
                  hand_size=4, starting_player_index=0, do_not_shuffle=False):
         super().__init__(CustomCard, CustomDeck, draw_pile, discard_pile, trump,
@@ -189,7 +189,7 @@ def play_uno_game():
 # -----------------------------------------------------------
 
 class SpecialCard(
-    GenericCard[Rank, Suit],
+    Card[Rank, Suit],
     metaclass=CardMeta,
     rank_type=Rank,
     suit_type=Suit
@@ -217,14 +217,14 @@ class SpecialCard(
 
 
 class SpecialDeck(
-    GenericDeck[SpecialCard],
+    Deck[SpecialCard],
     metaclass=DeckMeta,
     card_type=SpecialCard
 ):
     pass
 
 
-class SpecialPlayer(GenericPlayer[SpecialCard]):
+class SpecialPlayer(Player[SpecialCard]):
     def __init__(self, name: str, hand=None):
         super().__init__(name, hand)
         self.score = 0
@@ -234,7 +234,7 @@ class SpecialPlayer(GenericPlayer[SpecialCard]):
         return sum(card.value for card in self.hand)
 
 
-class SpecialGame(GenericGame[SpecialCard]):
+class SpecialGame(Game[SpecialCard]):
     def __init__(self, *players, draw_pile=None, discard_pile=None, trump=None,
                  hand_size=4, starting_player_index=0, do_not_shuffle=False):
         super().__init__(SpecialCard, SpecialDeck, draw_pile, discard_pile,

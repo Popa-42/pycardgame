@@ -18,14 +18,14 @@ from typing import Literal
 
 import pytest
 
-from ...src.base import CardMeta, GenericCard
+from ...src.base import CardMeta, Card
 
 T_Ranks = Literal["1", "2", "3"]
 T_Suits = Literal["Red", "Green", "Blue"]
 
 
 class DummyCard(
-    GenericCard[T_Ranks, T_Suits],
+    Card[T_Ranks, T_Suits],
     metaclass=CardMeta,
     rank_type=T_Ranks,
     suit_type=T_Suits

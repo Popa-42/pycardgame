@@ -16,14 +16,14 @@
 
 from typing import Literal
 
-from ...src.base import GenericCard, GenericPlayer, CardMeta
+from ...src.base import Card, Player, CardMeta
 
 T_Ranks = Literal["1", "2", "3"]
 T_Suits = Literal["Red", "Green", "Blue"]
 
 
 class DummyCard(
-    GenericCard[T_Ranks, T_Suits],
+    Card[T_Ranks, T_Suits],
     metaclass=CardMeta,
     rank_type=T_Ranks,
     suit_type=T_Suits
@@ -32,7 +32,7 @@ class DummyCard(
         pass
 
 
-class DummyPlayer(GenericPlayer[DummyCard]):
+class DummyPlayer(Player[DummyCard]):
     pass
 
 

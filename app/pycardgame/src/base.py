@@ -31,7 +31,7 @@ class CardMeta(ABCMeta):
         return super().__new__(cls, name, bases, class_dict)
 
 
-class GenericCard(ABC, Generic[_RankT, _SuitT]):
+class Card(ABC, Generic[_RankT, _SuitT]):
     __slots__ = ("rank", "suit", "trump")
 
     RANKS: MutableSequence[_RankT] = []
@@ -137,7 +137,7 @@ class GenericCard(ABC, Generic[_RankT, _SuitT]):
         return not self.__lt__(other)
 
 
-_CardT = TypeVar("_CardT", bound=GenericCard)
+_CardT = TypeVar("_CardT", bound=Card)
 
 
 class DeckMeta(ABCMeta):
@@ -146,7 +146,7 @@ class DeckMeta(ABCMeta):
         return super().__new__(cls, name, bases, class_dict)
 
 
-class GenericDeck(ABC, Generic[_CardT]):
+class Deck(ABC, Generic[_CardT]):
     _card_type: Type[_CardT]
     __hash__ = None  # type: ignore  # Mutable type, so hash is not defined
 
@@ -273,7 +273,7 @@ class GenericDeck(ABC, Generic[_CardT]):
         return bool(self.cards)
 
 
-class GenericPlayer(ABC, Generic[_CardT]):
+class Player(ABC, Generic[_CardT]):
     __slots__ = ("name", "hand", "score")
 
     def __init__(self, name, hand=None, score=0):
@@ -357,7 +357,7 @@ class GenericPlayer(ABC, Generic[_CardT]):
         return len(self.hand)
 
 
-class GenericGame(ABC, Generic[_CardT]):
+class Game(ABC, Generic[_CardT]):
     def __init__(self, card_type, deck_type, draw_pile=None, discard_pile=None,
                  trump=None, hand_size=4, starting_player_index=0,
                  do_not_shuffle=False, *players):
@@ -510,7 +510,7 @@ class GenericGame(ABC, Generic[_CardT]):
             if player < 0 or player >= len(self.players):
                 raise ValueError("Invalid player index")
             self.current_player_index = player
-        elif isinstance(player, GenericPlayer):
+        elif isinstance(player, Player):
             self.current_player_index = self.players.index(player)
         else:
             raise TypeError(

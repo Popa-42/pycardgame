@@ -32,10 +32,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from .src.base import (
     CardMeta,
     DeckMeta,
-    GenericCard,
-    GenericDeck,
-    GenericGame,
-    GenericPlayer,
+    Card,
+    Deck,
+    Game,
+    Player,
 )
 
 from .src.presets import (
@@ -52,14 +52,14 @@ from .src.presets import (
 )
 
 __all__ = [
+    "Card",
     "CardMeta",
+    "Deck",
     "DeckMeta",
     "DrawTwoCard",
-    "GenericCard",
-    "GenericDeck",
-    "GenericGame",
-    "GenericPlayer",
+    "Game",
     "NumberCard",
+    "Player",
     "ReverseCard",
     "SkipCard",
     "UnoCard",

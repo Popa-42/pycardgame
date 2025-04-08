@@ -22,10 +22,10 @@ from typing import Any, Literal, Optional, Sequence, Union
 from .base import (
     CardMeta,
     DeckMeta,
-    GenericCard,
-    GenericDeck,
-    GenericGame,
-    GenericPlayer,
+    Card,
+    Deck,
+    Game,
+    Player,
 )
 
 T_UnoRanks = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip",
@@ -35,7 +35,7 @@ T_UnoSuitsWild = Literal["Red", "Green", "Blue", "Yellow"]
 
 
 class UnoCard(
-    GenericCard[T_UnoRanks, T_UnoSuits],
+    Card[T_UnoRanks, T_UnoSuits],
     metaclass=CardMeta,
     rank_type=T_UnoRanks,
     suit_type=T_UnoSuits
@@ -64,7 +64,7 @@ class UnoCard(
 
     def effect(self,
                game: UnoGame,
-               player: GenericPlayer[UnoCard],
+               player: Player[UnoCard],
                *args: Any) -> None:
         """
         Apply the effect of the card in the game.
@@ -131,7 +131,7 @@ class WildDrawFourCard(UnoCard):
 
 
 class UnoDeck(
-    GenericDeck[UnoCard],
+    Deck[UnoCard],
     metaclass=DeckMeta,
     card_type=UnoCard
 ):
@@ -147,7 +147,7 @@ class UnoDeck(
         """
 
 
-class UnoPlayer(GenericPlayer[UnoCard]):
+class UnoPlayer(Player[UnoCard]):
     """A class representing a UNO player."""
     __slots__ = ("uno",)
 
@@ -173,13 +173,13 @@ class UnoPlayer(GenericPlayer[UnoCard]):
         """
 
 
-class UnoGame(GenericGame[UnoCard]):
+class UnoGame(Game[UnoCard]):
     """A class representing a UNO game."""
 
     def __init__(self,
-                 *players: GenericPlayer[UnoCard],
-                 draw_pile: Optional[GenericDeck[UnoCard]] = None,
-                 discard_pile: Optional[GenericDeck[UnoCard]] = None,
+                 *players: Player[UnoCard],
+                 draw_pile: Optional[Deck[UnoCard]] = None,
+                 discard_pile: Optional[Deck[UnoCard]] = None,
                  hand_size: int = 7) -> None:
         """
         Initialise the UNO game with a deck, discard pile, hand size, and
@@ -214,7 +214,7 @@ class UnoGame(GenericGame[UnoCard]):
         """
 
     def draw_instead_of_play(self,
-                             player: Optional[GenericPlayer[UnoCard]] = None
+                             player: Optional[Player[UnoCard]] = None
                              ) -> Sequence[UnoCard]:
         """
         Called when a player chooses to draw instead of playing a card.
@@ -225,7 +225,7 @@ class UnoGame(GenericGame[UnoCard]):
             empty.
         """
 
-    def determine_winner(self) -> Optional[GenericPlayer[UnoCard]]:
+    def determine_winner(self) -> Optional[Player[UnoCard]]:
         """
         Determine the winner of the game based on the players' scores.
         :return: The winning player or None if no winner is determined.
